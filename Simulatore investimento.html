@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Wine Caveau - Simulatore d'investimento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.3/dist/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    :root{ --bg:#0f0f10; --panel:#151518; --muted:#9797a1; --text:#f4f4f6; --brand:#7b0a2e; --gold:#c9a227; --radius:20px; --leftCol:520px }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial;background:#0f0f10;color:var(--text)}
+    .wrap{max-width:1320px;margin:24px auto;padding:0 16px}
+    header{
+      background:#141418;border:1px solid #2a2a31;border-radius:20px;padding:16px;
+      display:grid;grid-template-columns:var(--leftCol) 1fr auto;align-items:center;gap:12px
+    }
+    .brandCenter{grid-column:1 / 3;justify-self:center;display:flex;align-items:center;gap:14px}
+    .logo{background:#151518;width:160px;height:160px;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .logo-img{width:108%;height:130%;object-fit:contain}
+    .title h1{margin:0;font-size:35px}
+    .toolbar{grid-column:3;justify-self:end;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{border:1px solid #2a2a31;border-radius:12px;padding:8px 12px;background:#1a1a1f;color:#f7f7fa;cursor:pointer;font-weight:600}
+    .btn.gold{background:linear-gradient(135deg,var(--gold),#8d7218);color:#111;border-color:#8d7218}
+    .grid{display:grid;grid-template-columns:var(--leftCol) 1fr;gap:18px;margin:18px 0 0}
+    .card{background:#151518;border:1px solid #2a2a31;border-radius:20px}
+    .card .head{padding:14px 16px;border-bottom:1px solid #24242a;display:flex;align-items:center;justify-content:space-between}
+    .card .head h2{margin:0;font-size:16px}
+    .card .body{padding:14px 24px}
+    .row{display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap}
+    .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;flex:0 0 180px;max-width:180px}
+    .field.wide{flex:0 0 240px;max-width:240px}
+    .field label{font-size:12px;color:#c9cad1;margin-bottom:2px;font-weight:700}
+    .field input,.field select{border-radius:12px;border:1px solid #2a2a31;background:#0f0f12;color:#f8f8fb;padding:8px;font-size:13px;width:100%}
+    select{font-size:10px;padding:8px}
+    .inline-label{display:flex;align-items:center;gap:10px}
+    .inline-label label{margin:0;white-space:nowrap}
+    .pct{font-size:11px;opacity:.8;margin-left:4px}
+    .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .kpi{background:#0f0f12;border:1px solid #222228;border-radius:14px;padding:12px}
+    .kpi .t{font-weight:700}
+    .kpi .v{font-weight:800;font-size:20px;margin-top:4px}
+    .chart-box{position:relative;height:360px;width:100%;margin-top:12px}
+    #chart{width:100% !important;height:100% !important}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    thead th{font-size:12px;color:#b8bac3;text-align:left;padding:0 10px}
+    tbody td{padding:10px;background:#0f0f12;border-top:1px solid #222228;border-bottom:1px solid #222228}
+    tbody tr td:first-child{border-left:1px solid #222228;border-top-left-radius:10px;border-bottom-left-radius:10px}
+    tbody tr td:last-child{border-right:1px solid #222228;border-top-right-radius:10px;border-bottom-right-radius:10px}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
+    .modal .panel{background:#141418;border:1px solid #2a2a31;border-radius:16px;max-width:560px;width:100%}
+    .modal .panel .head{padding:12px 14px;border-bottom:1px solid #24242a;display:flex;align-items:center;justify-content:space-between}
+    .modal .panel .body{padding:14px}
+    @media (max-width:1024px){
+      .grid{grid-template-columns:1fr}
+      header{grid-template-columns:1fr auto}
+      .logo{width:120px;height:120px}
+      .field{flex:1 1 180px;max-width:100%}
+      .kpis{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brandCenter">
+        <div class="logo"><img id="brandLogo" class="logo-img" alt="Logo" src="https://shop.thewinecaveau.com/wp-content/uploads/2023/03/Logo-bianco-caveau-copia-2048x2048.png"/></div>
+        <div class="title"><h1 id="appTitle">The Wine Caveau - Simulatore d'investimento</h1></div>
+      </div>
+      <div class="toolbar">
+        <button class="btn gold" id="btnAdmin">Admin</button>
+        <button class="btn gold" id="btnPDF">Esporta PDF</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <div class="head"><h2>Impostazioni</h2>
+          <div>
+            <button class="btn" data-scenario="prudente">Prudente <span class="pct" id="pPrud">(10%)</span></button>
+            <button class="btn" data-scenario="base">Base <span class="pct" id="pBase">(15%)</span></button>
+            <button class="btn" data-scenario="ottimistico">Ottimistico <span class="pct" id="pOtt">(20%)</span></button>
+          </div>
+        </div>
+        <div class="body">
+          <div class="row">
+            <div class="field"><label>Budget iniziale (€)</label><input type="text" id="initial" value="10000"></div>
+            <div class="field"><label>Orizzonte (anni)</label><input type="number" id="years" value="10" min="1" max="50"></div>
+          </div>
+          <div class="row">
+            <div class="field wide"><label>Rendimento annuo di base (%)</label><input type="text" id="rate" value="15"></div>
+          </div>
+
+          <div class="row" id="histRow" style="display:none;align-items:center">
+            <div class="field" style="flex:0 0 240px;max-width:240px">
+              <div class="inline-label">
+                <input type="checkbox" id="useHistorical">
+                <label for="useHistorical">Simula andamento passato</label>
+              </div>
+            </div>
+            <div class="field" id="histYearsField" style="display:none">
+              <label>Anni da simulare</label>
+              <select id="histYears"></select>
+            </div>
+          </div>
+
+          <div class="row" style="align-items:center">
+            <div class="field" style="flex:1">
+              <div class="inline-label">
+                <label>Commissione di gestione</label>
+                <select id="mgmtType" style="max-width:260px">
+                  <option value="percent">Percentuale su quota investita</option>
+                  <option value="fixed">Quota annuale fissa</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label id="lblMgmtValue">Percentuale annua (%)</label><input type="text" id="mgmtValue" value="0"></div>
+          </div>
+          <div class="row" style="align-items:center">
+            <div class="field"><label>Commissione TWC (%)</label><input type="text" id="twcValue" value="50"></div>
+          </div>
+          <div class="row">
+            <button class="btn gold" id="btnRun">Simula</button>
+            <button class="btn" id="btnResetPeriods">Reset</button>
+          </div>
+          <div class="row" style="align-items:center;justify-content:space-between;margin-top:8px">
+            <h3 style="margin:0;font-size:14px">Periodi con rendimento personalizzato</h3>
+            <div><button class="btn" id="btnAddPeriod">+ Aggiungi periodo</button></div>
+          </div>
+          <div id="periodList" style="margin-top:6px" class="help">Nessun periodo personalizzato. Il rendimento userà il valore di base per tutti gli anni.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="head"><h2>Risultati</h2></div>
+        <div class="body">
+          <div class="kpis" id="kpis">
+            <div class="kpi"><div class="t">Capitale investito</div><div class="v" id="kpiPrincipal">—</div></div>
+            <div class="kpi"><div class="t">Guadagno netto</div><div class="v" id="kpiGain">—</div></div>
+            <div class="kpi"><div class="t">Valore finale</div><div class="v" id="kpiFinal">—</div></div>
+            <div class="kpi"><div class="t">Quota Cliente</div><div class="v" id="kpiClient">—</div></div>
+            <div class="kpi"><div class="t">Quota TWC</div><div class="v" id="kpiTWC">—</div></div>
+          </div>
+          <div class="chart-box"><canvas id="chart"></canvas></div>
+          <h3>Tabella riepilogativa</h3>
+          <table>
+            <thead>
+              <tr><th>Anno</th><th>Saldo iniziale</th><th>Commissioni</th><th>Rendimento netto</th><th>Saldo finale</th></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="adminModal">
+    <div class="panel">
+      <div class="head"><strong>Admin</strong><button class="btn" id="closeAdmin">Chiudi</button></div>
+      <div class="body">
+        <div class="field"><label>Logo</label><input type="file" id="logoUpload" accept="image/*"></div>
+        <div class="row">
+          <div class="field"><label>Prudente %</label><input type="number" id="admPrud" value="11" step="0.1"></div>
+          <div class="field"><label>Base %</label><input type="number" id="admBase" value="16" step="0.1"></div>
+          <div class="field"><label>Ottimistico %</label><input type="number" id="admOtt" value="20" step="0.1"></div>
+        </div>
+        <div class="row">
+          <div class="field wide">
+            <label>Opzioni extra</label>
+            <div class="inline-label">
+              <input type="checkbox" id="admEnableHist">
+              <label for="admEnableHist">Abilita “Simula andamento passato”</label>
+            </div>
+          </div>
+        </div>
+        <div class="row"><button class="btn gold" id="admSave">Salva</button><span class="help" id="admMsg"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const el=(id)=>document.getElementById(id);
+    const fmtEUR=new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'});
+    let chart; let lastSim=null; let periods=[];
+    const FULL_SERIES = [
+      {year:2015, pct:  7.9},
+      {year:2016, pct: 38.4},
+      {year:2017, pct: 27.5},
+      {year:2018, pct: 24.2},
+      {year:2019, pct: -0.8},
+      {year:2020, pct:  7.5},
+      {year:2021, pct: 24.2},
+      {year:2022, pct:  1.2},
+      {year:2023, pct:-12.5},
+      {year:2024, pct:-12.1},
+    ];
+
+    function getHistoricalSlice(n){
+      const nClamped = Math.max(1, Math.min(n, FULL_SERIES.length));
+      const slice = FULL_SERIES.slice(FULL_SERIES.length - nClamped);
+      return {
+        years: slice.map(x=>x.year),
+        rates: slice.map(x=> x.pct==null ? null : x.pct/100)
+      };
+    }
+
+    function renderPeriods(){
+      const list = el('periodList');
+      if (periods.length === 0) {
+        list.innerHTML = 'Nessun periodo personalizzato. Il rendimento userà il valore di base per tutti gli anni.';
+        return;
+      }
+      list.innerHTML = '';
+      periods.forEach((p, idx) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.style.marginTop = '8px';
+        row.style.flexWrap = 'nowrap';
+        row.style.gap = '12px';
+
+        row.innerHTML = `
+          <div class="field" style="flex:0 0 110px;max-width:110px">
+            <label>Da anno</label>
+            <input type="number" min="1" value="${p.start}" data-idx="${idx}" data-key="start"/>
+          </div>
+          <div class="field" style="flex:0 0 110px;max-width:110px">
+            <label>A anno</label>
+            <input type="number" min="1" value="${p.end}" data-idx="${idx}" data-key="end"/>
+          </div>
+          <div class="field" style="flex:0 0 110px;max-width:160px">
+            <label>Rendimento annuo (%)</label>
+            <input type="text" value="${p.rate}" data-idx="${idx}" data-key="rate"/>
+          </div>
+          <div class="field" style="flex:0 0 100px;max-width:100px">
+            <label>&nbsp;</label>
+            <button class="btn" onclick="removePeriod(${idx})">Rimuovi</button>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+      list.querySelectorAll('input').forEach(inp=>{
+        inp.addEventListener('input',e=>{
+          const i=+e.target.getAttribute('data-idx');
+          const k=e.target.getAttribute('data-key');
+          let v=e.target.value;
+          if(k==='rate') v=parseFloat(v)||0; else v=Math.max(1,Math.floor(+v||1));
+          periods[i][k]=v;
+        });
+      });
+    }
+
+    function addPeriod(p={start:1,end:3,rate:20}){ periods.push(p); renderPeriods(); }
+    function removePeriod(i){ periods.splice(i,1); renderPeriods(); }
+
+    function compute({P0,Y,baseR,mgmtType,mgmtValue,twcPct,periods,histRates}){
+      const months=Y*12; let b=P0; const rows=[];
+      let yearStart=b, netYear=0;
+
+      for(let m=1;m<=months;m++){
+        const yearIdx=Math.floor((m-1)/12)+1;
+        let annualR=baseR;
+
+        if(histRates && (yearIdx-1) < histRates.length && histRates[yearIdx-1] != null){
+          annualR = histRates[yearIdx-1];
+        }
+
+        for(const p of periods){ if(yearIdx>=p.start && yearIdx<=p.end){ annualR=p.rate/100; } }
+
+        const effMonth=Math.pow(1+annualR,1/12)-1;
+        const before=b; b*=(1+effMonth); const grown=b-before;
+        netYear += grown;
+
+        if(m%12===0){
+          rows.push({yearIndex:yearIdx,start:yearStart,fees:0,net:netYear,end:b});
+          yearStart=b; netYear=0;
+        }
+      }
+
+      const final=b;
+      const grossProfit = Math.max(0, final - P0);
+
+      const annualFee = (mgmtType==='percent')
+        ? (P0 * ((parseFloat(mgmtValue)||0)/100))
+        : (parseFloat(mgmtValue)||0);
+
+      const feesTot = annualFee * Y;
+
+      rows.forEach(r => { r.fees = annualFee; });
+
+      const twcShare    = Math.max(0, grossProfit * (twcPct/100) + feesTot);
+      const clientShare = Math.max(0, grossProfit - twcShare);
+
+      return { rows, final, grossProfit, clientShare, twcShare, feesTot, annualFee };
+    }
+
+    function simulate(){
+      const P0=parseFloat(initial.value)||0;
+      const mt=mgmtType.value; const mv=parseFloat(mgmtValue.value)||0; const twc=parseFloat(twcValue.value)||0;
+      const baseR=(parseFloat(rate.value)||0)/100;
+
+      const useHist = el('useHistorical').checked && el('histRow').style.display !== 'none';
+      let yearLabels=[], histRates=null, Y;
+
+      if(useHist){
+        const histN = parseInt(el('histYears')?.value||'1',10);
+        const {years, rates} = getHistoricalSlice(histN);
+        yearLabels = years.map(String);
+        histRates = rates;
+        Y = years.length;
+        el('years').value = String(Y);
+        el('years').setAttribute('disabled','disabled');
+      }else{
+        el('years').removeAttribute('disabled');
+        Y = Math.min(50,Math.max(1,parseInt(el('years').value)||1));
+        yearLabels = Array.from({length:Y},(_,i)=>'Anno '+(i+1));
+      }
+
+      const sim=compute({P0,Y,baseR,mgmtType:mt,mgmtValue:mv,twcPct:twc,periods,histRates});
+      lastSim=sim;
+
+      el('kpiPrincipal').textContent=fmtEUR.format(P0);
+      el('kpiFinal').textContent=fmtEUR.format(sim.final);
+      el('kpiGain').textContent=fmtEUR.format(sim.grossProfit);
+      el('kpiClient').textContent=fmtEUR.format(sim.clientShare);
+      el('kpiTWC').textContent=fmtEUR.format(sim.twcShare);
+
+      const principalCum=sim.rows.map(()=>P0);
+      const interestCum=sim.rows.map(r=>r.end-P0);
+
+      if(chart)chart.destroy();
+      chart=new Chart(document.getElementById('chart'),{
+        type:'bar',
+        data:{labels:yearLabels,datasets:[
+          {label:'Capitale investito',data:principalCum,backgroundColor:'rgba(123,10,46,0.7)',stack:'tot'},
+          {label:'Rendimento',data:interestCum,backgroundColor:'rgba(201,162,39,0.7)',stack:'tot'}
+        ]},
+        options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>fmtEUR.format(v)}}}}
+      });
+
+      const tb=el('tableBody');tb.innerHTML='';
+      sim.rows.forEach((r,i)=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${yearLabels[i]}</td><td>${fmtEUR.format(r.start)}</td><td>${fmtEUR.format(-r.fees)}</td><td>${fmtEUR.format(r.net)}</td><td>${fmtEUR.format(r.end)}</td>`;
+        tb.appendChild(tr);
+      });
+    }
+
+    document.getElementById('btnRun').onclick=simulate;
+    document.getElementById('mgmtType').addEventListener('change',()=>{ el('lblMgmtValue').textContent=(mgmtType.value==='percent')?'Percentuale annua (%)':'Quota annua (€)'; });
+
+    const statePresets={ prudente:11, base:16, ottimistico:20 };
+    document.querySelector('[data-scenario="prudente"]').onclick=()=>{ rate.value=statePresets.prudente; simulate(); };
+    document.querySelector('[data-scenario="base"]').onclick=()=>{ rate.value=statePresets.base; simulate(); };
+    document.querySelector('[data-scenario="ottimistico"]').onclick=()=>{ rate.value=statePresets.ottimistico; simulate(); };
+
+    const adminModal=el('adminModal');
+    el('btnAdmin').onclick=()=>{const pass=prompt('Password:');if(pass==='TWC€€'){
+      const enabled = localStorage.getItem('twc_hist_enabled')==='1';
+      el('admEnableHist').checked = enabled;
+      adminModal.style.display='flex';
+    }};
+    el('closeAdmin').onclick=()=>adminModal.style.display='none';
+    el('admSave').onclick=()=>{
+      const prud=+el('admPrud').value||0, base=+el('admBase').value||0, ott=+el('admOtt').value||0;
+      statePresets.prudente=prud; statePresets.base=base; statePresets.ottimistico=ott;
+      el('pPrud').textContent=`(${prud}%)`; el('pBase').textContent=`(${base}%)`; el('pOtt').textContent=`(${ott}%)`;
+      rate.value=base;
+
+      const enableHist = el('admEnableHist').checked ? '1' : '0';
+      localStorage.setItem('twc_hist_enabled', enableHist);
+      applyHistVisibility();
+
+      adminModal.style.display='none';
+      simulate();
+    };
+
+    el('logoUpload').addEventListener('change',e=>{
+      const f=e.target.files[0];if(!f)return;
+      const r=new FileReader();
+      r.onload=()=>{localStorage.setItem('twc_logo',r.result);el('brandLogo').src=r.result;};
+      r.readAsDataURL(f);
+    });
+    const savedLogo=localStorage.getItem('twc_logo');if(savedLogo)el('brandLogo').src=savedLogo;
+
+    document.getElementById('btnAddPeriod').onclick=()=>{ const next=periods.length? periods[periods.length-1].end+1 : 1; addPeriod({start:next,end:next+1,rate:20}); };
+    document.getElementById('btnResetPeriods').onclick=()=>{ periods=[]; renderPeriods(); };
+
+    (function populateHistYears(){
+      const sel = el('histYears'); const max = FULL_SERIES.length;
+      for(let i=1;i<=max;i++){ const opt=document.createElement('option'); opt.value=i; opt.textContent=i; sel.appendChild(opt); }
+      sel.value = Math.min(5,max).toString();
+    })();
+    el('useHistorical').addEventListener('change', e=>{
+      const on = e.target.checked;
+      el('histYearsField').style.display = on ? '' : 'none';
+      if(on){
+        const histN = parseInt(el('histYears').value,10);
+        el('years').value = String(histN);
+        el('years').setAttribute('disabled','disabled');
+      }else{
+        el('years').removeAttribute('disabled');
+      }
+    });
+    el('histYears').addEventListener('change', ()=>{
+      if(el('useHistorical').checked){
+        el('years').value = el('histYears').value;
+        simulate();
+      }
+    });
+
+    function applyHistVisibility(){
+      const enabled = localStorage.getItem('twc_hist_enabled')==='1';
+      el('histRow').style.display = enabled ? '' : 'none';
+      if(!enabled){
+        el('useHistorical').checked = false;
+        el('histYearsField').style.display = 'none';
+        el('years').removeAttribute('disabled');
+      }
+    }
+
+    async function toDataURL(src){ if(!src) return null; if(src.startsWith('data:')) return src; try{ const res=await fetch(src,{mode:'cors'}); const blob=await res.blob(); return await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(blob); }); }catch(e){ return null; } }
+    document.getElementById('btnPDF').onclick = async function(){
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p','pt','a4');
+
+      const minMargin = 24;
+      const topY = 20;
+      const pageW = pdf.internal.pageSize.getWidth();
+      const contentW = pageW - minMargin*2;
+      const leftX = (pageW - contentW)/2;
+
+      const logoW=90, logoH=90, gap=22;
+      const logoY=topY;
+      const title = "The Wine Caveau - Simulatore d'investimento";
+      pdf.setFontSize(20);
+      const titleWidth = pdf.getTextWidth(title);
+      const groupW = logoW + gap + titleWidth;
+      const groupX = (pageW - groupW)/2;
+      const logoX = groupX;
+      const titleX = groupX + logoW + gap;
+      const titleY = logoY + (logoH/2) + 7;
+
+   
+      const logoSrc = el('brandLogo')?.src || '';
+
+      async function getLogoDataURL(src){
+        if (!src) return null;
+        if (/^data:/i.test(src)) return src; 
+
+        const toDataURL = async (res) => {
+          const blob = await res.blob();
+          return await new Promise((ok, err) => {
+            const fr = new FileReader();
+            fr.onload = () => ok(fr.result);
+            fr.onerror = err;
+            fr.readAsDataURL(blob);
+          });
+        };
+
+        
+        try {
+          const r = await fetch(src, { mode: 'cors' });
+          if (r.ok) return await toDataURL(r);
+        } catch {}
+
+       
+        try {
+          const prox = 'https://images.weserv.nl/?url=' + encodeURIComponent(src.replace(/^https?:\/\//,''));
+          const r2 = await fetch(prox, { mode: 'cors' });
+          if (r2.ok) return await toDataURL(r2);
+        } catch {}
+
+        return null;
+      }
+
+      let logoData = localStorage.getItem('twc_logo') || await getLogoDataURL(logoSrc);
+
+
+      if (logoData) {
+        pdf.setFillColor(20,20,24);
+        pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10, 'F'); 
+        try {
+          const fmt = /^data:image\/jpe?g/i.test(logoData) ? 'JPEG' : 'PNG';
+          pdf.addImage(logoData, fmt, logoX, logoY, logoW, logoH);
+        } catch {}
+        pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10); 
+      } else {
+        pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10); 
+      }
+
+      pdf.text(title, titleX, titleY);
+
+      const colGap = 20;
+      const leftColW = 260;
+      const rightColW = contentW - leftColW - colGap;
+      const twoColX = leftX;
+      const rightColX = twoColX + leftColW + colGap;
+
+      const mgmtTypeText = (el('mgmtType')?.value==='percent')? 'Percentuale su quota investita' : 'Quota annuale fissa';
+
+      const useHist = el('useHistorical').checked && el('histRow').style.display !== 'none';
+      let histN=0, yearSpan='—';
+      if(useHist){
+        histN = parseInt(el('histYears').value||'0',10);
+        const {years} = getHistoricalSlice(histN);
+        if(years.length){ yearSpan = `${years[0]}–${years[years.length-1]}`; }
+      }
+
+      const paramsRows = [
+        ['Budget iniziale', `${el('initial')?.value || ''} €`],
+        ['Orizzonte', `${el('years')?.value || ''} anni`],
+        ['Rendimento base', `${el('rate')?.value || ''}%`],
+        ['Comm. gestione', `${mgmtTypeText} — ${el('mgmtValue')?.value || ''}${el('mgmtType')?.value==='percent'?'%':' €'}`],
+        ['Commissione TWC', `${el('twcValue')?.value || ''}%`],
+      ];
+      if(useHist){ paramsRows.push(['Andamento passato', `${histN} anni (${yearSpan})`]); }
+
+      const kpiRows = [
+        ['Capitale investito', el('kpiPrincipal')?.innerText || ''],
+        ['Guadagno netto', el('kpiGain')?.innerText || ''],
+        ['Valore finale', el('kpiFinal')?.innerText || ''],
+        ['Quota Cliente', el('kpiClient')?.innerText || ''],
+        ['Quota TWC', el('kpiTWC')?.innerText || '']
+      ];
+
+      pdf.setFontSize(13);
+      pdf.text('Parametri selezionati', twoColX, logoY + logoH + 18);
+      pdf.text('Indicatori', rightColX, logoY + logoH + 18);
+
+      pdf.autoTable({
+        startY: logoY + logoH + 26,
+        margin: { left: twoColX },
+        tableWidth: leftColW,
+        head: [['Parametro','Valore']],
+        body: paramsRows,
+        theme: 'grid',
+        styles: { fontSize: 10, cellPadding: 6 },
+        headStyles: { fillColor:[30,30,36], textColor:255, halign:'center' },
+        columnStyles: { 0:{ cellWidth: 120 }, 1:{ cellWidth: 140 } }
+      });
+      const paramsBottom = pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (logoY + logoH + 26);
+
+      pdf.autoTable({
+        startY: logoY + logoH + 26,
+        margin: { left: rightColX },
+        tableWidth: rightColW,
+        head: [['Indicatore','Valore']],
+        body: kpiRows,
+        theme: 'grid',
+        styles: { fontSize: 10, cellPadding: 6 },
+        headStyles: { fillColor:[30,30,36], textColor:255, halign:'center' },
+        columnStyles: { 0:{ cellWidth: Math.min(180,rightColW/2) }, 1:{ cellWidth: Math.max(120,rightColW/2), halign: 'right' } }
+      });
+      const kpiBottom = pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (logoY + logoH + 26);
+
+      let y = Math.max(paramsBottom, kpiBottom) + 12;
+
+      if (Array.isArray(periods) && periods.length > 0){
+        const periodsRows = periods.map(p => [String(p.start), String(p.end), `${p.rate}%`]);
+        pdf.setFontSize(13);
+        pdf.text('Periodi con rendimento personalizzato', leftX, y);
+        pdf.autoTable({
+          startY: y + 8,
+          margin: { left: leftX },
+          tableWidth: contentW,
+          head: [['Da anno','A anno','Rendimento annuo']],
+          body: periodsRows,
+          theme: 'grid',
+          styles: { fontSize: 10, cellPadding: 6 },
+          headStyles: { fillColor:[30,30,36], textColor:255, halign:'center' },
+          columnStyles: { 0:{ cellWidth: 100, halign:'center' }, 1:{ cellWidth: 100, halign:'center' }, 2:{ cellWidth: contentW-200, halign:'right' } }
+        });
+        y = pdf.lastAutoTable ? pdf.lastAutoTable.finalY + 12 : y + 40;
+      }
+
+      const chartEl = document.getElementById('chart');
+      if(chartEl){
+        try{ const chartImg = chartEl.toDataURL('image/png',1.0); pdf.addImage(chartImg,'PNG', leftX, y, contentW, 220); y+=232; }catch{}
+      }
+
+      const rows = Array.from(document.querySelectorAll('#tableBody tr')).map(tr=>Array.from(tr.children).map(td=>td.textContent));
+      const head = [['Anno','Saldo iniziale','Commissioni','Rendimento netto','Saldo finale']];
+      pdf.autoTable({
+        head, body: rows, startY: y,
+        margin: { left: leftX, bottom: 20 },
+        tableWidth: contentW,
+        theme:'grid',
+        styles:{ fontSize:10, cellPadding:6 },
+        headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' },
+        alternateRowStyles:{ fillColor:[20,20,24], textColor:255 },
+        columnStyles:{ 0:{ halign:'center', cellWidth:70 }, 1:{ halign:'right' }, 2:{ halign:'right' }, 3:{ halign:'right' }, 4:{ halign:'right' } }
+      });
+
+      pdf.save('simulazione.pdf');
+    };
+
+    renderPeriods();
+    (function(){
+      const saved=localStorage.getItem('twc_logo'); if(saved) el('brandLogo').src=saved;
+      applyHistVisibility();
+      simulate();
+    })();
+  </script>
+</body>
+</html>
