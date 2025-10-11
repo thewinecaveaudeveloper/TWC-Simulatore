@@ -4,32 +4,42 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>The Wine Caveau - Simulatore d'investimento</title>
+
+  <!-- Fonts & libs -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.3/dist/jspdf.plugin.autotable.min.js"></script>
+
   <style>
-    :root{ --bg:#0f0f10; --panel:#151518; --muted:#9797a1; --text:#f4f4f6; --brand:#7b0a2e; --gold:#c9a227; --radius:20px; --leftCol:520px }
+    :root{ --bg:#0f0f10; --panel:#151518; --muted:#9797a1; --text:#f4f4f6; --brand:#7b0a2e; --gold:#c9a227; --radius:20px; --leftCol:420px }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial;background:#0f0f10;color:var(--text)}
     .wrap{max-width:1320px;margin:24px auto;padding:0 16px}
+
+    /* Header */
     header{
-      background:#141418;border:1px solid #2a2a31;border-radius:20px;padding:16px;
-      display:grid;grid-template-columns:var(--leftCol) 1fr auto;align-items:center;gap:12px
+      background:#141418;border:1px solid #2a2a31;border-radius:20px;
+      padding:12px 16px 16px 12px;
+      display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px
     }
-    .brandCenter{grid-column:1 / 3;justify-self:center;display:flex;align-items:center;gap:14px}
-    .logo{background:#151518;width:160px;height:160px;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-    .logo-img{width:108%;height:130%;object-fit:contain}
-    .title h1{margin:0;font-size:35px}
+    .brandCenter{grid-column:1;justify-self:start;display:flex;align-items:center;gap:12px;margin-left:0}
+    .logo{background:#151518;width:150px;height:150px;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .logo-img{display:block;width:108%;height:130%;object-fit:contain}
+    .title h1{margin:0;font-size:34px}
     .toolbar{grid-column:3;justify-self:end;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .btn{border:1px solid #2a2a31;border-radius:12px;padding:8px 12px;background:#1a1a1f;color:#f7f7fa;cursor:pointer;font-weight:600}
     .btn.gold{background:linear-gradient(135deg,var(--gold),#8d7218);color:#111;border-color:#8d7218}
+
+    /* Layout principale */
     .grid{display:grid;grid-template-columns:var(--leftCol) 1fr;gap:18px;margin:18px 0 0}
     .card{background:#151518;border:1px solid #2a2a31;border-radius:20px}
     .card .head{padding:14px 16px;border-bottom:1px solid #24242a;display:flex;align-items:center;justify-content:space-between}
     .card .head h2{margin:0;font-size:16px}
+    /* Evita accavallamenti bottoni scenario */
+    .card .head > div{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .card .body{padding:14px 24px}
     .row{display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap}
     .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;flex:0 0 180px;max-width:180px}
@@ -40,10 +50,12 @@
     .inline-label{display:flex;align-items:center;gap:10px}
     .inline-label label{margin:0;white-space:nowrap}
     .pct{font-size:11px;opacity:.8;margin-left:4px}
+
+    /* KPI + chart + tabella */
     .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-    .kpi{background:#0f0f12;border:1px solid #222228;border-radius:14px;padding:12px}
-    .kpi .t{font-weight:700}
-    .kpi .v{font-weight:800;font-size:20px;margin-top:4px}
+    .kpi{background:#0f0f12;border:1px solid #222228;border-radius:14px;padding:12px;display:grid;grid-template-rows:auto 1fr;align-items:start;min-height:84px;text-align:center}
+    .kpi .t{font-size:12px;line-height:1.15;margin:0;min-height:2.4em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:center}
+    .kpi .v{align-self:end;font-weight:800;font-size:20px;margin-top:4px;white-space:nowrap}
     .chart-box{position:relative;height:360px;width:100%;margin-top:12px}
     #chart{width:100% !important;height:100% !important}
     table{width:100%;border-collapse:separate;border-spacing:0 8px}
@@ -51,31 +63,19 @@
     tbody td{padding:10px;background:#0f0f12;border-top:1px solid #222228;border-bottom:1px solid #222228}
     tbody tr td:first-child{border-left:1px solid #222228;border-top-left-radius:10px;border-bottom-left-radius:10px}
     tbody tr td:last-child{border-right:1px solid #222228;border-top-right-radius:10px;border-bottom-right-radius:10px}
+
+    /* Modal Admin */
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
     .modal .panel{background:#141418;border:1px solid #2a2a31;border-radius:16px;max-width:560px;width:100%}
     .modal .panel .head{padding:12px 14px;border-bottom:1px solid #24242a;display:flex;align-items:center;justify-content:space-between}
     .modal .panel .body{padding:14px}
-    @media (max-width:1024px){
-      .grid{grid-template-columns:1fr}
-      header{grid-template-columns:1fr auto}
-      .logo{width:120px;height:120px}
-      .field{flex:1 1 180px;max-width:100%}
-      .kpis{grid-template-columns:1fr 1fr}
-    }
 
-    /* ==== Dual Layout base ==== */
-    html{ --leftCol: 520px; }
-    html.desktop { --leftCol: 600px; }
+    /* Desktop/Mobile switches */
+    html{ --leftCol: 420px; }
+    html.desktop{ --leftCol: 520px; }
     html.desktop .grid{ grid-template-columns: var(--leftCol) 1fr !important; }
     html.desktop .toolbar{ justify-self: end; }
     html.desktop .kpis{ grid-template-columns: repeat(5, minmax(0,1fr)); }
-
-    /* Header centrato per entrambe */
-    header{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; }
-    .brandCenter{ grid-column:2; justify-self:center; text-align:center; }
-    .toolbar{ grid-column:3; justify-self:end; }
-
-    /* Mobile */
     html.mobile{ --leftCol:100%; }
     html.mobile .wrap{ padding:0 10px; }
     html.mobile header{ grid-template-columns:1fr; gap:8px; }
@@ -90,24 +90,20 @@
     html.mobile .chart-box{ height:240px; }
     html.mobile table{ display:block; overflow-x:auto; white-space:nowrap; }
 
-    /* ---- KPI tidy ---- */
-    html.desktop .kpis{ grid-template-columns: repeat(5, minmax(130px,1fr)); gap:6px; }
-    .kpi{ display:grid; grid-template-rows:auto 1fr; align-items:start; padding:12px 14px; min-height:84px; text-align:center; }
-    .kpi .t{ font-size:12px; line-height:1.15; margin:0; min-height:2.4em; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-align:center; }
-    .kpi .v{ align-self:end; font-size:18px; line-height:1.1; white-space:nowrap; }
-
-    /* ---- Centraggio e “respiro” del frame Risultati ---- */
-    .grid > .card:last-child { overflow:visible; } /* evitiamo tagli */
+    /* “Respiro” del frame Risultati */
+    .grid > .card:last-child{ overflow:visible; }
     .grid > .card:last-child .body{ padding-left:14px; padding-right:26px; }
-    #kpis.kpis{ margin-left:-10px; margin-right:0; gap:6px; } /* shift a sinistra e gap leggermente ridotto */
-
+    #kpis.kpis{ margin-left:-10px; margin-right:0; gap:6px; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div class="brandCenter">
-        <div class="logo"><img id="brandLogo" class="logo-img" alt="Logo" src="https://shop.thewinecaveau.com/wp-content/uploads/2023/03/Logo-bianco-caveau-copia-2048x2048.png"/></div>
+        <div class="logo">
+          <img id="brandLogo" class="logo-img" alt="Logo" referrerpolicy="no-referrer" loading="eager"
+               src="https://shop.thewinecaveau.com/wp-content/uploads/2023/03/Logo-bianco-caveau-copia-2048x2048.png">
+        </div>
         <div class="title"><h1 id="appTitle">The Wine Caveau - Simulatore d'investimento</h1></div>
       </div>
       <div class="toolbar">
@@ -117,8 +113,10 @@
     </header>
 
     <div class="grid">
+      <!-- IMPOSTAZIONI -->
       <div class="card">
-        <div class="head"><h2>Impostazioni</h2>
+        <div class="head">
+          <h2>Impostazioni</h2>
           <div>
             <button class="btn" data-scenario="prudente">Prudente <span class="pct" id="pPrud">(10%)</span></button>
             <button class="btn" data-scenario="base">Base <span class="pct" id="pBase">(15%)</span></button>
@@ -159,13 +157,16 @@
             </div>
             <div class="field"><label id="lblMgmtValue">Percentuale annua (%)</label><input type="text" id="mgmtValue" value="0"></div>
           </div>
+
           <div class="row" style="align-items:center">
             <div class="field"><label>Commissione TWC (%)</label><input type="text" id="twcValue" value="50"></div>
           </div>
+
           <div class="row">
             <button class="btn gold" id="btnRun">Simula</button>
             <button class="btn" id="btnReset">Reset</button>
           </div>
+
           <div class="row" style="align-items:center;justify-content:space-between;margin-top:8px">
             <h3 style="margin:0;font-size:14px">Periodi con rendimento personalizzato</h3>
             <div><button class="btn" id="btnAddPeriod">+ Aggiungi periodo</button></div>
@@ -174,6 +175,7 @@
         </div>
       </div>
 
+      <!-- RISULTATI -->
       <div class="card">
         <div class="head"><h2>Risultati</h2></div>
         <div class="body">
@@ -197,6 +199,7 @@
     </div>
   </div>
 
+  <!-- MODAL ADMIN -->
   <div class="modal" id="adminModal">
     <div class="panel">
       <div class="head"><strong>Admin</strong><button class="btn" id="closeAdmin">Chiudi</button></div>
@@ -221,450 +224,559 @@
     </div>
   </div>
 
+  <!-- APP SCRIPT -->
   <script>
-    const el=(id)=>document.getElementById(id);
-    const fmtEUR=new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'});
-    let chart; let lastSim=null; let periods=[];
-    const FULL_SERIES = [
-      {year:2015, pct:  7.9},
-      {year:2016, pct: 38.4},
-      {year:2017, pct: 27.5},
-      {year:2018, pct: 24.2},
-      {year:2019, pct: -0.8},
-      {year:2020, pct:  7.5},
-      {year:2021, pct: 24.2},
-      {year:2022, pct:  1.2},
-      {year:2023, pct:-12.5},
-      {year:2024, pct:-12.1},
-    ];
+    function $(id){ return document.getElementById(id); }
+    var fmtEUR = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'});
+    var chart, periods = [], lastSim = null;
 
+    var FULL_SERIES=[{year:2015,pct:7.9},{year:2016,pct:38.4},{year:2017,pct:27.5},{year:2018,pct:24.2},{year:2019,pct:-0.8},{year:2020,pct:7.5},{year:2021,pct:24.2},{year:2022,pct:1.2},{year:2023,pct:-12.5},{year:2024,pct:-12.1}];
     function getHistoricalSlice(n){
-      const nClamped = Math.max(1, Math.min(n, FULL_SERIES.length));
-      const slice = FULL_SERIES.slice(FULL_SERIES.length - nClamped);
-      return {
-        years: slice.map(x=>x.year),
-        rates: slice.map(x=> x.pct==null ? null : x.pct/100)
-      };
+      var nC=Math.max(1,Math.min(n,FULL_SERIES.length));
+      var s=FULL_SERIES.slice(FULL_SERIES.length-nC);
+      return { years:s.map(function(x){return x.year;}), rates:s.map(function(x){return x.pct==null?null:x.pct/100;}) };
     }
 
-    function renderPeriods(){
-      const list = el('periodList');
-      if (periods.length === 0) {
-        list.innerHTML = 'Nessun periodo personalizzato. Il rendimento userà il valore di base per tutti gli anni.';
-        return;
-      }
-      list.innerHTML = '';
-      periods.forEach((p, idx) => {
-        const row = document.createElement('div');
-        row.className = 'row';
-        row.style.marginTop = '8px';
-        row.style.flexWrap = 'nowrap';
-        row.style.gap = '12px';
-        row.innerHTML = `
-          <div class="field" style="flex:0 0 110px;max-width:110px">
-            <label>Da anno</label>
-            <input type="number" min="1" value="${p.start}" data-idx="${idx}" data-key="start"/>
-          </div>
-          <div class="field" style="flex:0 0 110px;max-width:110px">
-            <label>A anno</label>
-            <input type="number" min="1" value="${p.end}" data-idx="${idx}" data-key="end"/>
-          </div>
-          <div class="field" style="flex:0 0 110px;max-width:160px">
-            <label>Rendimento annuo (%)</label>
-            <input type="text" value="${p.rate}" data-idx="${idx}" data-key="rate"/>
-          </div>
-          <div class="field" style="flex:0 0 100px;max-width:100px">
-            <label>&nbsp;</label>
-            <button class="btn" onclick="removePeriod(${idx})">Rimuovi</button>
-          </div>
-        `;
-        list.appendChild(row);
+    /* ========== LOGO: copia on-demand dal dominio remoto (con fallback proxy) ========== */
+    var FALLBACK_SVG = encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='1024' height='1024' viewBox='0 0 1024 1024'><rect width='100%' height='100%' rx='120' ry='120' fill='#151518'/><rect x='40' y='40' width='944' height='944' rx='100' ry='100' fill='none' stroke='#2a2a31' stroke-width='20'/><text x='50%' y='55%' text-anchor='middle' font-family='Inter,Arial,sans-serif' font-size='300' font-weight='800' fill='#ffffff'>TWC</text></svg>");
+    var FALLBACK_LOGO_DATA = "data:image/svg+xml;utf8," + FALLBACK_SVG;
+    var REMOTE_LOGO = "https://shop.thewinecaveau.com/wp-content/uploads/2023/03/Logo-bianco-caveau-copia-2048x2048.png";
+
+    function setHeaderLogo(src){
+      var img=$('brandLogo');
+      img.onerror=function(){ img.src=FALLBACK_LOGO_DATA; };
+      img.src=src||FALLBACK_LOGO_DATA;
+    }
+
+    function toDataURL(src){
+      return new Promise(function(resolve){
+        if(!src){ resolve(null); return; }
+        if(String(src).indexOf('data:')===0){ resolve(src); return; }
+        fetch(src,{mode:'cors'}).then(function(res){
+          if(!res.ok){ resolve(null); return; }
+          return res.blob();
+        }).then(function(blob){
+          if(!blob){ resolve(null); return; }
+          var fr=new FileReader();
+          fr.onload=function(){ resolve(fr.result); };
+          fr.readAsDataURL(blob);
+        }).catch(function(){ resolve(null); });
       });
-      list.querySelectorAll('input').forEach(inp=>{
-        inp.addEventListener('input',e=>{
-          const i=+e.target.getAttribute('data-idx');
-          const k=e.target.getAttribute('data-key');
-          let v=e.target.value;
-          if(k==='rate') v=parseFloat(v)||0; else v=Math.max(1,Math.floor(+v||1));
-          periods[i][k]=v;
+    }
+
+    function rasterizeImageToPNG(src){
+      return new Promise(function(resolve){
+        var i=new Image();
+        i.crossOrigin='anonymous';
+        i.referrerPolicy='no-referrer';
+        i.onload=function(){
+          try{
+            var c=document.createElement('canvas');
+            c.width=i.naturalWidth||512; c.height=i.naturalHeight||512;
+            c.getContext('2d').drawImage(i,0,0,c.width,c.height);
+            resolve(c.toDataURL('image/png'));
+          }catch(e){ resolve(null); }
+        };
+        i.onerror=function(){ resolve(null); };
+        i.src=src;
+      });
+    }
+
+    // Prova diretto, poi due proxy pubblici read-only per sbloccare CORS
+    function fetchRemoteLogoData(url){
+      return new Promise(function(resolve){
+        // 1) tentativo diretto (se il server consente CORS funziona subito)
+        toDataURL(url).then(function(d){
+          if(d){ resolve(d); return; }
+          // 2) proxy images.weserv.nl (aggiunge CORS)
+          var viaWeserv = "https://images.weserv.nl/?url=" + encodeURIComponent(url.replace(/^https?:\/\//,''));
+          toDataURL(viaWeserv).then(function(d2){
+            if(d2){ resolve(d2); return; }
+            // 3) proxy isomorphic-git
+            var viaIso = "https://cors.isomorphic-git.org/" + url;
+            toDataURL(viaIso).then(function(d3){
+              if(d3){ resolve(d3); return; }
+              // 4) ultimo tentativo: rasterizza via <img> su uno dei proxy (PNG)
+              rasterizeImageToPNG(viaWeserv).then(function(png){
+                resolve(png || FALLBACK_LOGO_DATA);
+              });
+            });
+          });
         });
       });
     }
 
-    function addPeriod(p={start:1,end:3,rate:20}){ periods.push(p); renderPeriods(); }
+    /* Periodi personalizzati */
+    function renderPeriods(){
+      var list=$('periodList');
+      if(periods.length===0){
+        list.innerHTML='Nessun periodo personalizzato. Il rendimento userà il valore di base per tutti gli anni.';
+        return;
+      }
+      list.innerHTML='';
+      periods.forEach(function(p,idx){
+        var row=document.createElement('div');
+        row.className='row';
+        row.style.marginTop='8px';
+        row.style.flexWrap='nowrap';
+        row.style.gap='12px';
+        row.innerHTML =
+          '<div class="field" style="flex:0 0 110px;max-width:110px">'+
+            '<label>Da anno</label>'+
+            '<input type="number" min="1" value="'+p.start+'" data-idx="'+idx+'" data-key="start"/>'+
+          '</div>'+
+          '<div class="field" style="flex:0 0 110px;max-width:110px">'+
+            '<label>A anno</label>'+
+            '<input type="number" min="1" value="'+p.end+'" data-idx="'+idx+'" data-key="end"/>'+
+          '</div>'+
+          '<div class="field" style="flex:0 0 110px;max-width:160px">'+
+            '<label>Rendimento annuo (%)</label>'+
+            '<input type="text" value="'+p.rate+'" data-idx="'+idx+'" data-key="rate"/>'+
+          '</div>'+
+          '<div class="field" style="flex:0 0 100px;max-width:100px">'+
+            '<label>&nbsp;</label>'+
+            '<button class="btn" onclick="removePeriod('+idx+')">Rimuovi</button>'+
+          '</div>';
+        list.appendChild(row);
+      });
+      Array.prototype.slice.call(list.querySelectorAll('input')).forEach(function(inp){
+        inp.addEventListener('input',function(e){
+          var i=+e.target.getAttribute('data-idx');
+          var k=e.target.getAttribute('data-key');
+          var v=e.target.value;
+          if(k==='rate'){ v=parseFloat(v)||0; } else { v=Math.max(1,Math.floor(+v||1)); }
+          periods[i][k]=v;
+        });
+      });
+    }
+    function addPeriod(p){ p=p||{start:1,end:3,rate:20}; periods.push(p); renderPeriods(); }
     function removePeriod(i){ periods.splice(i,1); renderPeriods(); }
 
-    function compute({P0,Y,baseR,mgmtType,mgmtValue,twcPct,periods,histRates}){
-      const months=Y*12; let b=P0; const rows=[];
-      let yearStart=b, netYear=0;
+    /* Simulatore */
+    function compute(params){
+      var P0=params.P0, Y=params.Y, baseR=params.baseR, mgmtType=params.mgmtType,
+          mgmtValue=params.mgmtValue, twcPct=params.twcPct, periodsP=params.periods, histRates=params.histRates;
 
-      for(let m=1;m<=months;m++){
-        const yearIdx=Math.floor((m-1)/12)+1;
-        let annualR=baseR;
-
-        if(histRates && (yearIdx-1) < histRates.length && histRates[yearIdx-1] != null){
-          annualR = histRates[yearIdx-1];
-        }
-
-        for(const p of periods){ if(yearIdx>=p.start && yearIdx<=p.end){ annualR=p.rate/100; } }
-
-        const effMonth=Math.pow(1+annualR,1/12)-1;
-        const before=b; b*=(1+effMonth); const grown=b-before;
-        netYear += grown;
-
-        if(m%12===0){
-          rows.push({yearIndex:yearIdx,start:yearStart,fees:0,net:netYear,end:b});
-          yearStart=b; netYear=0;
-        }
+      var months=Y*12; var b=P0; var rows=[]; var yearStart=b, netYear=0;
+      for(var m=1;m<=months;m++){
+        var yIdx=Math.floor((m-1)/12)+1; var r=baseR;
+        if(histRates && (yIdx-1)<histRates.length && histRates[yIdx-1]!=null){ r=histRates[yIdx-1]; }
+        periodsP.forEach(function(pp){ if(yIdx>=pp.start && yIdx<=pp.end){ r=pp.rate/100; } });
+        var rm=Math.pow(1+r,1/12)-1; var before=b; b*=(1+rm); var grown=b-before; netYear+=grown;
+        if(m%12===0){ rows.push({yearIndex:yIdx,start:yearStart,fees:0,net:netYear,end:b}); yearStart=b; netYear=0; }
       }
-
-      const final=b;
-      const grossProfit = Math.max(0, final - P0);
-
-      const annualFee = (mgmtType==='percent')
-        ? (P0 * ((parseFloat(mgmtValue)||0)/100))
-        : (parseFloat(mgmtValue)||0);
-
-      const feesTot = annualFee * Y;
-      rows.forEach(r => { r.fees = annualFee; });
-
-      const twcShare    = Math.max(0, grossProfit * (twcPct/100) + feesTot);
-      const clientShare = Math.max(0, grossProfit - twcShare);
-
-      return { rows, final, grossProfit, clientShare, twcShare, feesTot, annualFee };
+      var final=b; var grossProfit=Math.max(0,final-P0);
+      var annualFee=(mgmtType==='percent')?(P0*((parseFloat(mgmtValue)||0)/100)):(parseFloat(mgmtValue)||0);
+      var feesTot=annualFee*Y; rows.forEach(function(r){ r.fees=annualFee; });
+      var twcShare=Math.max(0,grossProfit*(twcPct/100)+feesTot); var clientShare=Math.max(0,grossProfit-twcShare);
+      return { rows:rows, final:final, grossProfit:grossProfit, clientShare:clientShare, twcShare:twcShare, feesTot:feesTot, annualFee:annualFee };
     }
 
     function simulate(){
-      const P0=parseFloat(initial.value)||0;
-      const mt=mgmtType.value; const mv=parseFloat(mgmtValue.value)||0; const twc=parseFloat(twcValue.value)||0;
-      const baseR=(parseFloat(rate.value)||0)/100;
+      var P0=parseFloat($('initial').value)||0;
+      var mt=$('mgmtType').value;
+      var mv=parseFloat($('mgmtValue').value)||0;
+      var twc=parseFloat($('twcValue').value)||0;
+      var baseR=(parseFloat($('rate').value)||0)/100;
 
-      const useHist = el('useHistorical').checked && el('histRow').style.display !== 'none';
-      let yearLabels=[], histRates=null, Y;
+      var useHist = $('useHistorical').checked && $('histRow').style.display !== 'none';
+      var yearLabels=[], histRates=null, Y;
 
       if(useHist){
-        const histN = parseInt(el('histYears')?.value||'1',10);
-        const {years, rates} = getHistoricalSlice(histN);
-        yearLabels = years.map(String);
-        histRates = rates;
-        Y = years.length;
-        el('years').value = String(Y);
-        el('years').setAttribute('disabled','disabled');
+        var n=parseInt(($('histYears') && $('histYears').value) ? $('histYears').value : '1',10);
+        var r=getHistoricalSlice(n);
+        yearLabels=r.years.map(function(v){return String(v);});
+        histRates=r.rates;
+        Y=r.years.length;
+        $('years').value=String(Y);
+        $('years').setAttribute('disabled','disabled');
       }else{
-        el('years').removeAttribute('disabled');
-        Y = Math.min(50,Math.max(1,parseInt(el('years').value)||1));
-        yearLabels = Array.from({length:Y},(_,i)=>'Anno '+(i+1));
+        $('years').removeAttribute('disabled');
+        Y=Math.min(50,Math.max(1,parseInt($('years').value)||1));
+        yearLabels=Array.from({length:Y},function(_,i){return 'Anno '+(i+1);});
       }
 
-      const sim=compute({P0,Y,baseR,mgmtType:mt,mgmtValue:mv,twcPct:twc,periods,histRates});
+      var sim=compute({P0:P0,Y:Y,baseR:baseR,mgmtType:mt,mgmtValue:mv,twcPct:twc,periods:periods,histRates:histRates});
       lastSim=sim;
 
-      el('kpiPrincipal').textContent=fmtEUR.format(P0);
-      el('kpiFinal').textContent=fmtEUR.format(sim.final);
-      el('kpiGain').textContent=fmtEUR.format(sim.grossProfit);
-      el('kpiClient').textContent=fmtEUR.format(sim.clientShare);
-      el('kpiTWC').textContent=fmtEUR.format(sim.twcShare);
+      $('kpiPrincipal').textContent=fmtEUR.format(P0);
+      $('kpiFinal').textContent=fmtEUR.format(sim.final);
+      $('kpiGain').textContent=fmtEUR.format(sim.grossProfit);
+      $('kpiClient').textContent=fmtEUR.format(sim.clientShare);
+      $('kpiTWC').textContent=fmtEUR.format(sim.twcShare);
 
-      const principalCum=sim.rows.map(()=>P0);
-      const interestCum=sim.rows.map(r=>r.end-P0);
+      var principalCum=sim.rows.map(function(){return P0;});
+      var interestCum=sim.rows.map(function(r){return r.end-P0;});
 
-      if(chart)chart.destroy();
-      chart=new Chart(document.getElementById('chart'),{
+      if(chart){ chart.destroy(); }
+      chart=new Chart($('chart'),{
         type:'bar',
         data:{labels:yearLabels,datasets:[
           {label:'Capitale investito',data:principalCum,backgroundColor:'rgba(123,10,46,0.7)',stack:'tot'},
           {label:'Rendimento',data:interestCum,backgroundColor:'rgba(201,162,39,0.7)',stack:'tot'}
         ]},
-        options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>fmtEUR.format(v)}}}}
+        options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:function(v){return fmtEUR.format(v);}}}}}
       });
 
-      const tb=el('tableBody');tb.innerHTML='';
-      sim.rows.forEach((r,i)=>{
-        const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${yearLabels[i]}</td><td>${fmtEUR.format(r.start)}</td><td>${fmtEUR.format(-r.fees)}</td><td>${fmtEUR.format(r.net)}</td><td>${fmtEUR.format(r.end)}</td>`;
+      var tb=$('tableBody'); tb.innerHTML='';
+      sim.rows.forEach(function(r,i){
+        var tr=document.createElement('tr');
+        tr.innerHTML='<td>'+yearLabels[i]+'</td>'+
+                     '<td>'+fmtEUR.format(r.start)+'</td>'+
+                     '<td>'+fmtEUR.format(-r.fees)+'</td>'+
+                     '<td>'+fmtEUR.format(r.net)+'</td>'+
+                     '<td>'+fmtEUR.format(r.end)+'</td>';
         tb.appendChild(tr);
       });
     }
 
-    // Preset scenario buttons
-    const statePresets={ prudente:11, base:16, ottimistico:20 };
-    document.querySelector('[data-scenario="prudente"]').onclick=()=>{ rate.value=statePresets.prudente; simulate(); };
-    document.querySelector('[data-scenario="base"]').onclick=()=>{ rate.value=statePresets.base; simulate(); };
-    document.querySelector('[data-scenario="ottimistico"]').onclick=()=>{ rate.value=statePresets.ottimistico; simulate(); };
+    /* Preset + bind UI */
+    var statePresets={prudente:11,base:16,ottimistico:20};
+    document.querySelector('[data-scenario="prudente"]').onclick=function(){ $('rate').value=statePresets.prudente; simulate(); };
+    document.querySelector('[data-scenario="base"]').onclick=function(){ $('rate').value=statePresets.base; simulate(); };
+    document.querySelector('[data-scenario="ottimistico"]').onclick=function(){ $('rate').value=statePresets.ottimistico; simulate(); };
+    $('btnRun').onclick=simulate;
+    $('mgmtType').addEventListener('change',function(){
+      $('lblMgmtValue').textContent=($('mgmtType').value==='percent')?'Percentuale annua (%)':'Quota annuale (€)';
+    });
 
-    // Gestione
-    document.getElementById('btnRun').onclick=simulate;
-    document.getElementById('mgmtType').addEventListener('change',()=>{ el('lblMgmtValue').textContent=(mgmtType.value==='percent')?'Percentuale annua (%)':'Quota annua (€)'; });
-
-    // Admin
-    const adminModal=el('adminModal');
-    el('btnAdmin').onclick=()=>{const pass=prompt('Password:');if(pass==='TWC€€'){
-      const enabled = localStorage.getItem('twc_hist_enabled')==='1';
-      el('admEnableHist').checked = enabled;
-      adminModal.style.display='flex';
-    }};
-    el('closeAdmin').onclick=()=>adminModal.style.display='none';
-    el('admSave').onclick=()=>{
-      const prud=+el('admPrud').value||0, base=+el('admBase').value||0, ott=+el('admOtt').value||0;
+    /* Admin */
+    var adminModal=$('adminModal');
+    $('btnAdmin').onclick=function(){
+      var pass=prompt('Password:');
+      if(pass==='TWC€€'){
+        var enabled=false;
+        try{ enabled = localStorage.getItem('twc_hist_enabled')==='1'; }catch(e){}
+        $('admEnableHist').checked=enabled;
+        adminModal.style.display='flex';
+      }
+    };
+    $('closeAdmin').onclick=function(){ adminModal.style.display='none'; };
+    $('admSave').onclick=function(){
+      var prud=+$('admPrud').value||0, base=+$('admBase').value||0, ott=+$('admOtt').value||0;
       statePresets.prudente=prud; statePresets.base=base; statePresets.ottimistico=ott;
-      el('pPrud').textContent=`(${prud}%)`; el('pBase').textContent=`(${base}%)`; el('pOtt').textContent=`(${ott}%)`;
-      rate.value=base;
+      $('pPrud').textContent='('+prud+'%)';
+      $('pBase').textContent='('+base+'%)';
+      $('pOtt').textContent='('+ott+'%)';
+      $('rate').value=base;
 
-      const enableHist = el('admEnableHist').checked ? '1' : '0';
-      localStorage.setItem('twc_hist_enabled', enableHist);
+      var enableHist = $('admEnableHist').checked ? '1' : '0';
+      try{ localStorage.setItem('twc_hist_enabled', enableHist); }catch(e){}
       applyHistVisibility();
       adminModal.style.display='none';
       simulate();
     };
 
-    // Logo
-    el('logoUpload').addEventListener('change',e=>{
-      const f=e.target.files[0];if(!f)return;
-      const r=new FileReader();
-      r.onload=()=>{localStorage.setItem('twc_logo',r.result);el('brandLogo').src=r.result;};
+    $('logoUpload').addEventListener('change',function(e){
+      var f=e.target.files[0]; if(!f) return;
+      var r=new FileReader();
+      r.onload=function(){
+        try{
+          localStorage.setItem('twc_logo',r.result);
+          localStorage.setItem('twc_logo_pdf',r.result);
+        }catch(e){}
+        $('brandLogo').src=r.result;
+      };
       r.readAsDataURL(f);
     });
-    const savedLogo=localStorage.getItem('twc_logo');if(savedLogo)el('brandLogo').src=savedLogo;
 
-    // Periodi
-    document.getElementById('btnAddPeriod').onclick=()=>{ const next=periods.length? periods[periods.length-1].end+1 : 1; addPeriod({start:next,end:next+1,rate:20}); };
+    $('btnAddPeriod').onclick=function(){
+      var next=periods.length? (periods[periods.length-1].end+1) : 1;
+      addPeriod({start:next,end:next+1,rate:20});
+    };
 
-    // Storico
     (function populateHistYears(){
-      const sel = el('histYears'); const max = FULL_SERIES.length;
-      for(let i=1;i<=max;i++){ const opt=document.createElement('option'); opt.value=i; opt.textContent=i; sel.appendChild(opt); }
-      sel.value = Math.min(5,max).toString();
+      var sel=$('histYears'); if(!sel) return;
+      var max=FULL_SERIES.length;
+      for(var i=1;i<=max;i++){
+        var opt=document.createElement('option'); opt.value=i; opt.textContent=i; sel.appendChild(opt);
+      }
+      sel.value=String(Math.min(5,max));
     })();
-    el('useHistorical').addEventListener('change', e=>{
-      const on = e.target.checked;
-      el('histYearsField').style.display = on ? '' : 'none';
+
+    $('useHistorical').addEventListener('change',function(e){
+      var on=e.target.checked;
+      $('histYearsField').style.display=on?'':'none';
       if(on){
-        const histN = parseInt(el('histYears').value,10);
-        el('years').value = String(histN);
-        el('years').setAttribute('disabled','disabled');
+        var n=parseInt($('histYears').value,10);
+        $('years').value=String(n);
+        $('years').setAttribute('disabled','disabled');
       }else{
-        el('years').removeAttribute('disabled');
+        $('years').removeAttribute('disabled');
       }
     });
-    el('histYears').addEventListener('change', ()=>{
-      if(el('useHistorical').checked){
-        el('years').value = el('histYears').value;
+
+    $('histYears').addEventListener('change', function(){
+      if($('useHistorical').checked){
+        $('years').value = $('histYears').value;
         simulate();
       }
     });
 
     function applyHistVisibility(){
-      const enabled = localStorage.getItem('twc_hist_enabled')==='1';
-      el('histRow').style.display = enabled ? '' : 'none';
+      var enabled=false;
+      try{ enabled = localStorage.getItem('twc_hist_enabled')==='1'; }catch(e){}
+      $('histRow').style.display = enabled ? '' : 'none';
       if(!enabled){
-        el('useHistorical').checked = false;
-        el('histYearsField').style.display = 'none';
-        el('years').removeAttribute('disabled');
+        $('useHistorical').checked = false;
+        $('histYearsField').style.display = 'none';
+        $('years').removeAttribute('disabled');
       }
     }
 
-    // === DEFAULTS + RESET TOTALE ===
-    const DEFAULTS = Object.freeze({
-      initial: '10000',
-      years: '10',
-      rate: '15',
-      mgmtType: 'percent',
-      mgmtValue: '0',
-      twcValue: '50',
-      presets: { prudente: 10, base: 15, ottimistico: 20 }
-    });
-    const DEFAULT_LOGO_SRC = (function(){ const img=el('brandLogo'); return img? img.getAttribute('src') : ''; })();
+    /* Defaults + RESET (preserva layout) */
+    var DEFAULTS = {
+      initial:'10000', years:'10', rate:'15', mgmtType:'percent', mgmtValue:'0', twcValue:'50',
+      presets:{prudente:10,base:15,ottimistico:20}
+    };
 
-    function applyDefaultsToUI(){
-      // Inputs
-      el('initial').value = DEFAULTS.initial;
-      el('years').removeAttribute('disabled');
-      el('years').value = DEFAULTS.years;
-      el('rate').value = DEFAULTS.rate;
-      el('mgmtType').value = DEFAULTS.mgmtType;
-      el('mgmtValue').value = DEFAULTS.mgmtValue;
-      el('twcValue').value = DEFAULTS.twcValue;
-      el('mgmtType').dispatchEvent(new Event('change'));
+    function applyDefaultsToUI(opts){
+      opts = opts || {preserveLayout:false};
+      $('initial').value=DEFAULTS.initial;
+      $('years').removeAttribute('disabled'); $('years').value=DEFAULTS.years;
+      $('rate').value=DEFAULTS.rate;
+      $('mgmtType').value=DEFAULTS.mgmtType;
+      $('mgmtValue').value=DEFAULTS.mgmtValue;
+      $('twcValue').value=DEFAULTS.twcValue;
+      $('mgmtType').dispatchEvent(new Event('change'));
 
-      // Preset etichette + stato
-      statePresets.prudente = DEFAULTS.presets.prudente;
-      statePresets.base     = DEFAULTS.presets.base;
-      statePresets.ottimistico = DEFAULTS.presets.ottimistico;
-      el('pPrud').textContent = `(${statePresets.prudente}%)`;
-      el('pBase').textContent = `(${statePresets.base}%)`;
-      el('pOtt').textContent  = `(${statePresets.ottimistico}%)`;
-      el('rate').value = String(statePresets.base);
+      var ps=DEFAULTS.presets;
+      statePresets.prudente=ps.prudente; statePresets.base=ps.base; statePresets.ottimistico=ps.ottimistico;
+      $('pPrud').textContent='('+statePresets.prudente+'%)';
+      $('pBase').textContent='('+statePresets.base+'%)';
+      $('pOtt').textContent='('+statePresets.ottimistico+'%)';
+      $('rate').value=String(statePresets.base);
 
-      // Storico off
-      const histSel = el('histYears'); if(histSel){ histSel.value = '5'; }
+      var histSel=$('histYears'); if(histSel){ histSel.value='5'; }
       applyHistVisibility();
-      const chk = el('useHistorical'); if(chk){ chk.checked = false; }
-      const f = el('histYearsField'); if(f){ f.style.display='none'; }
+      var chk=$('useHistorical'); if(chk){ chk.checked=false; }
+      var f=$('histYearsField'); if(f){ f.style.display='none'; }
 
-      // Periodi
-      periods = [];
-      renderPeriods();
+      periods=[]; renderPeriods();
+      setHeaderLogo(REMOTE_LOGO);
 
-      // Logo default
-      const brand = el('brandLogo'); if(brand && DEFAULT_LOGO_SRC){ brand.src = DEFAULT_LOGO_SRC; }
-
-      // Layout “Auto”
-      localStorage.removeItem('layoutMode');
-      document.documentElement.classList.remove('mobile','desktop');
-      document.documentElement.classList.add('auto');
+      if(!opts.preserveLayout){
+        try{ localStorage.removeItem('layoutMode'); }catch(e){}
+        document.documentElement.classList.remove('mobile','desktop');
+        document.documentElement.classList.add('auto');
+      }
     }
 
     function resetAll(){
-      localStorage.removeItem('twc_logo');
-      localStorage.removeItem('twc_hist_enabled');
-      applyDefaultsToUI();
-      simulate(); // aggiorna KPI, grafico e tabella
-      // Chiudi eventuale admin aperto
-      const admin = el('adminModal'); if(admin){ admin.style.display='none'; }
+      var html = document.documentElement;
+      var currentMode = html.classList.contains('mobile') ? 'mobile' :
+                        (html.classList.contains('desktop') ? 'desktop' : 'auto');
+
+      try{
+        localStorage.removeItem('twc_logo');
+        localStorage.removeItem('twc_logo_pdf');
+        localStorage.removeItem('twc_hist_enabled');
+      }catch(e){}
+
+      applyDefaultsToUI({ preserveLayout:true });
+      simulate();
+
+      html.classList.remove('mobile','desktop','auto');
+      html.classList.add(currentMode);
+
+      var admin=$('adminModal'); if(admin){ admin.style.display='none'; }
     }
+    $('btnReset').onclick=resetAll;
 
-    // Bind RESET
-    document.getElementById('btnReset').onclick = resetAll;
+    /* ===== PDF: copia live dal dominio remoto al click ===== */
+    $('btnPDF').onclick=function(){
+      // forza a prendere l'immagine remota ogni volta che esporti
+      var remoteSrc = REMOTE_LOGO;
+      var headerImg = $('brandLogo');
+      if(headerImg && headerImg.src){ remoteSrc = headerImg.src; }
 
-    // PDF (immutato)
-    async function toDataURL(src){ if(!src) return null; if(src.startsWith('data:')) return src; try{ const res=await fetch(src,{mode:'cors'}); const blob=await res.blob(); return await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(blob); }); }catch(e){ return null; } }
-    document.getElementById('btnPDF').onclick = async function(){
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p','pt','a4');
-      const minMargin = 24, topY = 20;
-      const pageW = pdf.internal.pageSize.getWidth();
-      const contentW = pageW - minMargin*2;
-      const leftX = (pageW - contentW)/2;
-      const logoW=90, logoH=90, gap=22, logoY=topY;
-      const title = "The Wine Caveau - Simulatore d'investimento";
-      pdf.setFontSize(20);
-      const titleWidth = pdf.getTextWidth(title);
-      const groupW = logoW + gap + titleWidth;
-      const groupX = (pageW - groupW)/2;
-      const logoX = groupX;
-      const titleX = groupX + logoW + gap;
-      const titleY = logoY + (logoH/2) + 7;
-      let logoData = localStorage.getItem('twc_logo') || (await (async (src)=>{ try{ const r=await fetch(src,{mode:'cors'}); if(r.ok){ const b=await r.blob(); return await new Promise(ok=>{ const fr=new FileReader(); fr.onload=()=>ok(fr.result); fr.readAsDataURL(b);}); } }catch(e){} return null; })(el('brandLogo')?.src||'' ));
-      if (logoData) { pdf.setFillColor(20,20,24); pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10, 'F'); try{ const fmt=/^data:image\/jpe?g/i.test(logoData)?'JPEG':'PNG'; pdf.addImage(logoData, fmt, logoX, logoY, logoW, logoH);}catch{} pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10); } else { pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10); }
-      pdf.text(title, titleX, titleY);
+      fetchRemoteLogoData(remoteSrc).then(function(logoData){
+        var jsPDF = window.jspdf.jsPDF;
+        var pdf=new jsPDF('p','pt','a4');
+        var minMargin=24, topY=20;
+        var pageW=pdf.internal.pageSize.getWidth();
+        var contentW=pageW-minMargin*2;
+        var leftX=(pageW-contentW)/2;
 
-      const colGap = 20, leftColW = 260, rightColW = contentW - leftColW - colGap, twoColX = leftX, rightColX = twoColX + leftColW + colGap;
-      const mgmtTypeText = (el('mgmtType')?.value==='percent')? 'Percentuale su quota investita' : 'Quota annuale fissa';
-      const useHist = el('useHistorical').checked && el('histRow').style.display !== 'none';
-      let histN=0, yearSpan='—';
-      if(useHist){ histN = parseInt(el('histYears').value||'0',10); const {years} = getHistoricalSlice(histN); if(years.length){ yearSpan = `${years[0]}–${years[years.length-1]}`; } }
+        // Header PDF
+        var logoW=90, logoH=90, gap=22, logoY=topY;
+        var title="The Wine Caveau - Simulatore d'investimento";
+        var logoX=leftX+10;
+        var titleX=logoX+logoW+gap;
+        var titleY=logoY+(logoH/2)+7;
 
-      const paramsRows = [
-        ['Budget iniziale', `${el('initial')?.value || ''} €`],
-        ['Orizzonte', `${el('years')?.value || ''} anni`],
-        ['Rendimento base', `${el('rate')?.value || ''}%`],
-        ['Comm. gestione', `${mgmtTypeText} — ${el('mgmtValue')?.value || ''}${el('mgmtType')?.value==='percent'?'%':' €'}`],
-        ['Commissione TWC', `${el('twcValue')?.value || ''}%`],
-      ];
-      if(useHist){ paramsRows.push(['Andamento passato', `${histN} anni (${yearSpan})`]); }
+        pdf.setFontSize(20);
 
-      const kpiRows = [
-        ['Capitale investito', el('kpiPrincipal')?.innerText || ''],
-        ['Guadagno netto', el('kpiGain')?.innerText || ''],
-        ['Valore finale', el('kpiFinal')?.innerText || ''],
-        ['Quota Cliente', el('kpiClient')?.innerText || ''],
-        ['Quota TWC', el('kpiTWC')?.innerText || '']
-      ];
+        if(logoData){
+          pdf.setFillColor(20,20,24);
+          pdf.roundedRect(logoX,logoY,logoW,logoH,10,10,'F');
+          try{
+            var fmt = (typeof logoData==='string' && /^data:image\/jpe?g/i.test(logoData)) ? 'JPEG' : 'PNG';
+            pdf.addImage(logoData,fmt,logoX,logoY,logoW,logoH);
+          }catch(e){}
+          pdf.roundedRect(logoX,logoY,logoW,logoH,10,10);
+        }else{
+          pdf.roundedRect(logoX,logoY,logoW,logoH,10,10);
+        }
+        pdf.text(title,titleX,titleY);
 
-      pdf.setFontSize(13);
-      pdf.text('Parametri selezionati', twoColX, logoY + logoH + 18);
-      pdf.text('Indicatori', rightColX, logoY + logoH + 18);
+        var colGap=20,leftColW=260,rightColW=contentW-leftColW-colGap,twoColX=leftX,rightColX=twoColX+leftColW+colGap;
+        var mgmtTypeText = ($('mgmtType').value==='percent') ? 'Percentuale su quota investita' : 'Quota annuale fissa';
 
-      pdf.autoTable({ startY: logoY + logoH + 26, margin: { left: twoColX }, tableWidth: leftColW, head: [['Parametro','Valore']], body: paramsRows, theme:'grid', styles:{ fontSize:10, cellPadding:6 }, headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }, columnStyles:{ 0:{ cellWidth:120 }, 1:{ cellWidth:140 } } });
-      const paramsBottom = pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (logoY + logoH + 26);
+        var useHist = $('useHistorical').checked && $('histRow').style.display !== 'none';
+        var histN=0, yearSpan='—';
+        if(useHist){
+          histN = parseInt($('histYears').value||'0',10);
+          var ys = getHistoricalSlice(histN).years;
+          if(ys.length){ yearSpan = ys[0] + '–' + ys[ys.length-1]; }
+        }
 
-      pdf.autoTable({ startY: logoY + logoH + 26, margin: { left: rightColX }, tableWidth: rightColW, head: [['Indicatore','Valore']], body: kpiRows, theme:'grid', styles:{ fontSize:10, cellPadding:6 }, headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }, columnStyles:{ 0:{ cellWidth: Math.min(180,rightColW/2) }, 1:{ cellWidth: Math.max(120,rightColW/2), halign: 'right' } } });
-      const kpiBottom = pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (logoY + logoH + 26);
+        var paramsRows = [
+          ['Budget iniziale', ($('initial').value||'') + ' €'],
+          ['Orizzonte', ($('years').value||'') + ' anni'],
+          ['Rendimento base', ($('rate').value||'') + '%'],
+          ['Comm. gestione', mgmtTypeText + ' — ' + ($('mgmtValue').value||'') + (($('mgmtType').value==='percent')?'%':' €')],
+          ['Commissione TWC', ($('twcValue').value||'') + '%']
+        ];
+        if(useHist){ paramsRows.push(['Andamento passato', histN + ' anni (' + yearSpan + ')']); }
 
-      let y = Math.max(paramsBottom, kpiBottom) + 12;
+        var kpiRows = [
+          ['Capitale investito', $('kpiPrincipal').innerText || ''],
+          ['Guadagno netto', $('kpiGain').innerText || ''],
+          ['Valore finale', $('kpiFinal').innerText || ''],
+          ['Quota Cliente', $('kpiClient').innerText || ''],
+          ['Quota TWC', $('kpiTWC').innerText || '']
+        ];
 
-      if (Array.isArray(periods) && periods.length > 0){
-        const periodsRows = periods.map(p => [String(p.start), String(p.end), `${p.rate}%`]);
         pdf.setFontSize(13);
-        pdf.text('Periodi con rendimento personalizzato', leftX, y);
-        pdf.autoTable({ startY: y + 8, margin: { left: leftX }, tableWidth: contentW, head: [['Da anno','A anno','Rendimento annuo']], body: periodsRows, theme:'grid', styles:{ fontSize:10, cellPadding:6 }, headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }, columnStyles:{ 0:{ cellWidth:100, halign:'center' }, 1:{ cellWidth:100, halign:'center' }, 2:{ cellWidth: contentW-200, halign:'right' } } });
-        y = pdf.lastAutoTable ? pdf.lastAutoTable.finalY + 12 : y + 40;
-      }
+        pdf.text('Parametri selezionati', twoColX, logoY + logoH + 18);
+        pdf.text('Indicatori', rightColX, logoY + logoH + 18);
 
-      const chartEl = document.getElementById('chart');
-      if(chartEl){ try{ const chartImg = chartEl.toDataURL('image/png',1.0); pdf.addImage(chartImg,'PNG', leftX, y, contentW, 220); y+=232; }catch{} }
+        pdf.autoTable({
+          startY: logoY + logoH + 26, margin: { left: twoColX }, tableWidth: leftColW,
+          head: [['Parametro','Valore']], body: paramsRows, theme:'grid',
+          styles:{ fontSize:10, cellPadding:6 },
+          headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' },
+          columnStyles:{ 0:{ cellWidth:120 }, 1:{ cellWidth:140 } }
+        });
+        var paramsBottom = pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (logoY + logoH + 26);
 
-      const rows = Array.from(document.querySelectorAll('#tableBody tr')).map(tr=>Array.from(tr.children).map(td=>td.textContent));
-      const head = [['Anno','Saldo iniziale','Commissioni','Rendimento netto','Saldo finale']];
-      pdf.autoTable({ head, body: rows, startY: y, margin: { left: leftX, bottom: 20 }, tableWidth: contentW, theme:'grid', styles:{ fontSize:10, cellPadding:6 }, headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }, alternateRowStyles:{ fillColor:[20,20,24], textColor:255 }, columnStyles:{ 0:{ halign:'center', cellWidth:70 }, 1:{ halign:'right' }, 2:{ halign:'right' }, 3:{ halign:'right' }, 4:{ halign:'right' } } });
-      pdf.save('simulazione.pdf');
+        pdf.autoTable({
+          startY: logoY + logoH + 26, margin: { left: rightColX }, tableWidth: rightColW,
+          head: [['Indicatore','Valore']], body: kpiRows, theme:'grid',
+          styles:{ fontSize:10, cellPadding:6 },
+          headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' },
+          columnStyles:{ 0:{ cellWidth: Math.min(180,rightColW/2) }, 1:{ cellWidth: Math.max(120,rightColW/2), halign: 'right' } }
+        });
+        var kpiBottom = pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (logoY + logoH + 26);
+
+        var y = Math.max(paramsBottom, kpiBottom) + 12;
+
+        if(Array.isArray(periods) && periods.length > 0){
+          var pRows = periods.map(function(p){ return [String(p.start), String(p.end), p.rate + '%']; });
+          pdf.setFontSize(13);
+          pdf.text('Periodi con rendimento personalizzato', leftX, y);
+          pdf.autoTable({
+            startY: y + 8, margin: { left: leftX }, tableWidth: contentW,
+            head: [['Da anno','A anno','Rendimento annuo']], body: pRows, theme:'grid',
+            styles:{ fontSize:10, cellPadding:6 },
+            headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' },
+            columnStyles:{ 0:{ cellWidth:100, halign:'center' }, 1:{ cellWidth:100, halign:'center' }, 2:{ cellWidth: contentW-200, halign:'right' } }
+          });
+          y = pdf.lastAutoTable ? (pdf.lastAutoTable.finalY + 12) : (y + 40);
+        }
+
+        var chartEl=$('chart');
+        if(chartEl){
+          try{
+            var chartImg = chartEl.toDataURL('image/png',1.0);
+            pdf.addImage(chartImg,'PNG', leftX, y, contentW, 220);
+            y += 232;
+          }catch(e){}
+        }
+
+        var rows = Array.prototype.slice.call(document.querySelectorAll('#tableBody tr'))
+          .map(function(tr){
+            return Array.prototype.slice.call(tr.children).map(function(td){ return td.textContent; });
+          });
+
+        pdf.autoTable({
+          head: [['Anno','Saldo iniziale','Commissioni','Rendimento netto','Saldo finale']],
+          body: rows, startY: y, margin: { left: leftX, bottom: 20 }, tableWidth: contentW, theme:'grid',
+          styles:{ fontSize:10, cellPadding:6 },
+          headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' },
+          alternateRowStyles:{ fillColor:[20,20,24], textColor:255 },
+          columnStyles:{ 0:{ halign:'center', cellWidth:70 }, 1:{ halign:'right' }, 2:{ halign:'right' }, 3:{ halign:'right' }, 4:{ halign:'right' } }
+        });
+
+        pdf.save('simulazione.pdf');
+      });
     };
 
-    // Init
-    (function(){
-      const saved=localStorage.getItem('twc_logo'); if(saved) el('brandLogo').src=saved;
+    /* Init */
+    (function init(){
       applyHistVisibility();
+      var saved=null;
+      try{ saved=localStorage.getItem('twc_logo'); }catch(e){}
+      setHeaderLogo(saved||REMOTE_LOGO);
       simulate();
     })();
-
   </script>
 
   <!-- Dual Layout Switcher (Auto / Mobile / Desktop) -->
   <script>
   (function(){
-    const qs = new URLSearchParams(location.search);
-    const qsMode = qs.get('mode');
-    const stored = localStorage.getItem('layoutMode');
-    let mode = (qsMode || stored || 'auto').toLowerCase();
+    var qs=new URLSearchParams(location.search);
+    var qsMode=qs.get('mode');
+    var stored=null; try{ stored=localStorage.getItem('layoutMode'); }catch(e){}
+    var mode=(qsMode||stored||'auto').toLowerCase();
 
     function likelyMobile(){
       return window.matchMedia('(max-width: 760px)').matches ||
              /Mobi|Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     }
-    function apply(mode){
+    function apply(m){
       document.documentElement.classList.remove('mobile','desktop','auto');
-      document.documentElement.classList.add(mode);
-      if(mode === 'auto'){
+      document.documentElement.classList.add(m);
+      if(m==='auto'){
         document.documentElement.classList.add(likelyMobile() ? 'mobile' : 'desktop');
       }
-      localStorage.setItem('layoutMode', mode);
-      highlight(mode);
+      try{ localStorage.setItem('layoutMode',m); }catch(e){}
+      highlight(m);
       queueResizeCharts();
     }
     function buildToggle(){
-      const el = document.createElement('div');
-      el.id = 'layoutToggle';
-      el.innerHTML = `
-        <button data-m="auto" title="Selezione automatica">Auto</button>
-        <button data-m="mobile" title="Forza layout mobile">Mobile</button>
-        <button data-m="desktop" title="Forza layout desktop">Desktop</button>
-      `;
-      document.body.appendChild(el);
-      el.addEventListener('click', (e)=>{
-        const b = e.target.closest('button'); if(!b) return;
-        mode = b.dataset.m; apply(mode);
+      var d=document.createElement('div');
+      d.id='layoutToggle';
+      d.innerHTML='<button data-m="auto" title="Selezione automatica">Auto</button>'+
+                  '<button data-m="mobile" title="Forza layout mobile">Mobile</button>'+
+                  '<button data-m="desktop" title="Forza layout desktop">Desktop</button>';
+      document.body.appendChild(d);
+      d.addEventListener('click',function(e){
+        var b=e.target.closest('button'); if(!b) return;
+        mode=b.getAttribute('data-m'); apply(mode);
       });
-      return el;
+      return d;
     }
     function highlight(m){
-      const el = document.getElementById('layoutToggle'); if(!el) return;
-      [...el.querySelectorAll('button')].forEach(btn => btn.classList.toggle('active', btn.dataset.m === m));
+      var d=document.getElementById('layoutToggle'); if(!d) return;
+      Array.prototype.slice.call(d.querySelectorAll('button'))
+        .forEach(function(btn){ btn.classList.toggle('active', btn.getAttribute('data-m')===m); });
     }
     function queueResizeCharts(){
       if(!window.Chart) return;
-      setTimeout(()=>{
+      setTimeout(function(){
         try{
-          const inst = Chart.instances || Chart.getCharts?.() || {};
-          const list = Array.isArray(inst) ? inst : Object.values(inst);
-          list.forEach(c => { try{ c.resize(); }catch{} });
-        }catch{}
-      }, 50);
+          var inst = (Chart.instances) ? Chart.instances : (Chart.getCharts ? Chart.getCharts() : []);
+          var list = Array.isArray(inst) ? inst : Object.values(inst);
+          list.forEach(function(c){ try{ c.resize(); }catch(e){} });
+        }catch(e){}
+      },50);
     }
-    window.addEventListener('load', function(){ buildToggle(); apply(mode); }, { once:true });
-    window.addEventListener('resize', function(){ if(mode === 'auto'){ apply('auto'); }});
-    window.addEventListener('orientationchange', function(){ if(mode === 'auto'){ setTimeout(()=>apply('auto'), 100); }});
+    window.addEventListener('load',function(){ buildToggle(); apply(mode); },{once:true});
+    window.addEventListener('resize',function(){ if(mode==='auto'){ apply('auto'); }});
+    window.addEventListener('orientationchange',function(){ if(mode==='auto'){ setTimeout(function(){apply('auto');},100); }});
   })();
   </script>
-
 </body>
 </html>
