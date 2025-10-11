@@ -62,122 +62,46 @@
       .field{flex:1 1 180px;max-width:100%}
       .kpis{grid-template-columns:1fr 1fr}
     }
-  
-/* ==== Dual Layout (Desktop/Mobile) with Auto Detect ==== */
 
-/* Toggle UI (floating, non-intrusive) */
-#layoutToggle{
-  position: fixed; right: 10px; bottom: 10px; z-index: 9999;
-  display: flex; gap: 6px; padding: 6px;
-  backdrop-filter: blur(6px);
-  background: rgba(0,0,0,.35);
-  border-radius: 9999px;
-  box-shadow: 0 6px 18px rgba(0,0,0,.15);
-}
-#layoutToggle button{
-  font: 500 12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  color: #fff; border: 0; border-radius: 999px; padding: 8px 10px; cursor: pointer;
-  background: rgba(255,255,255,.15);
-}
-#layoutToggle button.active{ background: rgba(255,255,255,.35); }
-@media (min-width: 761px){ #layoutToggle{ right: 16px; bottom: 16px; } }
+    /* ==== Dual Layout base ==== */
+    html{ --leftCol: 520px; }
+    html.desktop { --leftCol: 600px; }
+    html.desktop .grid{ grid-template-columns: var(--leftCol) 1fr !important; }
+    html.desktop .toolbar{ justify-self: end; }
+    html.desktop .kpis{ grid-template-columns: repeat(5, minmax(0,1fr)); }
 
-/* Base: assume desktop */
-html{ --leftCol: 520px; } /* base */
-html.desktop { --leftCol: 600px; } /* <-- Desktop più largo per far stare gli indicatori su una riga */
-html.desktop .grid{ grid-template-columns: var(--leftCol) 1fr !important; }
-html.desktop .toolbar{ justify-self: end; }
-html.desktop .kpis{ grid-template-columns: repeat(5, minmax(0,1fr)); } /* <-- 5 indicatori su una riga */
+    /* Header centrato per entrambe */
+    header{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; }
+    .brandCenter{ grid-column:2; justify-self:center; text-align:center; }
+    .toolbar{ grid-column:3; justify-self:end; }
 
-/* Header davvero centrato (vale per entrambe) */
-header{
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-}
-.brandCenter{ grid-column: 2; justify-self: center; text-align: center; }
-.toolbar{ grid-column: 3; justify-self: end; }
+    /* Mobile */
+    html.mobile{ --leftCol:100%; }
+    html.mobile .wrap{ padding:0 10px; }
+    html.mobile header{ grid-template-columns:1fr; gap:8px; }
+    html.mobile .brandCenter{ grid-column:1; justify-self:center; text-align:center; }
+    html.mobile .toolbar{ grid-column:1; justify-self:center; gap:6px; }
+    html.mobile .logo{ width:84px; height:84px; }
+    html.mobile .title h1{ font-size: clamp(18px, 6vw, 24px); }
+    html.mobile .grid{ grid-template-columns:1fr !important; }
+    html.mobile .row{ gap:12px; }
+    html.mobile .field{ flex:1 1 100%; max-width:100%; }
+    html.mobile .kpis{ grid-template-columns:1fr; gap:8px; }
+    html.mobile .chart-box{ height:240px; }
+    html.mobile table{ display:block; overflow-x:auto; white-space:nowrap; }
 
-/* Mobile layout */
-html.mobile{ --leftCol: 100%; }
-html.mobile .wrap{ padding: 0 10px; }
-html.mobile header{ grid-template-columns: 1fr; gap: 8px; }
-html.mobile .brandCenter{ grid-column: 1; justify-self: center; text-align: center; }
-html.mobile .toolbar{ grid-column: 1; justify-self: center; gap: 6px; }
-html.mobile .logo{ width: 84px; height: 84px; }
-html.mobile .title h1{ font-size: clamp(18px, 6vw, 24px); }
-html.mobile .grid{ grid-template-columns: 1fr !important; }
-html.mobile .row{ gap: 12px; }
-html.mobile .field{ flex: 1 1 100%; max-width: 100%; }
-html.mobile .kpis{ grid-template-columns: 1fr; gap: 8px; }
-html.mobile .chart-box{ height: 240px; }
-html.mobile table{ display: block; overflow-x: auto; white-space: nowrap; }
+    /* ---- KPI tidy ---- */
+    html.desktop .kpis{ grid-template-columns: repeat(5, minmax(130px,1fr)); gap:6px; }
+    .kpi{ display:grid; grid-template-rows:auto 1fr; align-items:start; padding:12px 14px; min-height:84px; text-align:center; }
+    .kpi .t{ font-size:12px; line-height:1.15; margin:0; min-height:2.4em; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-align:center; }
+    .kpi .v{ align-self:end; font-size:18px; line-height:1.1; white-space:nowrap; }
 
-/* Ultra small phones refinement */
-@media (max-width: 380px){
-  html.mobile .btn{ padding: 8px 10px; }
-  html.mobile .title h1{ font-size: 18px; }
-}
+    /* ---- Centraggio e “respiro” del frame Risultati ---- */
+    .grid > .card:last-child { overflow:visible; } /* evitiamo tagli */
+    .grid > .card:last-child .body{ padding-left:14px; padding-right:26px; }
+    #kpis.kpis{ margin-left:-10px; margin-right:0; gap:6px; } /* shift a sinistra e gap leggermente ridotto */
 
-
-/* --- KPI row tidy (desktop) --- */
-html.desktop .kpis{ grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 8px; }
-.kpi{ display:flex; flex-direction:column; justify-content:center; padding:10px; }
-.kpi .t{ font-size:12px; line-height:1.15; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.kpi .v{ font-size:18px; line-height:1.1; white-space:nowrap; } /* evita andare a capo tra numero e € */
-
-
-/* === Adjustments (Oct 2025) === */
-
-/* 1) KPI frames: slightly wider feel via padding; consistent title height; aligned values */
-html.desktop .kpis{ grid-template-columns: repeat(5, minmax(130px, 1fr)); gap: 6px; } /* tighter gap to gain width per card */
-.kpi{
-  display: grid;
-  grid-template-rows: auto 1fr; /* title then value area */
-  align-items: start;
-  padding: 12px 14px; /* frame feels wider without increasing column width */
-  min-height: 84px;   /* ensures content fits */
-}
-.kpi .t{
-  font-size:12px;
-  line-height:1.15;
-  margin:0;
-  min-height: 2.4em;  /* equal title block height across all KPI -> values align */
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-}
-.kpi .v{
-  align-self: end;
-  font-size:18px;
-  line-height:1.1;
-  white-space:nowrap; /* keeps € glued to number */
-}
-
-/* 2) Header spacing tighter + logo slightly more left on desktop */
-html.desktop header{ padding: 12px; gap: 10px; }
-html.desktop .brandCenter{ gap: 10px; }
-html.desktop .brandCenter .logo{ transform: translateX(-12px); } /* move logo a bit left vs title */
-
-
-/* === Oct 2025: KPI titles centered + header more compact === */
-
-/* KPI: center alignment for title (and values for consistency) */
-.kpi{ text-align:center; }                /* center all text inside KPI */
-.kpi .t{ text-align:center; }            /* ensure title centered */
-.kpi .v{ justify-self:center; }          /* center value in grid if needed */
-
-/* Header: reduce internal padding and bring logo further left */
-html.desktop header{ padding: 8px; gap: 8px; }
-html.desktop .brandCenter{ gap: 8px; }
-html.desktop .toolbar{ gap: 6px; }
-
-/* To truly reduce header height, slightly shrink the desktop logo box */
-html.desktop .brandCenter .logo{
-  width: 140px;
-  height: 140px;
-  transform: translateX(-16px); /* a bit more left than before */
-}
-
-</style>
+  </style>
 </head>
 <body>
   <div class="wrap">
@@ -240,7 +164,7 @@ html.desktop .brandCenter .logo{
           </div>
           <div class="row">
             <button class="btn gold" id="btnRun">Simula</button>
-            <button class="btn" id="btnResetPeriods">Reset</button>
+            <button class="btn" id="btnReset">Reset</button>
           </div>
           <div class="row" style="align-items:center;justify-content:space-between;margin-top:8px">
             <h3 style="margin:0;font-size:14px">Periodi con rendimento personalizzato</h3>
@@ -336,7 +260,6 @@ html.desktop .brandCenter .logo{
         row.style.marginTop = '8px';
         row.style.flexWrap = 'nowrap';
         row.style.gap = '12px';
-
         row.innerHTML = `
           <div class="field" style="flex:0 0 110px;max-width:110px">
             <label>Da anno</label>
@@ -403,7 +326,6 @@ html.desktop .brandCenter .logo{
         : (parseFloat(mgmtValue)||0);
 
       const feesTot = annualFee * Y;
-
       rows.forEach(r => { r.fees = annualFee; });
 
       const twcShare    = Math.max(0, grossProfit * (twcPct/100) + feesTot);
@@ -464,14 +386,17 @@ html.desktop .brandCenter .logo{
       });
     }
 
-    document.getElementById('btnRun').onclick=simulate;
-    document.getElementById('mgmtType').addEventListener('change',()=>{ el('lblMgmtValue').textContent=(mgmtType.value==='percent')?'Percentuale annua (%)':'Quota annua (€)'; });
-
+    // Preset scenario buttons
     const statePresets={ prudente:11, base:16, ottimistico:20 };
     document.querySelector('[data-scenario="prudente"]').onclick=()=>{ rate.value=statePresets.prudente; simulate(); };
     document.querySelector('[data-scenario="base"]').onclick=()=>{ rate.value=statePresets.base; simulate(); };
     document.querySelector('[data-scenario="ottimistico"]').onclick=()=>{ rate.value=statePresets.ottimistico; simulate(); };
 
+    // Gestione
+    document.getElementById('btnRun').onclick=simulate;
+    document.getElementById('mgmtType').addEventListener('change',()=>{ el('lblMgmtValue').textContent=(mgmtType.value==='percent')?'Percentuale annua (%)':'Quota annua (€)'; });
+
+    // Admin
     const adminModal=el('adminModal');
     el('btnAdmin').onclick=()=>{const pass=prompt('Password:');if(pass==='TWC€€'){
       const enabled = localStorage.getItem('twc_hist_enabled')==='1';
@@ -488,11 +413,11 @@ html.desktop .brandCenter .logo{
       const enableHist = el('admEnableHist').checked ? '1' : '0';
       localStorage.setItem('twc_hist_enabled', enableHist);
       applyHistVisibility();
-
       adminModal.style.display='none';
       simulate();
     };
 
+    // Logo
     el('logoUpload').addEventListener('change',e=>{
       const f=e.target.files[0];if(!f)return;
       const r=new FileReader();
@@ -501,9 +426,10 @@ html.desktop .brandCenter .logo{
     });
     const savedLogo=localStorage.getItem('twc_logo');if(savedLogo)el('brandLogo').src=savedLogo;
 
+    // Periodi
     document.getElementById('btnAddPeriod').onclick=()=>{ const next=periods.length? periods[periods.length-1].end+1 : 1; addPeriod({start:next,end:next+1,rate:20}); };
-    document.getElementById('btnResetPeriods').onclick=()=>{ periods=[]; renderPeriods(); };
 
+    // Storico
     (function populateHistYears(){
       const sel = el('histYears'); const max = FULL_SERIES.length;
       for(let i=1;i<=max;i++){ const opt=document.createElement('option'); opt.value=i; opt.textContent=i; sel.appendChild(opt); }
@@ -537,19 +463,79 @@ html.desktop .brandCenter .logo{
       }
     }
 
+    // === DEFAULTS + RESET TOTALE ===
+    const DEFAULTS = Object.freeze({
+      initial: '10000',
+      years: '10',
+      rate: '15',
+      mgmtType: 'percent',
+      mgmtValue: '0',
+      twcValue: '50',
+      presets: { prudente: 10, base: 15, ottimistico: 20 }
+    });
+    const DEFAULT_LOGO_SRC = (function(){ const img=el('brandLogo'); return img? img.getAttribute('src') : ''; })();
+
+    function applyDefaultsToUI(){
+      // Inputs
+      el('initial').value = DEFAULTS.initial;
+      el('years').removeAttribute('disabled');
+      el('years').value = DEFAULTS.years;
+      el('rate').value = DEFAULTS.rate;
+      el('mgmtType').value = DEFAULTS.mgmtType;
+      el('mgmtValue').value = DEFAULTS.mgmtValue;
+      el('twcValue').value = DEFAULTS.twcValue;
+      el('mgmtType').dispatchEvent(new Event('change'));
+
+      // Preset etichette + stato
+      statePresets.prudente = DEFAULTS.presets.prudente;
+      statePresets.base     = DEFAULTS.presets.base;
+      statePresets.ottimistico = DEFAULTS.presets.ottimistico;
+      el('pPrud').textContent = `(${statePresets.prudente}%)`;
+      el('pBase').textContent = `(${statePresets.base}%)`;
+      el('pOtt').textContent  = `(${statePresets.ottimistico}%)`;
+      el('rate').value = String(statePresets.base);
+
+      // Storico off
+      const histSel = el('histYears'); if(histSel){ histSel.value = '5'; }
+      applyHistVisibility();
+      const chk = el('useHistorical'); if(chk){ chk.checked = false; }
+      const f = el('histYearsField'); if(f){ f.style.display='none'; }
+
+      // Periodi
+      periods = [];
+      renderPeriods();
+
+      // Logo default
+      const brand = el('brandLogo'); if(brand && DEFAULT_LOGO_SRC){ brand.src = DEFAULT_LOGO_SRC; }
+
+      // Layout “Auto”
+      localStorage.removeItem('layoutMode');
+      document.documentElement.classList.remove('mobile','desktop');
+      document.documentElement.classList.add('auto');
+    }
+
+    function resetAll(){
+      localStorage.removeItem('twc_logo');
+      localStorage.removeItem('twc_hist_enabled');
+      applyDefaultsToUI();
+      simulate(); // aggiorna KPI, grafico e tabella
+      // Chiudi eventuale admin aperto
+      const admin = el('adminModal'); if(admin){ admin.style.display='none'; }
+    }
+
+    // Bind RESET
+    document.getElementById('btnReset').onclick = resetAll;
+
+    // PDF (immutato)
     async function toDataURL(src){ if(!src) return null; if(src.startsWith('data:')) return src; try{ const res=await fetch(src,{mode:'cors'}); const blob=await res.blob(); return await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(blob); }); }catch(e){ return null; } }
     document.getElementById('btnPDF').onclick = async function(){
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p','pt','a4');
-
-      const minMargin = 24;
-      const topY = 20;
+      const minMargin = 24, topY = 20;
       const pageW = pdf.internal.pageSize.getWidth();
       const contentW = pageW - minMargin*2;
       const leftX = (pageW - contentW)/2;
-
-      const logoW=90, logoH=90, gap=22;
-      const logoY=topY;
+      const logoW=90, logoH=90, gap=22, logoY=topY;
       const title = "The Wine Caveau - Simulatore d'investimento";
       pdf.setFontSize(20);
       const titleWidth = pdf.getTextWidth(title);
@@ -558,72 +544,15 @@ html.desktop .brandCenter .logo{
       const logoX = groupX;
       const titleX = groupX + logoW + gap;
       const titleY = logoY + (logoH/2) + 7;
-
-   
-      const logoSrc = el('brandLogo')?.src || '';
-
-      async function getLogoDataURL(src){
-        if (!src) return null;
-        if (/^data:/i.test(src)) return src; 
-
-        const toDataURL = async (res) => {
-          const blob = await res.blob();
-          return await new Promise((ok, err) => {
-            const fr = new FileReader();
-            fr.onload = () => ok(fr.result);
-            fr.onerror = err;
-            fr.readAsDataURL(blob);
-          });
-        };
-
-        
-        try {
-          const r = await fetch(src, { mode: 'cors' });
-          if (r.ok) return await toDataURL(r);
-        } catch {}
-
-       
-        try {
-          const prox = 'https://images.weserv.nl/?url=' + encodeURIComponent(src.replace(/^https?:\/\//,''));
-          const r2 = await fetch(prox, { mode: 'cors' });
-          if (r2.ok) return await toDataURL(r2);
-        } catch {}
-
-        return null;
-      }
-
-      let logoData = localStorage.getItem('twc_logo') || await getLogoDataURL(logoSrc);
-
-
-      if (logoData) {
-        pdf.setFillColor(20,20,24);
-        pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10, 'F'); 
-        try {
-          const fmt = /^data:image\/jpe?g/i.test(logoData) ? 'JPEG' : 'PNG';
-          pdf.addImage(logoData, fmt, logoX, logoY, logoW, logoH);
-        } catch {}
-        pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10); 
-      } else {
-        pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10); 
-      }
-
+      let logoData = localStorage.getItem('twc_logo') || (await (async (src)=>{ try{ const r=await fetch(src,{mode:'cors'}); if(r.ok){ const b=await r.blob(); return await new Promise(ok=>{ const fr=new FileReader(); fr.onload=()=>ok(fr.result); fr.readAsDataURL(b);}); } }catch(e){} return null; })(el('brandLogo')?.src||'' ));
+      if (logoData) { pdf.setFillColor(20,20,24); pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10, 'F'); try{ const fmt=/^data:image\/jpe?g/i.test(logoData)?'JPEG':'PNG'; pdf.addImage(logoData, fmt, logoX, logoY, logoW, logoH);}catch{} pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10); } else { pdf.roundedRect(logoX, logoY, logoW, logoH, 10, 10); }
       pdf.text(title, titleX, titleY);
 
-      const colGap = 20;
-      const leftColW = 260;
-      const rightColW = contentW - leftColW - colGap;
-      const twoColX = leftX;
-      const rightColX = twoColX + leftColW + colGap;
-
+      const colGap = 20, leftColW = 260, rightColW = contentW - leftColW - colGap, twoColX = leftX, rightColX = twoColX + leftColW + colGap;
       const mgmtTypeText = (el('mgmtType')?.value==='percent')? 'Percentuale su quota investita' : 'Quota annuale fissa';
-
       const useHist = el('useHistorical').checked && el('histRow').style.display !== 'none';
       let histN=0, yearSpan='—';
-      if(useHist){
-        histN = parseInt(el('histYears').value||'0',10);
-        const {years} = getHistoricalSlice(histN);
-        if(years.length){ yearSpan = `${years[0]}–${years[years.length-1]}`; }
-      }
+      if(useHist){ histN = parseInt(el('histYears').value||'0',10); const {years} = getHistoricalSlice(histN); if(years.length){ yearSpan = `${years[0]}–${years[years.length-1]}`; } }
 
       const paramsRows = [
         ['Budget iniziale', `${el('initial')?.value || ''} €`],
@@ -646,30 +575,10 @@ html.desktop .brandCenter .logo{
       pdf.text('Parametri selezionati', twoColX, logoY + logoH + 18);
       pdf.text('Indicatori', rightColX, logoY + logoH + 18);
 
-      pdf.autoTable({
-        startY: logoY + logoH + 26,
-        margin: { left: twoColX },
-        tableWidth: leftColW,
-        head: [['Parametro','Valore']],
-        body: paramsRows,
-        theme: 'grid',
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor:[30,30,36], textColor:255, halign:'center' },
-        columnStyles: { 0:{ cellWidth: 120 }, 1:{ cellWidth: 140 } }
-      });
+      pdf.autoTable({ startY: logoY + logoH + 26, margin: { left: twoColX }, tableWidth: leftColW, head: [['Parametro','Valore']], body: paramsRows, theme:'grid', styles:{ fontSize:10, cellPadding:6 }, headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }, columnStyles:{ 0:{ cellWidth:120 }, 1:{ cellWidth:140 } } });
       const paramsBottom = pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (logoY + logoH + 26);
 
-      pdf.autoTable({
-        startY: logoY + logoH + 26,
-        margin: { left: rightColX },
-        tableWidth: rightColW,
-        head: [['Indicatore','Valore']],
-        body: kpiRows,
-        theme: 'grid',
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor:[30,30,36], textColor:255, halign:'center' },
-        columnStyles: { 0:{ cellWidth: Math.min(180,rightColW/2) }, 1:{ cellWidth: Math.max(120,rightColW/2), halign: 'right' } }
-      });
+      pdf.autoTable({ startY: logoY + logoH + 26, margin: { left: rightColX }, tableWidth: rightColW, head: [['Indicatore','Valore']], body: kpiRows, theme:'grid', styles:{ fontSize:10, cellPadding:6 }, headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }, columnStyles:{ 0:{ cellWidth: Math.min(180,rightColW/2) }, 1:{ cellWidth: Math.max(120,rightColW/2), halign: 'right' } } });
       const kpiBottom = pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (logoY + logoH + 26);
 
       let y = Math.max(paramsBottom, kpiBottom) + 12;
@@ -678,124 +587,84 @@ html.desktop .brandCenter .logo{
         const periodsRows = periods.map(p => [String(p.start), String(p.end), `${p.rate}%`]);
         pdf.setFontSize(13);
         pdf.text('Periodi con rendimento personalizzato', leftX, y);
-        pdf.autoTable({
-          startY: y + 8,
-          margin: { left: leftX },
-          tableWidth: contentW,
-          head: [['Da anno','A anno','Rendimento annuo']],
-          body: periodsRows,
-          theme: 'grid',
-          styles: { fontSize: 10, cellPadding: 6 },
-          headStyles: { fillColor:[30,30,36], textColor:255, halign:'center' },
-          columnStyles: { 0:{ cellWidth: 100, halign:'center' }, 1:{ cellWidth: 100, halign:'center' }, 2:{ cellWidth: contentW-200, halign:'right' } }
-        });
+        pdf.autoTable({ startY: y + 8, margin: { left: leftX }, tableWidth: contentW, head: [['Da anno','A anno','Rendimento annuo']], body: periodsRows, theme:'grid', styles:{ fontSize:10, cellPadding:6 }, headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }, columnStyles:{ 0:{ cellWidth:100, halign:'center' }, 1:{ cellWidth:100, halign:'center' }, 2:{ cellWidth: contentW-200, halign:'right' } } });
         y = pdf.lastAutoTable ? pdf.lastAutoTable.finalY + 12 : y + 40;
       }
 
       const chartEl = document.getElementById('chart');
-      if(chartEl){
-        try{ const chartImg = chartEl.toDataURL('image/png',1.0); pdf.addImage(chartImg,'PNG', leftX, y, contentW, 220); y+=232; }catch{}
-      }
+      if(chartEl){ try{ const chartImg = chartEl.toDataURL('image/png',1.0); pdf.addImage(chartImg,'PNG', leftX, y, contentW, 220); y+=232; }catch{} }
 
       const rows = Array.from(document.querySelectorAll('#tableBody tr')).map(tr=>Array.from(tr.children).map(td=>td.textContent));
       const head = [['Anno','Saldo iniziale','Commissioni','Rendimento netto','Saldo finale']];
-      pdf.autoTable({
-        head, body: rows, startY: y,
-        margin: { left: leftX, bottom: 20 },
-        tableWidth: contentW,
-        theme:'grid',
-        styles:{ fontSize:10, cellPadding:6 },
-        headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' },
-        alternateRowStyles:{ fillColor:[20,20,24], textColor:255 },
-        columnStyles:{ 0:{ halign:'center', cellWidth:70 }, 1:{ halign:'right' }, 2:{ halign:'right' }, 3:{ halign:'right' }, 4:{ halign:'right' } }
-      });
-
+      pdf.autoTable({ head, body: rows, startY: y, margin: { left: leftX, bottom: 20 }, tableWidth: contentW, theme:'grid', styles:{ fontSize:10, cellPadding:6 }, headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }, alternateRowStyles:{ fillColor:[20,20,24], textColor:255 }, columnStyles:{ 0:{ halign:'center', cellWidth:70 }, 1:{ halign:'right' }, 2:{ halign:'right' }, 3:{ halign:'right' }, 4:{ halign:'right' } } });
       pdf.save('simulazione.pdf');
     };
 
-    renderPeriods();
+    // Init
     (function(){
       const saved=localStorage.getItem('twc_logo'); if(saved) el('brandLogo').src=saved;
       applyHistVisibility();
       simulate();
     })();
+
   </script>
 
-<!-- Dual Layout Switcher (Auto / Mobile / Desktop) -->
-<script>
-(function(){
-  // ---- Decide initial mode ----
-  const qs = new URLSearchParams(location.search);
-  const qsMode = qs.get('mode'); // 'mobile' | 'desktop' | 'auto'
-  const stored = localStorage.getItem('layoutMode'); // previous choice
-  let mode = (qsMode || stored || 'auto').toLowerCase();
+  <!-- Dual Layout Switcher (Auto / Mobile / Desktop) -->
+  <script>
+  (function(){
+    const qs = new URLSearchParams(location.search);
+    const qsMode = qs.get('mode');
+    const stored = localStorage.getItem('layoutMode');
+    let mode = (qsMode || stored || 'auto').toLowerCase();
 
-  function likelyMobile(){
-    return window.matchMedia('(max-width: 760px)').matches ||
-           /Mobi|Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-  }
-
-  function apply(mode){
-    document.documentElement.classList.remove('mobile','desktop','auto');
-    document.documentElement.classList.add(mode);
-    if(mode === 'auto'){
-      document.documentElement.classList.add(likelyMobile() ? 'mobile' : 'desktop');
+    function likelyMobile(){
+      return window.matchMedia('(max-width: 760px)').matches ||
+             /Mobi|Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     }
-    localStorage.setItem('layoutMode', mode);
-    highlight(mode);
-    queueResizeCharts();
-  }
-
-  // ---- Toggle UI ----
-  function buildToggle(){
-    const el = document.createElement('div');
-    el.id = 'layoutToggle';
-    el.innerHTML = `
-      <button data-m="auto" title="Selezione automatica">Auto</button>
-      <button data-m="mobile" title="Forza layout mobile">Mobile</button>
-      <button data-m="desktop" title="Forza layout desktop">Desktop</button>
-    `;
-    document.body.appendChild(el);
-    el.addEventListener('click', (e)=>{
-      const b = e.target.closest('button'); if(!b) return;
-      mode = b.dataset.m; apply(mode);
-    });
-    return el;
-  }
-
-  function highlight(m){
-    const el = document.getElementById('layoutToggle'); if(!el) return;
-    [...el.querySelectorAll('button')].forEach(btn => btn.classList.toggle('active', btn.dataset.m === m));
-  }
-
-  // ---- Chart.js resize helper ----
-  function queueResizeCharts(){
-    if(!window.Chart) return;
-    setTimeout(()=>{
-      try{
-        // Chart.js v3+ instances map
-        const inst = Chart.instances || Chart.getCharts?.() || {};
-        const list = Array.isArray(inst) ? inst : Object.values(inst);
-        list.forEach(c => { try{ c.resize(); }catch{} });
-      }catch{}
-    }, 50);
-  }
-
-  // init
-  window.addEventListener('load', function(){
-    buildToggle();
-    apply(mode);
-  }, { once: true });
-
-  // if Auto, react to viewport changes
-  window.addEventListener('resize', function(){
-    if(mode === 'auto'){ apply('auto'); }
-  });
-  window.addEventListener('orientationchange', function(){
-    if(mode === 'auto'){ setTimeout(()=>apply('auto'), 100); }
-  });
-})();
-</script>
+    function apply(mode){
+      document.documentElement.classList.remove('mobile','desktop','auto');
+      document.documentElement.classList.add(mode);
+      if(mode === 'auto'){
+        document.documentElement.classList.add(likelyMobile() ? 'mobile' : 'desktop');
+      }
+      localStorage.setItem('layoutMode', mode);
+      highlight(mode);
+      queueResizeCharts();
+    }
+    function buildToggle(){
+      const el = document.createElement('div');
+      el.id = 'layoutToggle';
+      el.innerHTML = `
+        <button data-m="auto" title="Selezione automatica">Auto</button>
+        <button data-m="mobile" title="Forza layout mobile">Mobile</button>
+        <button data-m="desktop" title="Forza layout desktop">Desktop</button>
+      `;
+      document.body.appendChild(el);
+      el.addEventListener('click', (e)=>{
+        const b = e.target.closest('button'); if(!b) return;
+        mode = b.dataset.m; apply(mode);
+      });
+      return el;
+    }
+    function highlight(m){
+      const el = document.getElementById('layoutToggle'); if(!el) return;
+      [...el.querySelectorAll('button')].forEach(btn => btn.classList.toggle('active', btn.dataset.m === m));
+    }
+    function queueResizeCharts(){
+      if(!window.Chart) return;
+      setTimeout(()=>{
+        try{
+          const inst = Chart.instances || Chart.getCharts?.() || {};
+          const list = Array.isArray(inst) ? inst : Object.values(inst);
+          list.forEach(c => { try{ c.resize(); }catch{} });
+        }catch{}
+      }, 50);
+    }
+    window.addEventListener('load', function(){ buildToggle(); apply(mode); }, { once:true });
+    window.addEventListener('resize', function(){ if(mode === 'auto'){ apply('auto'); }});
+    window.addEventListener('orientationchange', function(){ if(mode === 'auto'){ setTimeout(()=>apply('auto'), 100); }});
+  })();
+  </script>
 
 </body>
 </html>
