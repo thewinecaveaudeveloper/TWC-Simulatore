@@ -65,7 +65,6 @@
   
 /* --- Added: mobile responsiveness tweaks (Oct 2025) --- */
 @media (max-width: 1024px){
-  /* avoid creating an implicit 3rd column for the toolbar on smaller screens */
   .toolbar{ grid-column: 2; }
 }
 @media (max-width: 760px){
@@ -88,6 +87,21 @@
   .title h1{ font-size: 18px; }
 }
 /* --- End mobile tweaks --- */
+
+
+/* --- Center header brand/logo exactly --- */
+header{
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.brandCenter{ grid-column: 2; justify-self: center; text-align: center; }
+.toolbar{ grid-column: 3; justify-self: end; }
+@media (max-width: 760px){
+  header{ grid-template-columns: 1fr; }
+  .brandCenter{ grid-column: 1; }
+  .toolbar{ grid-column: 1; justify-self: center; }
+}
 
 </style>
 </head>
@@ -632,5 +646,47 @@
       simulate();
     })();
   </script>
+
+<!-- Auto Fit-to-Screen for small devices (prevents needing manual zoom-out) -->
+<script>
+(function(){
+  var MIN_SCALE = 0.70; // abbassa a 0.60 se vuoi forzare tutto in 1 schermata
+  function vw(){ return (window.visualViewport && visualViewport.width) || window.innerWidth; }
+  function vh(){ return (window.visualViewport && visualViewport.height) || window.innerHeight; }
+  var fitRoot = null;
+  function ensureFitRoot(){
+    if(fitRoot) return fitRoot;
+    fitRoot = document.createElement('div');
+    fitRoot.id = 'fitRoot';
+    while(document.body.firstChild){
+      fitRoot.appendChild(document.body.firstChild);
+    }
+    document.body.appendChild(fitRoot);
+    var s = fitRoot.style;
+    s.transformOrigin = 'top left';
+    s.willChange = 'transform';
+    return fitRoot;
+  }
+  function applyFit(){
+    if(!window.matchMedia('(max-width: 760px)').matches) return;
+    var rootEl = document.documentElement;
+    var bw = vw(), bh = vh();
+    var contentW = Math.max(rootEl.scrollWidth, document.body.scrollWidth);
+    var contentH = Math.max(rootEl.scrollHeight, document.body.scrollHeight);
+    var sx = bw / contentW, sy = bh / contentH;
+    var scale = Math.min(1, Math.max(Math.min(sx, sy), MIN_SCALE));
+    var wrap = ensureFitRoot();
+    wrap.style.width = contentW + 'px';
+    wrap.style.height = contentH + 'px';
+    wrap.style.transform = 'scale(' + scale + ')';
+    document.body.style.overflow = 'hidden';
+    rootEl.style.overflow = 'hidden';
+  }
+  window.addEventListener('load', applyFit, { once: true });
+  window.addEventListener('orientationchange', function(){ setTimeout(applyFit, 150); });
+  window.addEventListener('resize', function(){ clearTimeout(window.__fitT); window.__fitT = setTimeout(applyFit, 120); });
+})();
+</script>
+
 </body>
 </html>
