@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>The Wine Caveau - Simulatore d'investimento</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,7 +62,34 @@
       .field{flex:1 1 180px;max-width:100%}
       .kpis{grid-template-columns:1fr 1fr}
     }
-  </style>
+  
+/* --- Added: mobile responsiveness tweaks (Oct 2025) --- */
+@media (max-width: 1024px){
+  /* avoid creating an implicit 3rd column for the toolbar on smaller screens */
+  .toolbar{ grid-column: 2; }
+}
+@media (max-width: 760px){
+  :root{ --leftCol: 100%; }
+  .wrap{ padding: 0 10px; }
+  header{ grid-template-columns: 1fr; gap: 8px; }
+  .brandCenter{ grid-column: 1; justify-self: center; flex-direction: column; text-align: center; }
+  .logo{ width: 84px; height: 84px; }
+  .title h1{ font-size: clamp(18px, 6vw, 24px); }
+  .toolbar{ grid-column: 1; justify-self: stretch; justify-content: center; gap: 6px; }
+  .grid{ grid-template-columns: 1fr; }
+  .row{ gap: 12px; }
+  .field{ flex: 1 1 100%; max-width: 100%; }
+  .kpis{ grid-template-columns: 1fr; gap: 8px; }
+  .chart-box{ height: 220px; }
+  table{ display: block; overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 380px){
+  .btn{ padding: 8px 10px; }
+  .title h1{ font-size: 18px; }
+}
+/* --- End mobile tweaks --- */
+
+</style>
 </head>
 <body>
   <div class="wrap">
@@ -338,7 +365,7 @@
           {label:'Capitale investito',data:principalCum,backgroundColor:'rgba(123,10,46,0.7)',stack:'tot'},
           {label:'Rendimento',data:interestCum,backgroundColor:'rgba(201,162,39,0.7)',stack:'tot'}
         ]},
-        options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>fmtEUR.format(v)}}}}
+        options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>fmtEUR.format(v)}}}}
       });
 
       const tb=el('tableBody');tb.innerHTML='';
