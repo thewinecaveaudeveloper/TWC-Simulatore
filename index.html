@@ -83,10 +83,11 @@
 @media (min-width: 761px){ #layoutToggle{ right: 16px; bottom: 16px; } }
 
 /* Base: assume desktop */
-html{ --leftCol: 520px; } /* preserva il layout attuale se esiste questa var */
+html{ --leftCol: 520px; } /* base */
+html.desktop { --leftCol: 600px; } /* <-- Desktop più largo per far stare gli indicatori su una riga */
 html.desktop .grid{ grid-template-columns: var(--leftCol) 1fr !important; }
 html.desktop .toolbar{ justify-self: end; }
-html.desktop .kpis{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+html.desktop .kpis{ grid-template-columns: repeat(5, minmax(0,1fr)); } /* <-- 5 indicatori su una riga */
 
 /* Header davvero centrato (vale per entrambe) */
 header{
@@ -116,6 +117,64 @@ html.mobile table{ display: block; overflow-x: auto; white-space: nowrap; }
 @media (max-width: 380px){
   html.mobile .btn{ padding: 8px 10px; }
   html.mobile .title h1{ font-size: 18px; }
+}
+
+
+/* --- KPI row tidy (desktop) --- */
+html.desktop .kpis{ grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 8px; }
+.kpi{ display:flex; flex-direction:column; justify-content:center; padding:10px; }
+.kpi .t{ font-size:12px; line-height:1.15; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.kpi .v{ font-size:18px; line-height:1.1; white-space:nowrap; } /* evita andare a capo tra numero e € */
+
+
+/* === Adjustments (Oct 2025) === */
+
+/* 1) KPI frames: slightly wider feel via padding; consistent title height; aligned values */
+html.desktop .kpis{ grid-template-columns: repeat(5, minmax(130px, 1fr)); gap: 6px; } /* tighter gap to gain width per card */
+.kpi{
+  display: grid;
+  grid-template-rows: auto 1fr; /* title then value area */
+  align-items: start;
+  padding: 12px 14px; /* frame feels wider without increasing column width */
+  min-height: 84px;   /* ensures content fits */
+}
+.kpi .t{
+  font-size:12px;
+  line-height:1.15;
+  margin:0;
+  min-height: 2.4em;  /* equal title block height across all KPI -> values align */
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.kpi .v{
+  align-self: end;
+  font-size:18px;
+  line-height:1.1;
+  white-space:nowrap; /* keeps € glued to number */
+}
+
+/* 2) Header spacing tighter + logo slightly more left on desktop */
+html.desktop header{ padding: 12px; gap: 10px; }
+html.desktop .brandCenter{ gap: 10px; }
+html.desktop .brandCenter .logo{ transform: translateX(-12px); } /* move logo a bit left vs title */
+
+
+/* === Oct 2025: KPI titles centered + header more compact === */
+
+/* KPI: center alignment for title (and values for consistency) */
+.kpi{ text-align:center; }                /* center all text inside KPI */
+.kpi .t{ text-align:center; }            /* ensure title centered */
+.kpi .v{ justify-self:center; }          /* center value in grid if needed */
+
+/* Header: reduce internal padding and bring logo further left */
+html.desktop header{ padding: 8px; gap: 8px; }
+html.desktop .brandCenter{ gap: 8px; }
+html.desktop .toolbar{ gap: 6px; }
+
+/* To truly reduce header height, slightly shrink the desktop logo box */
+html.desktop .brandCenter .logo{
+  width: 140px;
+  height: 140px;
+  transform: translateX(-16px); /* a bit more left than before */
 }
 
 </style>
