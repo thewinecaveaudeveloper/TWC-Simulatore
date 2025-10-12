@@ -4,27 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>The Wine Caveau - Simulatore d'investimento</title>
-
-  <!-- Fonts & libs -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.3/dist/jspdf.plugin.autotable.min.js"></script>
-
   <style>
     :root{ --bg:#0f0f10; --panel:#151518; --muted:#9797a1; --text:#f4f4f6; --brand:#7b0a2e; --gold:#c9a227; --radius:20px; --leftCol:420px }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial;background:#0f0f10;color:var(--text)}
     .wrap{max-width:1320px;margin:24px auto;padding:0 16px}
-
-    /* Header */
-    header{
-      background:#141418;border:1px solid #2a2a31;border-radius:20px;
-      padding:12px 16px 16px 12px;
-      display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px
-    }
+    header{background:#141418;border:1px solid #2a2a31;border-radius:20px;padding:12px 16px 16px 12px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
     .brandCenter{grid-column:1;justify-self:start;display:flex;align-items:center;gap:12px;margin-left:0}
     .logo{background:#151518;width:150px;height:150px;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
     .logo-img{display:block;width:108%;height:130%;object-fit:contain}
@@ -32,14 +23,11 @@
     .toolbar{grid-column:3;justify-self:end;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .btn{border:1px solid #2a2a31;border-radius:12px;padding:8px 12px;background:#1a1a1f;color:#f7f7fa;cursor:pointer;font-weight:600}
     .btn.gold{background:linear-gradient(135deg,var(--gold),#8d7218);color:#111;border-color:#8d7218}
-
-    /* Layout principale */
     .grid{display:grid;grid-template-columns:var(--leftCol) 1fr;gap:18px;margin:18px 0 0}
     .card{background:#151518;border:1px solid #2a2a31;border-radius:20px}
     .card .head{padding:14px 16px;border-bottom:1px solid #24242a;display:flex;align-items:center;justify-content:space-between}
     .card .head h2{margin:0;font-size:16px}
-    /* Evita accavallamenti bottoni scenario */
-    .card .head > div{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .card .head > div{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .card .body{padding:14px 24px}
     .row{display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap}
     .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;flex:0 0 180px;max-width:180px}
@@ -50,8 +38,6 @@
     .inline-label{display:flex;align-items:center;gap:10px}
     .inline-label label{margin:0;white-space:nowrap}
     .pct{font-size:11px;opacity:.8;margin-left:4px}
-
-    /* KPI + chart + tabella */
     .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
     .kpi{background:#0f0f12;border:1px solid #222228;border-radius:14px;padding:12px;display:grid;grid-template-rows:auto 1fr;align-items:start;min-height:84px;text-align:center}
     .kpi .t{font-size:12px;line-height:1.15;margin:0;min-height:2.4em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:center}
@@ -63,68 +49,34 @@
     tbody td{padding:10px;background:#0f0f12;border-top:1px solid #222228;border-bottom:1px solid #222228}
     tbody tr td:first-child{border-left:1px solid #222228;border-top-left-radius:10px;border-bottom-left-radius:10px}
     tbody tr td:last-child{border-right:1px solid #222228;border-top-right-radius:10px;border-bottom-right-radius:10px}
-
-    /* Modal Admin */
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
     .modal .panel{background:#141418;border:1px solid #2a2a31;border-radius:16px;max-width:560px;width:100%}
     .modal .panel .head{padding:12px 14px;border-bottom:1px solid #24242a;display:flex;align-items:center;justify-content:space-between}
     .modal .panel .body{padding:14px}
-
-    /* MOBILE */
-    html.mobile{ --leftCol:100%; }
-    html.mobile .wrap{ padding:0 10px; max-width:100%; }
-
-    /* header completamente centrato su mobile */
-    html.mobile header{
-      grid-template-columns:1fr;
-      gap:8px;
-      padding:14px;                /* padding simmetrico: elimina la sensazione “spostato a sinistra” */
-      text-align:center;
-    }
-    html.mobile .brandCenter{
-      grid-column:1;
-      justify-self:center;
-      text-align:center;
-      display:flex;
-      flex-direction:column;        /* logo sopra, titolo sotto */
-      align-items:center;
-      gap:10px;
-      margin:0;
-      max-width:100%;
-    }
-    html.mobile .logo{ width:84px; height:84px; }
-    html.mobile .title{ width:100%; max-width:100%; }
-    html.mobile .title h1{
-      font-size: clamp(20px, 5.6vw, 26px);
-      line-height:1.15;
-      margin:0;
-      text-align:center;            /* centratura esplicita del testo */
-    }
-    html.mobile .toolbar{
-      grid-column:1;
-      justify-self:center;
-      gap:6px;
-    }
-
-    /* layout contenuti */
-    html.mobile .grid{ grid-template-columns:1fr !important; }
-    html.mobile .row{ gap:12px; }
-    html.mobile .field{ flex:1 1 100%; max-width:100%; }
-    html.mobile .kpis{ grid-template-columns:1fr; gap:8px; }
-    html.mobile .chart-box{ height:240px; }
-    html.mobile table{ display:block; overflow-x:auto; white-space:nowrap; }
-
-    /* stop allo zoom automatico di Safari su input < 16px */
-    html.mobile .field input,
-    html.mobile .field select,
-    html.mobile select{
-      font-size:16px;
-    }
-
-    /* “Respiro” del frame Risultati */
-    .grid > .card:last-child{ overflow:visible; }
-    .grid > .card:last-child .body{ padding-left:14px; padding-right:26px; }
-    #kpis.kpis{ margin-left:-10px; margin-right:0; gap:6px; }
+    html{--leftCol:420px}
+    html.desktop{--leftCol:520px}
+    html.desktop .grid{grid-template-columns:var(--leftCol) 1fr !important}
+    html.desktop .toolbar{justify-self:end}
+    html.desktop .kpis{grid-template-columns:repeat(5,minmax(0,1fr))}
+    html.mobile{--leftCol:100%}
+    html.mobile .wrap{padding:0 10px;max-width:100%}
+    html.mobile header{grid-template-columns:1fr;gap:8px;padding:14px;text-align:center}
+    html.mobile .brandCenter{grid-column:1;justify-self:center;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;margin:0;max-width:100%}
+    html.mobile .logo{width:84px;height:84px}
+    html.mobile .title{width:100%;max-width:100%}
+    html.mobile .title h1{font-size:clamp(20px,5.6vw,26px);line-height:1.15;margin:0;text-align:center}
+    html.mobile .toolbar{grid-column:1;justify-self:center;gap:6px}
+    html.mobile .grid{grid-template-columns:1fr !important}
+    html.mobile .row{gap:12px}
+    html.mobile .field{flex:1 1 100%;max-width:100%}
+    html.mobile .kpis{grid-template-columns:1fr;gap:8px}
+    html.mobile .chart-box{height:240px}
+    html.mobile table{display:block;overflow-x:auto;white-space:nowrap}
+    html.mobile .field input,html.mobile .field select,html.mobile select{font-size:16px}
+    html.desktop .grid > .card:last-child .body{padding-left:14px;padding-right:26px}
+    html.desktop #kpis.kpis{margin-left:-10px;margin-right:0;gap:6px}
+    html.mobile .grid > .card:last-child .body{padding:14px 14px}
+    html.mobile #kpis.kpis{margin:0;gap:8px}
   </style>
 </head>
 <body>
@@ -132,8 +84,7 @@
     <header>
       <div class="brandCenter">
         <div class="logo">
-          <img id="brandLogo" class="logo-img" alt="Logo" referrerpolicy="no-referrer" loading="eager"
-               src="https://shop.thewinecaveau.com/wp-content/uploads/2023/03/Logo-bianco-caveau-copia-2048x2048.png">
+          <img id="brandLogo" class="logo-img" alt="Logo" referrerpolicy="no-referrer" loading="eager" src="https://shop.thewinecaveau.com/wp-content/uploads/2023/03/Logo-bianco-caveau-copia-2048x2048.png">
         </div>
         <div class="title"><h1 id="appTitle">The Wine Caveau - Simulatore d'investimento</h1></div>
       </div>
@@ -142,9 +93,7 @@
         <button class="btn gold" id="btnPDF">Esporta PDF</button>
       </div>
     </header>
-
     <div class="grid">
-      <!-- IMPOSTAZIONI -->
       <div class="card">
         <div class="head">
           <h2>Impostazioni</h2>
@@ -162,7 +111,6 @@
           <div class="row">
             <div class="field wide"><label>Rendimento annuo di base (%)</label><input type="text" id="rate" value="15"></div>
           </div>
-
           <div class="row" id="histRow" style="display:none;align-items:center">
             <div class="field" style="flex:0 0 240px;max-width:240px">
               <div class="inline-label">
@@ -175,7 +123,6 @@
               <select id="histYears"></select>
             </div>
           </div>
-
           <div class="row" style="align-items:center">
             <div class="field" style="flex:1">
               <div class="inline-label">
@@ -188,16 +135,13 @@
             </div>
             <div class="field"><label id="lblMgmtValue">Percentuale annua (%)</label><input type="text" id="mgmtValue" value="0"></div>
           </div>
-
           <div class="row" style="align-items:center">
             <div class="field"><label>Commissione TWC (%)</label><input type="text" id="twcValue" value="50"></div>
           </div>
-
           <div class="row">
             <button class="btn gold" id="btnRun">Simula</button>
             <button class="btn" id="btnReset">Reset</button>
           </div>
-
           <div class="row" style="align-items:center;justify-content:space-between;margin-top:8px">
             <h3 style="margin:0;font-size:14px">Periodi con rendimento personalizzato</h3>
             <div><button class="btn" id="btnAddPeriod">+ Aggiungi periodo</button></div>
@@ -205,8 +149,6 @@
           <div id="periodList" style="margin-top:6px" class="help">Nessun periodo personalizzato. Il rendimento userà il valore di base per tutti gli anni.</div>
         </div>
       </div>
-
-      <!-- RISULTATI -->
       <div class="card">
         <div class="head"><h2>Risultati</h2></div>
         <div class="body">
@@ -229,8 +171,6 @@
       </div>
     </div>
   </div>
-
-  <!-- MODAL ADMIN -->
   <div class="modal" id="adminModal">
     <div class="panel">
       <div class="head"><strong>Admin</strong><button class="btn" id="closeAdmin">Chiudi</button></div>
@@ -254,31 +194,24 @@
       </div>
     </div>
   </div>
-
-  <!-- APP SCRIPT -->
   <script>
     function $(id){ return document.getElementById(id); }
     var fmtEUR = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'});
     var chart, periods = [], lastSim = null;
-
     var FULL_SERIES=[{year:2015,pct:7.9},{year:2016,pct:38.4},{year:2017,pct:27.5},{year:2018,pct:24.2},{year:2019,pct:-0.8},{year:2020,pct:7.5},{year:2021,pct:24.2},{year:2022,pct:1.2},{year:2023,pct:-12.5},{year:2024,pct:-12.1}];
     function getHistoricalSlice(n){
       var nC=Math.max(1,Math.min(n,FULL_SERIES.length));
       var s=FULL_SERIES.slice(FULL_SERIES.length-nC);
       return { years:s.map(function(x){return x.year;}), rates:s.map(function(x){return x.pct==null?null:x.pct/100;}) };
     }
-
-    /* ========== LOGO: copia on-demand dal dominio remoto (con fallback proxy) ========== */
     var FALLBACK_SVG = encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='1024' height='1024' viewBox='0 0 1024 1024'><rect width='100%' height='100%' rx='120' ry='120' fill='#151518'/><rect x='40' y='40' width='944' height='944' rx='100' ry='100' fill='none' stroke='#2a2a31' stroke-width='20'/><text x='50%' y='55%' text-anchor='middle' font-family='Inter,Arial,sans-serif' font-size='300' font-weight='800' fill='#ffffff'>TWC</text></svg>");
     var FALLBACK_LOGO_DATA = "data:image/svg+xml;utf8," + FALLBACK_SVG;
     var REMOTE_LOGO = "https://shop.thewinecaveau.com/wp-content/uploads/2023/03/Logo-bianco-caveau-copia-2048x2048.png";
-
     function setHeaderLogo(src){
       var img=$('brandLogo');
       img.onerror=function(){ img.src=FALLBACK_LOGO_DATA; };
       img.src=src||FALLBACK_LOGO_DATA;
     }
-
     function toDataURL(src){
       return new Promise(function(resolve){
         if(!src){ resolve(null); return; }
@@ -294,7 +227,6 @@
         }).catch(function(){ resolve(null); });
       });
     }
-
     function rasterizeImageToPNG(src){
       return new Promise(function(resolve){
         var i=new Image();
@@ -312,22 +244,16 @@
         i.src=src;
       });
     }
-
-    // Prova diretto, poi due proxy pubblici read-only per sbloccare CORS
     function fetchRemoteLogoData(url){
       return new Promise(function(resolve){
-        // 1) tentativo diretto (se il server consente CORS funziona subito)
         toDataURL(url).then(function(d){
           if(d){ resolve(d); return; }
-          // 2) proxy images.weserv.nl (aggiunge CORS)
           var viaWeserv = "https://images.weserv.nl/?url=" + encodeURIComponent(url.replace(/^https?:\/\//,''));
           toDataURL(viaWeserv).then(function(d2){
             if(d2){ resolve(d2); return; }
-            // 3) proxy isomorphic-git
             var viaIso = "https://cors.isomorphic-git.org/" + url;
             toDataURL(viaIso).then(function(d3){
               if(d3){ resolve(d3); return; }
-              // 4) ultimo tentativo: rasterizza via <img> su uno dei proxy (PNG)
               rasterizeImageToPNG(viaWeserv).then(function(png){
                 resolve(png || FALLBACK_LOGO_DATA);
               });
@@ -336,8 +262,6 @@
         });
       });
     }
-
-    /* Periodi personalizzati */
     function renderPeriods(){
       var list=$('periodList');
       if(periods.length===0){
@@ -382,12 +306,9 @@
     }
     function addPeriod(p){ p=p||{start:1,end:3,rate:20}; periods.push(p); renderPeriods(); }
     function removePeriod(i){ periods.splice(i,1); renderPeriods(); }
-
-    /* Simulatore */
     function compute(params){
       var P0=params.P0, Y=params.Y, baseR=params.baseR, mgmtType=params.mgmtType,
           mgmtValue=params.mgmtValue, twcPct=params.twcPct, periodsP=params.periods, histRates=params.histRates;
-
       var months=Y*12; var b=P0; var rows=[]; var yearStart=b, netYear=0;
       for(var m=1;m<=months;m++){
         var yIdx=Math.floor((m-1)/12)+1; var r=baseR;
@@ -402,17 +323,14 @@
       var twcShare=Math.max(0,grossProfit*(twcPct/100)+feesTot); var clientShare=Math.max(0,grossProfit-twcShare);
       return { rows:rows, final:final, grossProfit:grossProfit, clientShare:clientShare, twcShare:twcShare, feesTot:feesTot, annualFee:annualFee };
     }
-
     function simulate(){
       var P0=parseFloat($('initial').value)||0;
       var mt=$('mgmtType').value;
       var mv=parseFloat($('mgmtValue').value)||0;
       var twc=parseFloat($('twcValue').value)||0;
       var baseR=(parseFloat($('rate').value)||0)/100;
-
       var useHist = $('useHistorical').checked && $('histRow').style.display !== 'none';
       var yearLabels=[], histRates=null, Y;
-
       if(useHist){
         var n=parseInt(($('histYears') && $('histYears').value) ? $('histYears').value : '1',10);
         var r=getHistoricalSlice(n);
@@ -426,19 +344,15 @@
         Y=Math.min(50,Math.max(1,parseInt($('years').value)||1));
         yearLabels=Array.from({length:Y},function(_,i){return 'Anno '+(i+1);});
       }
-
       var sim=compute({P0:P0,Y:Y,baseR:baseR,mgmtType:mt,mgmtValue:mv,twcPct:twc,periods:periods,histRates:histRates});
       lastSim=sim;
-
       $('kpiPrincipal').textContent=fmtEUR.format(P0);
       $('kpiFinal').textContent=fmtEUR.format(sim.final);
       $('kpiGain').textContent=fmtEUR.format(sim.grossProfit);
       $('kpiClient').textContent=fmtEUR.format(sim.clientShare);
       $('kpiTWC').textContent=fmtEUR.format(sim.twcShare);
-
       var principalCum=sim.rows.map(function(){return P0;});
       var interestCum=sim.rows.map(function(r){return r.end-P0;});
-
       if(chart){ chart.destroy(); }
       chart=new Chart($('chart'),{
         type:'bar',
@@ -448,7 +362,6 @@
         ]},
         options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:function(v){return fmtEUR.format(v);}}}}}
       });
-
       var tb=$('tableBody'); tb.innerHTML='';
       sim.rows.forEach(function(r,i){
         var tr=document.createElement('tr');
@@ -460,8 +373,6 @@
         tb.appendChild(tr);
       });
     }
-
-    /* Preset + bind UI */
     var statePresets={prudente:11,base:16,ottimistico:20};
     document.querySelector('[data-scenario="prudente"]').onclick=function(){ $('rate').value=statePresets.prudente; simulate(); };
     document.querySelector('[data-scenario="base"]').onclick=function(){ $('rate').value=statePresets.base; simulate(); };
@@ -470,8 +381,6 @@
     $('mgmtType').addEventListener('change',function(){
       $('lblMgmtValue').textContent=($('mgmtType').value==='percent')?'Percentuale annua (%)':'Quota annuale (€)';
     });
-
-    /* Admin */
     var adminModal=$('adminModal');
     $('btnAdmin').onclick=function(){
       var pass=prompt('Password:');
@@ -486,18 +395,16 @@
     $('admSave').onclick=function(){
       var prud=+$('admPrud').value||0, base=+$('admBase').value||0, ott=+$('admOtt').value||0;
       statePresets.prudente=prud; statePresets.base=base; statePresets.ottimistico=ott;
-      $('pPrud').textContent='('+prud+'%)';
-      $('pBase').textContent='('+base+'%)';
-      $('pOtt').textContent='('+ott+'%)';
+      $('pPrud').textContent='('+statePresets.prudente+'%)';
+      $('pBase').textContent='('+statePresets.base+'%)';
+      $('pOtt').textContent='('+statePresets.ottimistico+'%)';
       $('rate').value=base;
-
       var enableHist = $('admEnableHist').checked ? '1' : '0';
       try{ localStorage.setItem('twc_hist_enabled', enableHist); }catch(e){}
       applyHistVisibility();
       adminModal.style.display='none';
       simulate();
     };
-
     $('logoUpload').addEventListener('change',function(e){
       var f=e.target.files[0]; if(!f) return;
       var r=new FileReader();
@@ -510,12 +417,10 @@
       };
       r.readAsDataURL(f);
     });
-
     $('btnAddPeriod').onclick=function(){
       var next=periods.length? (periods[periods.length-1].end+1) : 1;
       addPeriod({start:next,end:next+1,rate:20});
     };
-
     (function populateHistYears(){
       var sel=$('histYears'); if(!sel) return;
       var max=FULL_SERIES.length;
@@ -524,7 +429,6 @@
       }
       sel.value=String(Math.min(5,max));
     })();
-
     $('useHistorical').addEventListener('change',function(e){
       var on=e.target.checked;
       $('histYearsField').style.display=on?'':'none';
@@ -536,14 +440,12 @@
         $('years').removeAttribute('disabled');
       }
     });
-
     $('histYears').addEventListener('change', function(){
       if($('useHistorical').checked){
         $('years').value = $('histYears').value;
         simulate();
       }
     });
-
     function applyHistVisibility(){
       var enabled=false;
       try{ enabled = localStorage.getItem('twc_hist_enabled')==='1'; }catch(e){}
@@ -554,13 +456,10 @@
         $('years').removeAttribute('disabled');
       }
     }
-
-    /* Defaults + RESET (preserva layout) */
     var DEFAULTS = {
       initial:'10000', years:'10', rate:'15', mgmtType:'percent', mgmtValue:'0', twcValue:'50',
       presets:{prudente:10,base:15,ottimistico:20}
     };
-
     function applyDefaultsToUI(opts){
       opts = opts || {preserveLayout:false};
       $('initial').value=DEFAULTS.initial;
@@ -570,57 +469,44 @@
       $('mgmtValue').value=DEFAULTS.mgmtValue;
       $('twcValue').value=DEFAULTS.twcValue;
       $('mgmtType').dispatchEvent(new Event('change'));
-
       var ps=DEFAULTS.presets;
       statePresets.prudente=ps.prudente; statePresets.base=ps.base; statePresets.ottimistico=ps.ottimistico;
       $('pPrud').textContent='('+statePresets.prudente+'%)';
       $('pBase').textContent='('+statePresets.base+'%)';
       $('pOtt').textContent='('+statePresets.ottimistico+'%)';
       $('rate').value=String(statePresets.base);
-
       var histSel=$('histYears'); if(histSel){ histSel.value='5'; }
       applyHistVisibility();
       var chk=$('useHistorical'); if(chk){ chk.checked=false; }
       var f=$('histYearsField'); if(f){ f.style.display='none'; }
-
       periods=[]; renderPeriods();
       setHeaderLogo(REMOTE_LOGO);
-
       if(!opts.preserveLayout){
         try{ localStorage.removeItem('layoutMode'); }catch(e){}
         document.documentElement.classList.remove('mobile','desktop');
         document.documentElement.classList.add('auto');
       }
     }
-
     function resetAll(){
       var html = document.documentElement;
       var currentMode = html.classList.contains('mobile') ? 'mobile' :
                         (html.classList.contains('desktop') ? 'desktop' : 'auto');
-
       try{
         localStorage.removeItem('twc_logo');
         localStorage.removeItem('twc_logo_pdf');
         localStorage.removeItem('twc_hist_enabled');
       }catch(e){}
-
       applyDefaultsToUI({ preserveLayout:true });
       simulate();
-
       html.classList.remove('mobile','desktop','auto');
       html.classList.add(currentMode);
-
       var admin=$('adminModal'); if(admin){ admin.style.display='none'; }
     }
     $('btnReset').onclick=resetAll;
-
-    /* ===== PDF: copia live dal dominio remoto al click ===== */
     $('btnPDF').onclick=function(){
-      // forza a prendere l'immagine remota ogni volta che esporti
       var remoteSrc = REMOTE_LOGO;
       var headerImg = $('brandLogo');
       if(headerImg && headerImg.src){ remoteSrc = headerImg.src; }
-
       fetchRemoteLogoData(remoteSrc).then(function(logoData){
         var jsPDF = window.jspdf.jsPDF;
         var pdf=new jsPDF('p','pt','a4');
@@ -628,16 +514,12 @@
         var pageW=pdf.internal.pageSize.getWidth();
         var contentW=pageW-minMargin*2;
         var leftX=(pageW-contentW)/2;
-
-        // Header PDF
         var logoW=90, logoH=90, gap=22, logoY=topY;
         var title="The Wine Caveau - Simulatore d'investimento";
         var logoX=leftX+10;
         var titleX=logoX+logoW+gap;
         var titleY=logoY+(logoH/2)+7;
-
         pdf.setFontSize(20);
-
         if(logoData){
           pdf.setFillColor(20,20,24);
           pdf.roundedRect(logoX,logoY,logoW,logoH,10,10,'F');
@@ -650,10 +532,8 @@
           pdf.roundedRect(logoX,logoY,logoW,logoH,10,10);
         }
         pdf.text(title,titleX,titleY);
-
         var colGap=20,leftColW=260,rightColW=contentW-leftColW-colGap,twoColX=leftX,rightColX=twoColX+leftColW+colGap;
         var mgmtTypeText = ($('mgmtType').value==='percent') ? 'Percentuale su quota investita' : 'Quota annuale fissa';
-
         var useHist = $('useHistorical').checked && $('histRow').style.display !== 'none';
         var histN=0, yearSpan='—';
         if(useHist){
@@ -661,7 +541,6 @@
           var ys = getHistoricalSlice(histN).years;
           if(ys.length){ yearSpan = ys[0] + '–' + ys[ys.length-1]; }
         }
-
         var paramsRows = [
           ['Budget iniziale', ($('initial').value||'') + ' €'],
           ['Orizzonte', ($('years').value||'') + ' anni'],
@@ -670,7 +549,6 @@
           ['Commissione TWC', ($('twcValue').value||'') + '%']
         ];
         if(useHist){ paramsRows.push(['Andamento passato', histN + ' anni (' + yearSpan + ')']); }
-
         var kpiRows = [
           ['Capitale investito', $('kpiPrincipal').innerText || ''],
           ['Guadagno netto', $('kpiGain').innerText || ''],
@@ -678,11 +556,9 @@
           ['Quota Cliente', $('kpiClient').innerText || ''],
           ['Quota TWC', $('kpiTWC').innerText || '']
         ];
-
         pdf.setFontSize(13);
         pdf.text('Parametri selezionati', twoColX, logoY + logoH + 18);
         pdf.text('Indicatori', rightColX, logoY + logoH + 18);
-
         pdf.autoTable({
           startY: logoY + logoH + 26, margin: { left: twoColX }, tableWidth: leftColW,
           head: [['Parametro','Valore']], body: paramsRows, theme:'grid',
@@ -691,7 +567,6 @@
           columnStyles:{ 0:{ cellWidth:120 }, 1:{ cellWidth:140 } }
         });
         var paramsBottom = pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (logoY + logoH + 26);
-
         pdf.autoTable({
           startY: logoY + logoH + 26, margin: { left: rightColX }, tableWidth: rightColW,
           head: [['Indicatore','Valore']], body: kpiRows, theme:'grid',
@@ -700,9 +575,7 @@
           columnStyles:{ 0:{ cellWidth: Math.min(180,rightColW/2) }, 1:{ cellWidth: Math.max(120,rightColW/2), halign: 'right' } }
         });
         var kpiBottom = pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (logoY + logoH + 26);
-
         var y = Math.max(paramsBottom, kpiBottom) + 12;
-
         if(Array.isArray(periods) && periods.length > 0){
           var pRows = periods.map(function(p){ return [String(p.start), String(p.end), p.rate + '%']; });
           pdf.setFontSize(13);
@@ -716,7 +589,6 @@
           });
           y = pdf.lastAutoTable ? (pdf.lastAutoTable.finalY + 12) : (y + 40);
         }
-
         var chartEl=$('chart');
         if(chartEl){
           try{
@@ -725,12 +597,10 @@
             y += 232;
           }catch(e){}
         }
-
         var rows = Array.prototype.slice.call(document.querySelectorAll('#tableBody tr'))
           .map(function(tr){
             return Array.prototype.slice.call(tr.children).map(function(td){ return td.textContent; });
           });
-
         pdf.autoTable({
           head: [['Anno','Saldo iniziale','Commissioni','Rendimento netto','Saldo finale']],
           body: rows, startY: y, margin: { left: leftX, bottom: 20 }, tableWidth: contentW, theme:'grid',
@@ -739,12 +609,9 @@
           alternateRowStyles:{ fillColor:[20,20,24], textColor:255 },
           columnStyles:{ 0:{ halign:'center', cellWidth:70 }, 1:{ halign:'right' }, 2:{ halign:'right' }, 3:{ halign:'right' }, 4:{ halign:'right' } }
         });
-
         pdf.save('simulazione.pdf');
       });
     };
-
-    /* Init */
     (function init(){
       applyHistVisibility();
       var saved=null;
@@ -753,15 +620,12 @@
       simulate();
     })();
   </script>
-
-  <!-- Dual Layout Switcher (Auto / Mobile / Desktop) -->
   <script>
   (function(){
     var qs=new URLSearchParams(location.search);
     var qsMode=qs.get('mode');
     var stored=null; try{ stored=localStorage.getItem('layoutMode'); }catch(e){}
     var mode=(qsMode||stored||'auto').toLowerCase();
-
     function likelyMobile(){
       return window.matchMedia('(max-width: 760px)').matches ||
              /Mobi|Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
