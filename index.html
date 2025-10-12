@@ -70,25 +70,56 @@
     .modal .panel .head{padding:12px 14px;border-bottom:1px solid #24242a;display:flex;align-items:center;justify-content:space-between}
     .modal .panel .body{padding:14px}
 
-    /* Desktop/Mobile switches */
-    html{ --leftCol: 420px; }
-    html.desktop{ --leftCol: 520px; }
-    html.desktop .grid{ grid-template-columns: var(--leftCol) 1fr !important; }
-    html.desktop .toolbar{ justify-self: end; }
-    html.desktop .kpis{ grid-template-columns: repeat(5, minmax(0,1fr)); }
+    /* MOBILE */
     html.mobile{ --leftCol:100%; }
-    html.mobile .wrap{ padding:0 10px; }
-    html.mobile header{ grid-template-columns:1fr; gap:8px; }
-    html.mobile .brandCenter{ grid-column:1; justify-self:center; text-align:center; }
-    html.mobile .toolbar{ grid-column:1; justify-self:center; gap:6px; }
+    html.mobile .wrap{ padding:0 10px; max-width:100%; }
+
+    /* header completamente centrato su mobile */
+    html.mobile header{
+      grid-template-columns:1fr;
+      gap:8px;
+      padding:14px;                /* padding simmetrico: elimina la sensazione “spostato a sinistra” */
+      text-align:center;
+    }
+    html.mobile .brandCenter{
+      grid-column:1;
+      justify-self:center;
+      text-align:center;
+      display:flex;
+      flex-direction:column;        /* logo sopra, titolo sotto */
+      align-items:center;
+      gap:10px;
+      margin:0;
+      max-width:100%;
+    }
     html.mobile .logo{ width:84px; height:84px; }
-    html.mobile .title h1{ font-size: clamp(18px, 6vw, 24px); }
+    html.mobile .title{ width:100%; max-width:100%; }
+    html.mobile .title h1{
+      font-size: clamp(20px, 5.6vw, 26px);
+      line-height:1.15;
+      margin:0;
+      text-align:center;            /* centratura esplicita del testo */
+    }
+    html.mobile .toolbar{
+      grid-column:1;
+      justify-self:center;
+      gap:6px;
+    }
+
+    /* layout contenuti */
     html.mobile .grid{ grid-template-columns:1fr !important; }
     html.mobile .row{ gap:12px; }
     html.mobile .field{ flex:1 1 100%; max-width:100%; }
     html.mobile .kpis{ grid-template-columns:1fr; gap:8px; }
     html.mobile .chart-box{ height:240px; }
     html.mobile table{ display:block; overflow-x:auto; white-space:nowrap; }
+
+    /* stop allo zoom automatico di Safari su input < 16px */
+    html.mobile .field input,
+    html.mobile .field select,
+    html.mobile select{
+      font-size:16px;
+    }
 
     /* “Respiro” del frame Risultati */
     .grid > .card:last-child{ overflow:visible; }
