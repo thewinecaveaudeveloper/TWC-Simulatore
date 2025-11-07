@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>The Wine Caveau - Simulatore d'investimento</title>
 
-  <!-- Fonts & libs -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -19,7 +18,6 @@
     body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial;background:#0f0f10;color:var(--text)}
     .wrap{max-width:1320px;margin:24px auto;padding:0 16px}
 
-    /* Header */
     header{
       background:#141418;border:1px solid #2a2a31;border-radius:20px;
       padding:8px 12px;
@@ -34,7 +32,6 @@
     .btn.gold{background:linear-gradient(135deg,var(--gold),#8d7218);color:#111;border-color:#8d7218}
     .btn.ghost{background:transparent}
 
-    /* Layout principale */
     .grid{display:grid;grid-template-columns:var(--leftCol) 1fr;gap:18px;margin:18px 0 0}
     .card{background:#151518;border:1px solid #2a2a31;border-radius:20px}
     .card .head{padding:14px 16px;border-bottom:1px solid #24242a;display:flex;align-items:center;justify-content:space-between}
@@ -42,7 +39,6 @@
     .card .head > div{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .card .body{padding:14px 18px}
 
-    /* Colonna sinistra */
     .settings .head{ flex-direction:column; align-items:center; gap:8px; }
     .settings .head h2{ width:100%; text-align:center; }
     .settings .head > div{ justify-content:center; }
@@ -51,7 +47,6 @@
     .field label{font-size:12px;color:#c9cad1;margin-bottom:2px;font-weight:700}
     .field input,.field select{border-radius:12px;border:1px solid #2a2a31;background:#0f0f12;color:#f8f8fb;padding:8px;font-size:13px;width:100%}
 
-    /* KPI + chart + tabelle */
     .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
     .kpi{background:#0f0f12;border:1px solid #222228;border-radius:14px;padding:12px;display:grid;grid-template-rows:auto 1fr;align-items:start;min-height:84px;text-align:center}
     .kpi .t{font-size:12px;line-height:1.15;margin:0;min-height:2.4em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:center}
@@ -65,17 +60,15 @@
     tbody tr td:first-child{border-left:1px solid #222228;border-top-left-radius:10px;border-bottom-left-radius:10px}
     tbody tr td:last-child{border-right:1px solid #222228;border-top-right-radius:10px;border-bottom-right-radius:10px}
 
-    /* Confronto asset UI */
     .bench-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-    #benchControls{ display:none; }   /* solo 'bench' */
-    #simTableWrap{ display:block; }   /* solo 'sim' */
-    #twcControls{ display:none; }     /* solo 'twc' */
+    #benchControls{ display:none; }
+    #simTableWrap{ display:block; }
+    #twcControls{ display:none; }
 
     .seg{display:inline-flex;background:#0f0f12;border:1px solid #2a2a31;border-radius:999px;overflow:hidden}
     .seg button{background:transparent;border:0;padding:8px 12px;color:#ddd;font-weight:700;cursor:pointer}
     .seg button.active{background:#2a2a31;color:#fff}
 
-    /* Avvisi */
     .notice{
       margin:8px 0 10px 0; padding:10px 12px; border:1px solid #5c4d12;
       background:linear-gradient(180deg,#1a180e,#141207); color:#e8d18b; border-radius:12px; display:none;
@@ -83,18 +76,15 @@
     }
     .notice.show{ display:block; }
 
-    /* Evidenza percentuali positive/negative in TWC */
     .pct-pos{ color:#2ecc71; font-weight:800; }
     .pct-neg{ color:#e74c3c; font-weight:800; }
 
-    /* Footer disclaimer */
     footer{max-width:1320px;margin:14px auto 28px auto;padding:0 16px}
     .disclaimer{
       font-size:12px;line-height:1.5;color:#b7b7c2;background:#141418;border:1px dashed #2a2a31;
       border-radius:14px;padding:12px 14px
     }
 
-    /* Desktop/Mobile */
     html{ --leftCol: 320px; }
     html.desktop{ --leftCol: 380px; }
     html.mobile{ --leftCol:100%; }
@@ -121,7 +111,6 @@
     </header>
 
     <div class="grid">
-      <!-- IMPOSTAZIONI -->
       <div class="card settings">
         <div class="head">
           <h2>Impostazioni</h2>
@@ -136,7 +125,6 @@
             <div class="field"><label>Orizzonte (anni)</label><input type="number" id="years" value="10" min="1" max="50"></div>
             <div class="field"><label>Rendimento annuo di base (%)</label><input type="text" id="rate" value="16"></div>
 
-            <!-- storico (nascosto) -->
             <div class="field" id="histRow" style="display:none">
               <div class="inline-label">
                 <input type="checkbox" id="useHistorical">
@@ -171,7 +159,6 @@
         </div>
       </div>
 
-      <!-- RISULTATI -->
       <div class="card">
         <div class="head"><h2>Risultati</h2></div>
         <div class="body">
@@ -183,7 +170,6 @@
             <div class="kpi"><div class="t">Quota TWC</div><div class="v" id="kpiTWC">—</div></div>
           </div>
 
-          <!-- SWITCH tra grafici -->
           <div class="row" style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
             <div class="seg" id="modeSwitch">
               <button data-mode="sim" class="active" aria-pressed="true">Simulazione</button>
@@ -192,10 +178,8 @@
             </div>
           </div>
 
-          <!-- UNICO GRAFICO (nascosto in TWC) -->
           <div class="chart-box"><canvas id="chart"></canvas></div>
 
-          <!-- TABELLA SIMULAZIONE -->
           <div id="simTableWrap" style="margin-top:16px">
             <h3>Tabella riepilogativa</h3>
             <table>
@@ -206,7 +190,6 @@
             </table>
           </div>
 
-          <!-- CONFRONTO ASSET -->
           <div id="benchControls">
             <div id="benchNotice" class="notice"></div>
 
@@ -236,7 +219,6 @@
             </div>
           </div>
 
-          <!-- TWC INDEX (SOLO TABELLA) -->
           <div id="twcControls" style="margin-top:8px">
             <div id="twcNotice" class="notice show">
               Le bottiglie riportate sono <b>solo alcuni esempi</b> del TWC index, a puro scopo illustrativo. I rendimenti passati non sono garanzia di risultati futuri.
@@ -266,7 +248,7 @@
 
   <footer>
     <div class="disclaimer">
-      Il presente simulatore ha finalità esclusivamente informative ed esemplificative. I risultati mostrati non costituiscono in alcun modo garanzia di rendimenti futuri né raccomandazione di investimento.<br/>
+      Il presente simulatore ha finalità esclusivamente informative ed esemplificative. I risultati mostrati non costituiscono in alcun modo garanzia di rendimenti futuri né raccomandazione di inves[...]
       The Wine Caveau S.r.l. declina ogni responsabilità per eventuali decisioni finanziarie prese sulla base delle simulazioni fornite o per l’uso improprio del presente strumento.
     </div>
   </footer>
@@ -279,14 +261,12 @@
 
     let chart, periods = [], lastSim = null, activeChartMode = 'sim', benchMetric='return';
 
-    /* Colori */
     const COLORS = {
       TWC:'#2ecc71', NDX:'#007bff', SPX:'#e74c3c', GOLD:'#c9a227',
       SIM_INVESTITO:'rgba(123,10,46,0.7)', SIM_RENDIMENTO:'rgba(201,162,39,0.7)',
       IT:'#e67e22', WORLD:'#95a5a6'
     };
 
-    /* === DATASET BOTTIGLIE (dati utente) === */
     const TWC_BOTTLES = [
       { name: 'Romanee Conti Grand Cru 2015',                       release: 20000, after5y: 31500 },
       { name: 'Jacques Selosse Substance',                          release:   220, after5y:   530 },
@@ -300,8 +280,7 @@
       { name: 'The Macallan Sherry Oak 30 Year Release 18',         release:  4700, after5y:  8100 }
     ];
 
-    /* Serie storica interna */
-    const FULL_SERIES=[{year:2015,pct:7.9},{year:2016,pct:38.4},{year:2017,pct:27.5},{year:2018,pct:24.2},{year:2019,pct:-0.8},{year:2020,pct:7.5},{year:2021,pct:24.2},{year:2022,pct:1.2},{year:2023,pct:-12.5},{year:2024,pct:-12.1}];
+    const FULL_SERIES=[{year:2015,pct:7.9},{year:2016,pct:38.4},{year:2017,pct:27.5},{year:2018,pct:24.2},{year:2019,pct:-0.8},{year:2020,pct:7.5},{year:2021,pct:24.2},{year:2022,pct:1.2},{year:2023,p[...]
     const VOL_FIX = { NDX:0.28, SPX:0.138, GOLD:0.19 };
     const INFL = { years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],
       IT:[0.0007,-0.0009,0.0124,0.0115,0.0061,-0.0014,0.0187,0.0813,0.0569,0.0100],
@@ -426,7 +405,7 @@
       const showWarn = (Ysim>10);
 
       const notice = $('benchNotice');
-      if(showWarn){ notice.classList.add('show'); notice.textContent = 'Nota: l’orizzonte della simulazione ('+Ysim+' anni) eccede i dati disponibili per il confronto (max 10 anni: 2015–2024). Il grafico usa gli ultimi 10 anni.'; }
+      if(showWarn){ notice.classList.add('show'); notice.textContent = 'Nota: l’orizzonte della simulazione ('+Ysim+' anni) eccede i dati disponibili per il confronto (max 10 anni: 2015–2024). Il [...]';
       else{ notice.classList.remove('show'); notice.textContent = ''; }
 
       const P0 = parseFloat($('initial').value)||0;
@@ -557,7 +536,6 @@
       }
     }
 
-    /* === TWC index (SOLO TABELLA) === */
     function drawTWCIndex(){
       const uscita = TWC_BOTTLES.map(b=>+b.release||0);
       const y5     = TWC_BOTTLES.map(b=>+b.after5y||0);
@@ -644,10 +622,8 @@
       addPeriod({start:next,end:next+1,rate:20});
     };
 
-    /* =================== PDF =================== */
     const LOGO_SRC = 'https://shop.thewinecaveau.com/wp-content/uploads/2023/03/Logo-bianco-caveau-copia-2048x2048.png';
 
-    // genera sempre un PNG (anche in fallback) per evitare errori addImage
     function makeTextLogoPNG(){
       const c=document.createElement('canvas'); c.width=420; c.height=120;
       const ctx=c.getContext('2d');
@@ -655,7 +631,7 @@
       ctx.strokeStyle='#2a2a31'; ctx.strokeRect(0.5,0.5,c.width-1,c.height-1);
       ctx.fillStyle='#ffffff'; ctx.font='bold 36px Inter,Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText('The Wine Caveau', c.width/2, c.height/2);
-      return c.toDataURL('image/png'); // <-- sempre PNG
+      return c.toDataURL('image/png');
     }
 
     async function getLogoPNGDataURL(){
@@ -681,7 +657,7 @@
         if(!dataUrl.startsWith('data:image/png')) throw new Error('not png');
         return dataUrl;
       }catch(e){
-        return makeTextLogoPNG(); // fallback garantito
+        return makeTextLogoPNG();
       }
     }
 
@@ -691,20 +667,17 @@
       const jsPDF = window.jspdf.jsPDF;
       const pdf=new jsPDF('p','pt','a4');
 
-      // Margini compatti
       const marginX=14, marginTop=10, marginBottom=12;
       const pageW=pdf.internal.pageSize.getWidth();
       const pageH=pdf.internal.pageSize.getHeight();
       const contentW=pageW - marginX*2;
       let y = marginTop;
 
-      // Header con logo in PNG (sempre)
       const logoPNG = await getLogoPNGDataURL();
       const logoW=86, logoH=86, logoX=marginX, logoY=y;
       try{
         pdf.addImage(logoPNG, 'PNG', logoX, logoY, logoW, logoH);
       }catch(err){
-        // fallback estremo: box
         pdf.setDrawColor(42,42,49); pdf.setFillColor(21,21,24);
         pdf.roundedRect(logoX,logoY,logoW,logoH,8,8,'FD');
       }
@@ -759,7 +732,6 @@
 
       y = Math.max(paramsBottom, kpiBottom) + 8;
 
-      // Grafico (solo se non TWC)
       const chartEl = $('chart');
       if (chartEl && activeChartMode!=='twc'){
         try{
@@ -770,7 +742,6 @@
         }catch(e){}
       }
 
-      // Tabella coerente con la vista
       if(activeChartMode==='sim'){
         const rows = Array.from(document.querySelectorAll('#tableBody tr'))
           .map(tr=>Array.from(tr.children).map(td=>td.textContent));
@@ -801,7 +772,6 @@
         });
       }
 
-      // Footer carta intestata su ogni pagina
       const totalPages = pdf.internal.getNumberOfPages();
       pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(120,120,130);
       for (let i = 1; i <= totalPages; i++){
@@ -814,7 +784,6 @@
 
       pdf.save('simulazione.pdf');
     };
-    /* =============== /PDF =================== */
 
     const DEFAULTS = { initial:'10000', years:'10', rate:'16', mgmtType:'percent', mgmtValue:'0', twcValue:'50' };
 
@@ -863,3 +832,4 @@
   </script>
 </body>
 </html>
+```
