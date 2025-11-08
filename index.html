@@ -33,19 +33,24 @@
     header{
       background:#141418; border:1px solid #2a2a31; border-radius:14px;
       padding:6px 10px;
-      display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      grid-template-areas: 'logo title toolbar';
+      align-items:center; gap:8px;
       text-align:center;
     }
+    .settings-toggle{ grid-area:settings; display:none; } /* visibile solo su mobile */
     .logo{
+      grid-area:logo;
       background:#151518; width:132px; height:132px; border-radius:10px;
       display:flex; align-items:center; justify-content:center;
       overflow:hidden; position:relative; padding:0; margin-left:4px;
     }
     .logo-img{ display:block; max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; object-position:center; }
     .logo-fallback{ position:absolute; inset:0; display:grid; place-items:center; font-weight:900; font-size:24px; color:#c9a227; letter-spacing:1px; }
-    .title{ justify-self:center; text-align:center; }
+    .title{ grid-area:title; justify-self:center; text-align:center; }
     .title h1{ margin:0; font-size:32px; line-height:1.15; white-space:normal; }
-    .toolbar{ justify-self:end; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+    .toolbar{ grid-area:toolbar; justify-self:end; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
     .btn{
       border:1px solid #2a2a31; border-radius:10px; padding:8px 12px;
       background:#1a1a1f; color:#f7f7fa; cursor:pointer; font-weight:700;
@@ -145,22 +150,35 @@
     html.desktop{ --leftCol: 380px; }
     html.mobile{ --leftCol:100%; }
 
-    /* ===== MOBILE COMPACT ===== */
-    html.mobile body{ padding-top: calc(env(safe-area-inset-top) + 48px); } /* spazio per bottone fisso */
+    /* ===== MOBILE LAYOUT ===== */
     html.mobile .wrap{ padding:0 8px; }
 
-    /* Header super-compatto: logo + titolo su una riga */
+    /* Header: due righe. Riga 1 = logo centrato; Riga 2 = [icona] [titolo] [export] */
     html.mobile header{
-      grid-template-columns:auto 1fr auto; gap:6px; padding:6px 8px;
+      grid-template-columns:auto 1fr auto;
+      grid-template-rows:auto auto;
+      grid-template-areas:
+        'logo logo logo'
+        'settings title toolbar';
+      gap:4px; padding:6px 8px;
     }
-    html.mobile .logo{ width:58px; height:58px; margin:0; }
-    /* titolo leggermente più piccolo */
-    html.mobile .title h1{ font-size: clamp(15px, 4.2vw, 19px); text-align:center; line-height:1.1; }
-    /* bottone esporta leggermente più piccolo */
-    html.mobile .toolbar .btn{ padding:5px 7px; font-size:11.5px; border-radius:8px; }
+    html.mobile .logo{
+      width:54px; height:54px; margin:0; justify-self:center;
+    }
+    /* Bottone impostazioni visibile e allineato a sinistra della riga titolo */
+    html.mobile .settings-toggle{ display:inline-flex; grid-area:settings; justify-self:start; }
+    /* Titolo: una sola linea, ellissi */
+    html.mobile .title{ grid-area:title; align-self:center; justify-self:center; max-width:75vw; }
+    html.mobile .title h1{
+      font-size: clamp(14px, 3.8vw, 18px);
+      line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;
+    }
+    /* Export più piccolo a destra */
+    html.mobile .toolbar{ grid-area:toolbar; justify-self:end; }
+    html.mobile .toolbar .btn{ padding:4px 7px; font-size:11px; border-radius:8px; }
 
     html.mobile .grid{ grid-template-columns:1fr !important; gap:8px; }
-    html.mobile .kpis{ grid-template-columns:repeat(3,1fr); gap:4px; } /* 3 colonne molto compatte */
+    html.mobile .kpis{ grid-template-columns:repeat(3,1fr); gap:4px; }
     html.mobile .kpi{ min-height:54px; padding:6px; }
     html.mobile .kpi .t{ font-size:10px; -webkit-line-clamp:2; }
     html.mobile .kpi .v{ font-size:14.5px; }
@@ -195,35 +213,37 @@
     html.mobile .settings .head{ padding:10px; }
     html.mobile .settings .body{ padding:10px; overflow:auto; -webkit-overflow-scrolling:touch; }
 
-    /* Desktop: hide mobile-only elements */
-    /* (nessun bottone di chiusura) */
+    /* Desktop: il bottone impostazioni rimane nascosto (come da requisito) */
+    html.desktop .settings-toggle{ display:none; }
 
-    /* ====== Floating Settings Button (mobile only) ====== */
-    #btnOpenSettings{
-      position:fixed; top:calc(env(safe-area-inset-top) + 6px); left:calc(env(safe-area-inset-left) + 6px);
-      width:42px; height:42px; border-radius:10px; display:none; align-items:center; justify-content:center;
-      background:#1a1a1f; color:#f7f7fa; border:1px solid #2a2a31; box-shadow:0 6px 16px rgba(0,0,0,0.35);
-      z-index:100; cursor:pointer;
+    /* Icona hamburger */
+    #btnOpenSettings.btn{
+      padding:6px 8px; width:auto; height:auto; display:none; align-items:center; justify-content:center;
     }
     #btnOpenSettings .ic{ font-weight:900; font-size:18px; line-height:1; }
     #btnOpenSettings .txt{ display:none; }
-    html.mobile #btnOpenSettings{ display:flex; }
+    html.mobile #btnOpenSettings{ display:inline-flex; }
     html.desktop #btnOpenSettings{ display:none !important; }
   </style>
 </head>
 <body>
-  <!-- Floating settings button (mobile only, top-left) -->
-  <button class="btn" id="btnOpenSettings" aria-expanded="false" aria-controls="settingsPanel" title="Impostazioni" aria-label="Apri impostazioni">
-    <span class="ic">☰</span><span class="txt">Impostazioni</span>
-  </button>
-
   <div class="wrap">
     <header>
+      <!-- Icona impostazioni (mobile) - a sinistra del titolo -->
+      <button class="btn settings-toggle" id="btnOpenSettings" aria-expanded="false" aria-controls="settingsPanel" title="Impostazioni" aria-label="Apri impostazioni">
+        <span class="ic">☰</span><span class="txt">Impostazioni</span>
+      </button>
+
+      <!-- Logo (desktop a sinistra, su mobile in alto centrato) -->
       <div class="logo">
         <img id="brandLogo" class="logo-img" alt="TWC Logo" loading="eager" crossorigin="anonymous">
         <div id="brandLogoFallback" class="logo-fallback" aria-hidden="true" style="display:none;">TWC</div>
       </div>
+
+      <!-- Titolo -->
       <div class="title"><h1 id="appTitle">The Wine Caveau - Simulatore d'investimento</h1></div>
+
+      <!-- Toolbar -->
       <div class="toolbar" role="toolbar" aria-label="Azioni principali">
         <button class="btn gold" id="btnPDF">Esporta PDF</button>
       </div>
@@ -240,7 +260,6 @@
           <div>
             <button class="btn ghost" id="btnMinusRate">Prudente −1%</button>
             <button class="btn ghost" id="btnPlusRate">Ottimistico +1%</button>
-            <!-- rimosso bottone "Chiudi" -->
           </div>
         </div>
         <div class="body">
@@ -955,10 +974,19 @@
       if(!isMobile){ closeSettingsDrawer(false); } // chiuso su desktop
     }
 
-    /* ====== Drawer impostazioni: toggle con la stessa icona ====== */
+    /* ====== Drawer impostazioni: toggle con la stessa icona + reset zoom ====== */
     const drawer = $('settingsPanel');
     const scrim  = $('scrim');
     const btnOpen = $('btnOpenSettings');
+
+    function resetViewportZoom(){
+      const vp = document.querySelector('meta[name="viewport"]');
+      if(!vp) return;
+      const base = 'width=device-width, initial-scale=1, viewport-fit=cover';
+      // Forza il ritorno allo zoom 1 impostando temporaneamente maximum-scale=1
+      vp.setAttribute('content', base + ', maximum-scale=1');
+      setTimeout(()=>{ vp.setAttribute('content', base); }, 350);
+    }
 
     function openSettingsDrawer(){
       if(!document.documentElement.classList.contains('mobile')){ // desktop: scorri alla card impostazioni
@@ -979,10 +1007,11 @@
       btnOpen.setAttribute('aria-expanded','false');
       document.body.classList.remove('no-scroll');
       if(restoreFocus) btnOpen.focus();
+      // Zoom out al livello iniziale
+      resetViewportZoom();
     }
     function toggleSettingsDrawer(){
       if (!document.documentElement.classList.contains('mobile')) {
-        // su desktop non è un drawer: scorri alla sezione
         drawer.scrollIntoView({ behavior:'smooth', block:'start' });
         return;
       }
