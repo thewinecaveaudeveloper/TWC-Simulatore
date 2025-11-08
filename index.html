@@ -160,22 +160,40 @@
       grid-template-areas:
         'logo logo logo'
         'settings title toolbar';
-      gap:4px; padding:6px 8px;
+      gap:2px;                               /* spazio verticale ridotto */
+      padding:4px 8px;                       /* header più compatto */
     }
     html.mobile .logo{
-      width:54px; height:54px; margin:0; justify-self:center;
+      width:48px; height:48px; margin:0;     /* logo più piccolo */
+      justify-self:center;
     }
-    /* Bottone impostazioni visibile e allineato a sinistra della riga titolo */
+    /* Bottone impostazioni visibile e SEMPRE cliccabile anche con drawer aperto */
     html.mobile .settings-toggle{ display:inline-flex; grid-area:settings; justify-self:start; }
-    /* Titolo: una sola linea, ellissi */
-    html.mobile .title{ grid-area:title; align-self:center; justify-self:center; max-width:75vw; }
-    html.mobile .title h1{
-      font-size: clamp(14px, 3.8vw, 18px);
-      line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;
+    #btnOpenSettings.btn{
+      padding:6px 8px; display:none; align-items:center; justify-content:center;
     }
-    /* Export più piccolo a destra */
+    #btnOpenSettings .ic{ font-weight:900; font-size:18px; line-height:1; }
+    #btnOpenSettings .txt{ display:none; }
+    html.mobile #btnOpenSettings{
+      display:inline-flex;
+      position:fixed;                         /* resta visibile sopra al drawer */
+      top:calc(env(safe-area-inset-top) + 6px);
+      left:calc(env(safe-area-inset-left) + 6px);
+      z-index:101;                            /* sopra scrim(98) e drawer(99) */
+      border-radius:9px;
+    }
+    html.desktop #btnOpenSettings{ display:none !important; }
+
+    /* Titolo: UNA sola linea con ellissi, font più piccolo */
+    html.mobile .title{ grid-area:title; align-self:center; justify-self:center; max-width:70vw; }
+    html.mobile .title h1{
+      font-size: clamp(12px, 3.2vw, 16px);
+      line-height:1.05; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;
+    }
+
+    /* Export più piccolo a destra (proporzionato) */
     html.mobile .toolbar{ grid-area:toolbar; justify-self:end; }
-    html.mobile .toolbar .btn{ padding:4px 7px; font-size:11px; border-radius:8px; }
+    html.mobile .toolbar .btn{ padding:3px 6px; font-size:10px; border-radius:7px; }
 
     html.mobile .grid{ grid-template-columns:1fr !important; gap:8px; }
     html.mobile .kpis{ grid-template-columns:repeat(3,1fr); gap:4px; }
@@ -213,17 +231,8 @@
     html.mobile .settings .head{ padding:10px; }
     html.mobile .settings .body{ padding:10px; overflow:auto; -webkit-overflow-scrolling:touch; }
 
-    /* Desktop: il bottone impostazioni rimane nascosto (come da requisito) */
+    /* Desktop: bottone impostazioni nascosto */
     html.desktop .settings-toggle{ display:none; }
-
-    /* Icona hamburger */
-    #btnOpenSettings.btn{
-      padding:6px 8px; width:auto; height:auto; display:none; align-items:center; justify-content:center;
-    }
-    #btnOpenSettings .ic{ font-weight:900; font-size:18px; line-height:1; }
-    #btnOpenSettings .txt{ display:none; }
-    html.mobile #btnOpenSettings{ display:inline-flex; }
-    html.desktop #btnOpenSettings{ display:none !important; }
   </style>
 </head>
 <body>
@@ -593,6 +602,11 @@
       });
       if(activeChartMode==='bench') drawBenchmarkChart();
       if(activeChartMode==='twc')  drawTWCIndex();
+
+      // CHIUSURA AUTOMATICA DRAWER SU "Simula"
+      if(document.documentElement.classList.contains('mobile') && drawer.classList.contains('open')){
+        closeSettingsDrawer(true);
+      }
     }
 
     /* ====== Confronto asset & Inflazione (invariato) ====== */
@@ -746,10 +760,18 @@
       if (chart){ chart.destroy(); chart = null; }
     }
 
-    /* ====== Interazioni base (invariato) ====== */
+    /* ====== Interazioni base ====== */
     function clampRate(x){ return Math.max(-50, Math.min(100, x)); }
-    $('btnMinusRate').onclick=function(){ const v = clampRate((parseFloat($('rate').value)||0) - 1); $('rate').value = String(v); simulate(); };
-    $('btnPlusRate').onclick=function(){ const v = clampRate((parseFloat($('rate').value)||0) + 1); $('rate').value = String(v); simulate(); };
+    $('btnMinusRate').onclick=function(){
+      const v = clampRate((parseFloat($('rate').value)||0) - 1);
+      $('rate').value = String(v);
+      simulate();
+    };
+    $('btnPlusRate').onclick=function(){
+      const v = clampRate((parseFloat($('rate').value)||0) + 1);
+      $('rate').value = String(v);
+      simulate();
+    };
     $('btnRun').onclick=function(){ simulate(); };
     $('mgmtType').addEventListener('change',function(){
       $('lblMgmtValue').textContent=($('mgmtType').value==='percent')?'Percentuale annua (%)':'Quota annuale (€)';
@@ -983,7 +1005,6 @@
       const vp = document.querySelector('meta[name="viewport"]');
       if(!vp) return;
       const base = 'width=device-width, initial-scale=1, viewport-fit=cover';
-      // Forza il ritorno allo zoom 1 impostando temporaneamente maximum-scale=1
       vp.setAttribute('content', base + ', maximum-scale=1');
       setTimeout(()=>{ vp.setAttribute('content', base); }, 350);
     }
@@ -1007,8 +1028,7 @@
       btnOpen.setAttribute('aria-expanded','false');
       document.body.classList.remove('no-scroll');
       if(restoreFocus) btnOpen.focus();
-      // Zoom out al livello iniziale
-      resetViewportZoom();
+      resetViewportZoom(); // zoom-out al livello iniziale
     }
     function toggleSettingsDrawer(){
       if (!document.documentElement.classList.contains('mobile')) {
@@ -1050,7 +1070,7 @@
       html.classList.remove('mobile','desktop','auto');
       html.classList.add(currentMode);
       updateResponsiveClass();
-      closeSettingsDrawer(false);
+      closeSettingsDrawer(false);  // chiusura automatica anche su Reset
     }
     $('btnReset').onclick=resetAll;
 
