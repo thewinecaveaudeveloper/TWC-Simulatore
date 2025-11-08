@@ -429,7 +429,7 @@
     const INFL = { years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],
       IT:[0.0007,-0.0009,0.0124,0.0115,0.0061,-0.0014,0.0187,0.0813,0.0569,0.0100],
       WORLD:[0.0276,0.0279,0.0328,0.0361,0.0351,0.0323,0.0469,0.0874,0.0679,0.0590] };
-    function stdev(arr){ const a=arr.filter(x=>isFinite(x)); if(!a.length) return 0; const m=a.reduce((s,x)=>s+x,0)/a.length; return Math.sqrt(a.reduce((s,x)=>s+(x-m)*(x-m),0)/a.length); }
+    function stdev(arr){ const a=arr.filter(x=>isFinite(x)); if(!a.length) return 0; const m=a.reduce((s,x)=>s+x,0)/a.length; return Math.sqrt(a.reduce((s,x)=>(x-m)*(x-m),0)/a.length); }
     function computeTWCVolFromSeries(nYears){ const n=Math.max(1,Math.min(10,nYears||10)); const r=FULL_SERIES.slice(-n).map(x=>x.pct/100); return stdev(r); }
     function wealthFromReturns(P0, returns, Y){ let vals=[P0], b=P0; for(let i=0;i<Y;i++){ const r=(i<returns.length&&returns[i]!=null)?returns[i]:0; b*=(1+r); vals.push(b); } return vals; }
     function CAGR(v0, vN, years){ return (years<=0||v0<=0)?0:Math.pow(vN/v0,1/years)-1; }
@@ -681,7 +681,6 @@
       $('rate').value = String(v);
       simulate();
     };
-    $('btnRun').onclick=function(){ simulate(); };
     $('mgmtType').addEventListener('change',function(){
       $('lblMgmtValue').textContent=($('mgmtType').value==='percent')?'Percentuale annua (%)':'Quota annuale (€)';
     });
@@ -913,6 +912,7 @@
       resetViewportZoom();
     }
     function toggleSettingsDrawer(){
+      resetViewportZoom();
       if (!document.documentElement.classList.contains('mobile')) {
         drawer.scrollIntoView({ behavior:'smooth', block:'start' });
         return;
@@ -951,7 +951,14 @@
       updateResponsiveClass();
       closeSettingsDrawer(false);
     }
-    $('btnReset').onclick=resetAll;
+    $('btnRun').onclick = function(){
+      resetViewportZoom();
+      simulate();
+    };
+    $('btnReset').onclick = function(){
+      resetViewportZoom();
+      resetAll();
+    };
     (function init(){
       setupLogoUI();
       updateResponsiveClass();
