@@ -4,15 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>The Wine Caveau - Simulatore d'investimento</title>
-
-  <!-- Fonts & libs -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.3/dist/jspdf.plugin.autotable.min.js"></script>
-
   <style>
     :root{
       --bg:#0f0f10; --panel:#151518; --muted:#9797a1; --text:#f4f4f6; --brand:#7b0a2e; --gold:#c9a227;
@@ -26,10 +23,7 @@
       display:flex; flex-direction:column; min-height:100vh; overflow-x:hidden;
     }
     body.no-scroll{ overflow:hidden; }
-
     .wrap{ max-width:1320px; margin:14px auto; padding:0 12px; width:100%; flex:1 0 auto; }
-
-    /* Header */
     header{
       background:#141418; border:1px solid #2a2a31; border-radius:14px;
       padding:6px 10px;
@@ -39,7 +33,7 @@
       align-items:center; gap:8px;
       text-align:center;
     }
-    .settings-toggle{ grid-area:settings; display:none; } /* visibile solo su mobile */
+    .settings-toggle{ grid-area:settings; display:none; }
     .logo{
       grid-area:logo;
       background:#151518; width:132px; height:132px; border-radius:10px;
@@ -57,11 +51,7 @@
     }
     .btn.gold{ background:linear-gradient(135deg,var(--gold),#8d7218); color:#111; border-color:#8d7218; }
     .btn.ghost{ background:transparent; }
-
-    /* Layout colonne (desktop) */
     .grid{ display:grid; grid-template-columns:var(--leftCol) 1fr; gap:12px; margin:12px 0 0; }
-
-    /* Cards */
     .card{ background:#151518; border:1px solid #2a2a31; border-radius:14px; }
     .card .head{
       padding:8px 10px; border-bottom:1px solid #24242a;
@@ -70,8 +60,6 @@
     .card .head h2{ margin:0; font-size:15px; width:100%; text-align:center; }
     .card .head > div{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; justify-content:center; }
     .card .body{ padding:8px 10px; }
-
-    /* Pannello impostazioni */
     .settings .head{ flex-direction:column; gap:6px; }
     .settings .body .row{ display:flex; flex-direction:column; gap:8px; align-items:stretch; }
     .field{ display:flex; flex-direction:column; gap:4px; margin-bottom:6px; text-align:center; }
@@ -80,8 +68,6 @@
       border-radius:10px; border:1px solid #2a2a31; background:#0f0f12; color:#f8f8fb; padding:8px; font-size:13px; width:100%;
       text-align:center;
     }
-
-    /* KPI */
     .kpis{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
     .kpi{
       background:#0f0f12; border:1px solid #222228; border-radius:10px; padding:8px;
@@ -96,12 +82,8 @@
       align-self:end; font-weight:900; font-size:18px; margin-top:2px; white-space:nowrap;
       overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums;
     }
-
-    /* Chart */
     .chart-box{ position:relative; height:340px; width:100%; margin-top:6px; }
     #chart{ width:100% !important; height:100% !important; display:block; }
-
-    /* Tabelle */
     table{ width:100%; border-collapse:separate; border-spacing:0 6px; text-align:center; table-layout:auto; }
     thead th{ font-size:12px; color:#b8bac3; text-align:center; padding:0 8px; }
     tbody td{ padding:8px; background:#0f0f12; border-top:1px solid #222228; border-bottom:1px solid #222228; font-size:13px; }
@@ -109,26 +91,18 @@
     tbody tr td:last-child{ border-right:1px solid #222228; border-top-right-radius:8px; border-bottom-right-radius:8px; }
     th,td{ word-break:break-word; overflow-wrap:anywhere; }
     canvas, table{ max-width:100%; }
-
-    /* Confronto asset */
     .bench-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; text-align:center; }
     #benchControls{ display:none; }
     #simTableWrap{ display:block; }
     #twcControls{ display:none; }
-
-    /* Segmented control */
     .seg{ display:inline-flex; background:#0f0f12; border:1px solid #2a2a31; border-radius:999px; overflow:hidden; }
     .seg button{ background:transparent; border:0; padding:8px 10px; color:#ddd; font-weight:800; cursor:pointer; font-size:13px; }
     .seg button.active{ background:#2a2a31; color:#fff; }
-
-    /* Notice */
     .notice{
       margin:6px 0 8px; padding:8px 10px; border:1px solid #5c4d12;
       background:linear-gradient(180deg,#1a180e,#141207); color:#e8d18b; border-radius:10px; display:none; font-size:12px; text-align:center;
     }
     .notice.show{ display:block; }
-
-    /* Periodi custom */
     .pct-pos{ color:#2ecc71; font-weight:900; }
     .pct-neg{ color:#e74c3c; font-weight:900; }
     .p-row{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:6px; align-items:end; }
@@ -137,88 +111,76 @@
     .p-row input{ height:34px; text-align:center; }
     .p-row .remove-wrap{ grid-column: 1 / -1; }
     .p-row .remove-wrap .btn{ width:100%; height:34px; padding:6px 8px; }
-
-    /* Footer */
     footer{ flex:0 0 auto; width:100%; border-top:1px solid #2a2a31; background:#111114; margin-top:14px; }
     .disclaimer{
       max-width:1320px; margin:0 auto; padding:10px 12px;
       font-size:11px; line-height:1.35; color:#b9bac5; text-align:center;
     }
-
-    /* Responsive helper class (set by JS) */
     html{ --leftCol: 320px; }
     html.desktop{ --leftCol: 380px; }
     html.mobile{ --leftCol:100%; }
-
-    /* ===== MOBILE LAYOUT ===== */
     html.mobile .wrap{ padding:0 8px; }
-
-    /* Header: due righe. Riga 1 = logo centrato; Riga 2 = [icona] [titolo] [export] */
     html.mobile header{
+      position:relative;
       grid-template-columns:auto 1fr auto;
       grid-template-rows:auto auto;
       grid-template-areas:
         'logo logo logo'
-        'settings title toolbar';
-      gap:2px;                               /* spazio verticale ridotto */
-      padding:4px 8px;                       /* header più compatto */
+        'settings title title';
+      gap:2px;
+      padding:4px 8px;
     }
     html.mobile .logo{
-      width:48px; height:48px; margin:0;     /* logo più piccolo */
+      width:48px; height:48px; margin:0;
       justify-self:center;
     }
-    /* Bottone impostazioni visibile e SEMPRE cliccabile anche con drawer aperto */
     html.mobile .settings-toggle{ display:inline-flex; grid-area:settings; justify-self:start; }
     #btnOpenSettings.btn{
-      padding:6px 8px; display:none; align-items:center; justify-content:center;
+      padding:8px 10px;
+      display:none; align-items:center; justify-content:center;
     }
-    #btnOpenSettings .ic{ font-weight:900; font-size:18px; line-height:1; }
+    #btnOpenSettings .ic{ font-weight:900; font-size:20px; line-height:1; }
     #btnOpenSettings .txt{ display:none; }
     html.mobile #btnOpenSettings{
       display:inline-flex;
-      position:fixed;                         /* resta visibile sopra al drawer */
+      position:fixed;
       top:calc(env(safe-area-inset-top) + 6px);
       left:calc(env(safe-area-inset-left) + 6px);
-      z-index:101;                            /* sopra scrim(98) e drawer(99) */
+      z-index:101;
       border-radius:9px;
     }
     html.desktop #btnOpenSettings{ display:none !important; }
-
-    /* Titolo: UNA sola linea con ellissi, font più piccolo */
-    html.mobile .title{ grid-area:title; align-self:center; justify-self:center; max-width:70vw; }
+    html.mobile .title{ grid-area:title; align-self:center; justify-self:center; max-width:76vw; }
     html.mobile .title h1{
-      font-size: clamp(12px, 3.2vw, 16px);
+      font-size: clamp(12px, 2.9vw, 14px);
       line-height:1.05; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;
     }
-
-    /* Export più piccolo a destra (proporzionato) */
-    html.mobile .toolbar{ grid-area:toolbar; justify-self:end; }
-    html.mobile .toolbar .btn{ padding:3px 6px; font-size:10px; border-radius:7px; }
-
+    html.mobile .toolbar{
+      position:absolute; top:6px; right:6px;
+      display:flex; gap:4px; align-items:center; justify-content:flex-end;
+    }
+    html.mobile .toolbar .btn{
+      padding:1px 4px;
+      font-size:8.5px;
+      line-height:1; border-radius:6px;
+      min-height:18px;
+    }
     html.mobile .grid{ grid-template-columns:1fr !important; gap:8px; }
     html.mobile .kpis{ grid-template-columns:repeat(3,1fr); gap:4px; }
     html.mobile .kpi{ min-height:54px; padding:6px; }
     html.mobile .kpi .t{ font-size:10px; -webkit-line-clamp:2; }
     html.mobile .kpi .v{ font-size:14.5px; }
-
     html.mobile .chart-box{ height:190px; margin-top:6px; }
-
-    /* Tabelle compatte e senza overflow */
     html.mobile table{ table-layout:fixed; width:100%; white-space:normal; }
     html.mobile thead th{ font-size:10.5px; padding:0 6px; }
     html.mobile tbody td{ font-size:11px; padding:6px 4px; }
     html.mobile #simTableWrap h3{ margin:4px 0 6px; font-size:13px; }
-
-    /* Bench cards compatti */
     html.mobile .bench-grid{ grid-template-columns:1fr; gap:6px; }
-
-    /* Drawer (solo mobile) */
     .scrim{
       position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none;
       z-index:var(--zScrim);
     }
     .scrim.show{ display:block; }
-
     html.mobile .settings{
       position:fixed; top:0; left:0;
       height:100dvh; width:min(84vw, 400px);
@@ -230,39 +192,26 @@
     html.mobile .settings.open{ transform:translateX(0); }
     html.mobile .settings .head{ padding:10px; }
     html.mobile .settings .body{ padding:10px; overflow:auto; -webkit-overflow-scrolling:touch; }
-
-    /* Desktop: bottone impostazioni nascosto */
     html.desktop .settings-toggle{ display:none; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <!-- Icona impostazioni (mobile) - a sinistra del titolo -->
       <button class="btn settings-toggle" id="btnOpenSettings" aria-expanded="false" aria-controls="settingsPanel" title="Impostazioni" aria-label="Apri impostazioni">
         <span class="ic">☰</span><span class="txt">Impostazioni</span>
       </button>
-
-      <!-- Logo (desktop a sinistra, su mobile in alto centrato) -->
       <div class="logo">
         <img id="brandLogo" class="logo-img" alt="TWC Logo" loading="eager" crossorigin="anonymous">
         <div id="brandLogoFallback" class="logo-fallback" aria-hidden="true" style="display:none;">TWC</div>
       </div>
-
-      <!-- Titolo -->
       <div class="title"><h1 id="appTitle">The Wine Caveau - Simulatore d'investimento</h1></div>
-
-      <!-- Toolbar -->
       <div class="toolbar" role="toolbar" aria-label="Azioni principali">
         <button class="btn gold" id="btnPDF">Esporta PDF</button>
       </div>
     </header>
-
-    <!-- Scrim per drawer mobile -->
     <div id="scrim" class="scrim" aria-hidden="true"></div>
-
     <div class="grid" id="layoutGrid">
-      <!-- PANNELLO IMPOSTAZIONI -->
       <div class="card settings" id="settingsPanel">
         <div class="head">
           <h2>Impostazioni</h2>
@@ -276,7 +225,6 @@
             <div class="field"><label>Budget iniziale (€)</label><input type="text" id="initial" value="10000"></div>
             <div class="field"><label>Orizzonte (anni)</label><input type="number" id="years" value="10" min="1" max="50"></div>
             <div class="field"><label>Rendimento annuo di base (%)</label><input type="text" id="rate" value="16"></div>
-
             <div class="field" id="histRow" style="display:none">
               <div class="inline-label" style="display:flex;align-items:center;gap:8px;justify-content:center">
                 <input type="checkbox" id="useHistorical">
@@ -287,7 +235,6 @@
               <label>Anni da simulare</label>
               <select id="histYears"></select>
             </div>
-
             <div class="field">
               <label>Commissione di gestione</label>
               <select id="mgmtType">
@@ -297,10 +244,8 @@
             </div>
             <div class="field"><label id="lblMgmtValue">Percentuale annua (%)</label><input type="text" id="mgmtValue" value="0"></div>
             <div class="field"><label>Commissione TWC (%)</label><input type="text" id="twcValue" value="50"></div>
-
             <div class="field"><button class="btn gold" id="btnRun">Simula</button></div>
             <div class="field"><button class="btn" id="btnReset">Reset</button></div>
-
             <div class="field">
               <label style="font-weight:900; margin-bottom:6px">Periodi con rendimento personalizzato</label>
               <div id="periodList"></div>
@@ -309,8 +254,6 @@
           </div>
         </div>
       </div>
-
-      <!-- RISULTATI -->
       <div class="card">
         <div class="head"><h2>Risultati</h2></div>
         <div class="body">
@@ -321,7 +264,6 @@
             <div class="kpi"><div class="t">Quota Cliente</div><div class="v" id="kpiClient">—</div></div>
             <div class="kpi"><div class="t">Quota TWC</div><div class="v" id="kpiTWC">—</div></div>
           </div>
-
           <div class="row" style="display:flex;align-items:center;justify-content:center;margin-top:6px;gap:6px;text-align:center">
             <div class="seg" id="modeSwitch" role="tablist" aria-label="Modalità grafico">
               <button data-mode="sim" class="active" aria-pressed="true" role="tab">Simulazione</button>
@@ -329,9 +271,7 @@
               <button data-mode="twc" aria-pressed="false" role="tab">TWC index</button>
             </div>
           </div>
-
           <div class="chart-box"><canvas id="chart"></canvas></div>
-
           <div id="simTableWrap" style="margin-top:8px">
             <h3 style="text-align:center;margin:4px 0 6px">Tabella riepilogativa</h3>
             <table>
@@ -341,16 +281,13 @@
               <tbody id="tableBody"></tbody>
             </table>
           </div>
-
           <div id="benchControls">
             <div id="benchNotice" class="notice"></div>
-
             <div class="seg" id="metricSwitch" style="margin:6px auto 8px auto; display:flex; justify-content:center">
               <button data-metric="return" class="active" aria-pressed="true">Rendimento</button>
               <button data-metric="vol" aria-pressed="false">Confronto volatilità</button>
               <button data-metric="infl" aria-pressed="false">Inflazione</button>
             </div>
-
             <div class="bench-grid" style="margin-bottom:6px">
               <div class="card" style="padding:8px; text-align:center">
                 <label><input type="checkbox" id="chkGOLD" checked> Oro</label>
@@ -362,7 +299,6 @@
                 <label><input type="checkbox" id="chkSPX" checked> S&amp;P 500</label>
               </div>
             </div>
-
             <div id="benchTableWrap">
               <table>
                 <thead id="benchThead"></thead>
@@ -370,7 +306,6 @@
               </table>
             </div>
           </div>
-
           <div id="twcControls" style="margin-top:6px">
             <div id="twcNotice" class="notice show">
               Le bottiglie riportate sono <b>solo alcuni esempi</b> del TWC index, a puro scopo illustrativo. I rendimenti passati non sono garanzia di risultati futuri.
@@ -392,29 +327,21 @@
               </table>
             </div>
           </div>
-
         </div>
       </div>
     </div>
   </div>
-
   <footer>
     <div class="disclaimer">
       Il presente simulatore ha finalità esclusivamente informative ed esemplificative. I risultati mostrati non costituiscono in alcun modo garanzia di rendimenti futuri né raccomandazione di investimento.
       TWC srl declina ogni responsabilità per eventuali decisioni finanziarie prese sulla base delle simulazioni fornite o per l’uso improprio del presente strumento.
     </div>
   </footer>
-
   <script>
-    /* ====== Helper & formattazione ====== */
     function $(id){ return document.getElementById(id); }
     const fmtEUR = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'});
     const fmtPCT1= new Intl.NumberFormat('it-IT',{style:'percent',minimumFractionDigits:1,maximumFractionDigits:1});
-
-    /* ====== Stato app ====== */
     let chart, periods = [], lastSim = null, activeChartMode = 'sim', benchMetric='return';
-
-    /* ====== Asset brand ====== */
     const LOGO_UI_REMOTE  = 'https://raw.githubusercontent.com/thewinecaveaudeveloper/TWC-ASSETS/main/Logo%20bianco%20caveau%20copia.png';
     const LOGO_PDF_REMOTE = 'https://raw.githubusercontent.com/thewinecaveaudeveloper/TWC-ASSETS/main/Logo%20nero%20wine%20caveau.png';
     const LOGO_EMBED  = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
@@ -431,8 +358,6 @@
       img.onload = ()=>{ fb.style.display='none'; };
       img.onerror= ()=>{ fb.style.display='grid'; img.removeAttribute('src'); img.src = LOGO_EMBED; };
     }
-
-    /* ====== Util PDF logo ====== */
     async function fetchAsDataURL(url){
       try{
         const res = await fetch(url, { mode:'cors', cache:'no-store', credentials:'omit' });
@@ -482,8 +407,6 @@
       if (raster){ __logoPDFCache = { dataURL: raster, fmt: 'PNG' }; return __logoPDFCache; }
       return null;
     }
-
-    /* ====== Colori & dati ====== */
     const COLORS = {
       TWC:'#2ecc71', NDX:'#007bff', SPX:'#e74c3c', GOLD:'#c9a227',
       SIM_INVESTITO:'rgba(123,10,46,0.7)', SIM_RENDIMENTO:'rgba(201,162,39,0.7)',
@@ -506,14 +429,10 @@
     const INFL = { years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],
       IT:[0.0007,-0.0009,0.0124,0.0115,0.0061,-0.0014,0.0187,0.0813,0.0569,0.0100],
       WORLD:[0.0276,0.0279,0.0328,0.0361,0.0351,0.0323,0.0469,0.0874,0.0679,0.0590] };
-
-    /* ====== Math utility ====== */
     function stdev(arr){ const a=arr.filter(x=>isFinite(x)); if(!a.length) return 0; const m=a.reduce((s,x)=>s+x,0)/a.length; return Math.sqrt(a.reduce((s,x)=>s+(x-m)*(x-m),0)/a.length); }
     function computeTWCVolFromSeries(nYears){ const n=Math.max(1,Math.min(10,nYears||10)); const r=FULL_SERIES.slice(-n).map(x=>x.pct/100); return stdev(r); }
     function wealthFromReturns(P0, returns, Y){ let vals=[P0], b=P0; for(let i=0;i<Y;i++){ const r=(i<returns.length&&returns[i]!=null)?returns[i]:0; b*=(1+r); vals.push(b); } return vals; }
     function CAGR(v0, vN, years){ return (years<=0||v0<=0)?0:Math.pow(vN/v0,1/years)-1; }
-
-    /* ====== Periodi custom (UI) ====== */
     function renderPeriods(){
       const list = $('periodList');
       list.innerHTML = '';
@@ -542,8 +461,6 @@
     }
     function addPeriod(p){ periods.push(p||{start:1,end:3,rate:20}); renderPeriods(); }
     function removePeriod(i){ periods.splice(i,1); renderPeriods(); }
-
-    /* ====== CORE: Calcolo & Simulazione (invariato) ====== */
     function compute(params){
       const {P0,Y,baseR,mgmtType,mgmtValue,twcPct,periods:periodsP,histRates}=params;
       const months=Y*12; let b=P0; const rows=[]; let yearStart=b, netYear=0;
@@ -602,14 +519,10 @@
       });
       if(activeChartMode==='bench') drawBenchmarkChart();
       if(activeChartMode==='twc')  drawTWCIndex();
-
-      // CHIUSURA AUTOMATICA DRAWER SU "Simula"
       if(document.documentElement.classList.contains('mobile') && drawer.classList.contains('open')){
         closeSettingsDrawer(true);
       }
     }
-
-    /* ====== Confronto asset & Inflazione (invariato) ====== */
     const BENCH = {
       GOLD:{name:'Oro',years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],rates:[-0.0418,0.0854,0.1321,-0.0158,0.1826,0.2499,-0.0365,-0.0031,0.1309,0.2711]},
       NDX:{name:'Nasdaq 100',years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],rates:[0.0843,0.0589,0.3152,-0.0104,0.3796,0.4758,0.2663,-0.3297,0.5381,0.2488]},
@@ -736,8 +649,6 @@
         });
       }
     }
-
-    /* ====== TWC Index (invariato) ====== */
     function drawTWCIndex(){
       const uscita = TWC_BOTTLES.map(b=>+b.release||0);
       const y5     = TWC_BOTTLES.map(b=>+b.after5y||0);
@@ -759,8 +670,6 @@
       $('twcTable').innerHTML = rowsHTML;
       if (chart){ chart.destroy(); chart = null; }
     }
-
-    /* ====== Interazioni base ====== */
     function clampRate(x){ return Math.max(-50, Math.min(100, x)); }
     $('btnMinusRate').onclick=function(){
       const v = clampRate((parseFloat($('rate').value)||0) - 1);
@@ -776,7 +685,6 @@
     $('mgmtType').addEventListener('change',function(){
       $('lblMgmtValue').textContent=($('mgmtType').value==='percent')?'Percentuale annua (%)':'Quota annuale (€)';
     });
-
     (function(){
       const seg=$('modeSwitch');
       function showSection(mode){
@@ -804,7 +712,6 @@
       });
       showSection('sim');
     })();
-
     (function(){
       const seg=$('metricSwitch');
       seg.addEventListener('click', function(e){
@@ -820,18 +727,14 @@
         if(activeChartMode==='bench') drawBenchmarkChart();
       });
     })();
-
     ['chkGOLD','chkNDX','chkSPX'].forEach(function(id){
       const el=$(id);
       if(el) el.addEventListener('change', function(){ if(activeChartMode==='bench') drawBenchmarkChart(); });
     });
-
     $('btnAddPeriod').onclick=function(){
       const next=periods.length? (periods[periods.length-1].end+1) : 1;
       addPeriod({start:next,end:next+1,rate:20});
     };
-
-    /* ====== PDF ====== */
     function drawLogoFallback(pdf,x,y,w,h){
       pdf.setDrawColor(42,42,49); pdf.setFillColor(21,21,24);
       pdf.roundedRect(x,y,w,h,8,8,'FD');
@@ -860,11 +763,9 @@
       const pageW=pdf.internal.pageSize.getWidth();
       const pageH=pdf.internal.pageSize.getHeight();
       const contentW=pageW - marginX*2;
-
       let y = marginTop;
       const boxW = 86, boxH = 86;
       const boxX = marginX, boxY = y;
-
       const logoObj = await getLogoForPDF();
       if (logoObj && logoObj.dataURL){
         const ok = await addImageFitted(pdf, logoObj.dataURL, logoObj.fmt, boxX, boxY, boxW, boxH);
@@ -872,16 +773,12 @@
       } else {
         drawLogoFallback(pdf, boxX, boxY, boxW, boxH);
       }
-
       const title="The Wine Caveau - Simulatore d'investimento";
       pdf.setFont('helvetica','bold'); pdf.setFontSize(18);
       pdf.text(title, boxX + boxW + 14, boxY + 52);
-
       y = boxY + boxH + 8;
-
       const colGap=16,leftColW=258,rightColW=contentW-leftColW-colGap,twoColX=marginX,rightColX=twoColX+leftColW+colGap;
       const mgmtTypeText = ($('mgmtType').value==='percent') ? 'Percentuale su quota investita' : 'Quota annuale fissa';
-
       const paramsRows = [
         ['Budget iniziale', ($('initial').value||'') + ' €'],
         ['Orizzonte', ($('years').value||'') + ' anni'],
@@ -899,11 +796,9 @@
         ['Quota Cliente', $('kpiClient').innerText || ''],
         ['Quota TWC', $('kpiTWC').innerText || '']
       ];
-
       pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
       pdf.text('Parametri selezionati', twoColX, y + 12);
       pdf.text('Indicatori', rightColX, y + 12);
-
       pdf.autoTable({
         startY: y + 20, margin: { left: twoColX }, tableWidth: leftColW,
         head: [['Parametro','Valore']], body: paramsRows, theme:'grid',
@@ -911,7 +806,6 @@
         headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }
       });
       const paramsBottom = pdf.lastAutoTable.finalY;
-
       pdf.autoTable({
         startY: y + 20, margin: { left: rightColX }, tableWidth: rightColW,
         head: [['Indicatore','Valore']], body: kpiRows, theme:'grid',
@@ -919,9 +813,7 @@
         headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }
       });
       const kpiBottom = pdf.lastAutoTable.finalY;
-
       y = Math.max(paramsBottom, kpiBottom) + 8;
-
       const chartEl = $('chart');
       if (chartEl && activeChartMode!=='twc'){
         try{
@@ -931,7 +823,6 @@
           y += h + 8;
         }catch(e){}
       }
-
       if(activeChartMode==='sim'){
         const rows = Array.from(document.querySelectorAll('#tableBody tr'))
           .map(tr=>Array.from(tr.children).map(td=>td.textContent));
@@ -961,7 +852,6 @@
           headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }
         });
       }
-
       const totalPages = pdf.internal.getNumberOfPages();
       pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(120,120,130);
       for (let i = 1; i <= totalPages; i++){
@@ -973,8 +863,6 @@
       }
       pdf.save('simulazione.pdf');
     };
-
-    /* ====== Default ====== */
     const DEFAULTS = { initial:'10000', years:'10', rate:'16', mgmtType:'percent', mgmtValue:'0', twcValue:'50' };
     function applyDefaultsToUI(){
       $('initial').value=DEFAULTS.initial;
@@ -986,21 +874,16 @@
       $('mgmtType').dispatchEvent(new Event('change'));
       periods=[]; renderPeriods();
     }
-
-    /* ====== Responsive ====== */
     function updateResponsiveClass(){
       const html = document.documentElement;
       const isMobile = window.matchMedia('(max-width: 900px)').matches;
       html.classList.remove('mobile','desktop');
       html.classList.add(isMobile ? 'mobile' : 'desktop');
-      if(!isMobile){ closeSettingsDrawer(false); } // chiuso su desktop
+      if(!isMobile){ closeSettingsDrawer(false); }
     }
-
-    /* ====== Drawer impostazioni: toggle con la stessa icona + reset zoom ====== */
     const drawer = $('settingsPanel');
     const scrim  = $('scrim');
     const btnOpen = $('btnOpenSettings');
-
     function resetViewportZoom(){
       const vp = document.querySelector('meta[name="viewport"]');
       if(!vp) return;
@@ -1008,9 +891,8 @@
       vp.setAttribute('content', base + ', maximum-scale=1');
       setTimeout(()=>{ vp.setAttribute('content', base); }, 350);
     }
-
     function openSettingsDrawer(){
-      if(!document.documentElement.classList.contains('mobile')){ // desktop: scorri alla card impostazioni
+      if(!document.documentElement.classList.contains('mobile')){
         drawer.scrollIntoView({ behavior:'smooth', block:'start' });
         return;
       }
@@ -1028,7 +910,7 @@
       btnOpen.setAttribute('aria-expanded','false');
       document.body.classList.remove('no-scroll');
       if(restoreFocus) btnOpen.focus();
-      resetViewportZoom(); // zoom-out al livello iniziale
+      resetViewportZoom();
     }
     function toggleSettingsDrawer(){
       if (!document.documentElement.classList.contains('mobile')) {
@@ -1038,12 +920,9 @@
       if (drawer.classList.contains('open')) closeSettingsDrawer(true);
       else openSettingsDrawer();
     }
-
     btnOpen.addEventListener('click', toggleSettingsDrawer);
     scrim.addEventListener('click', ()=> closeSettingsDrawer(true));
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeSettingsDrawer(true); });
-
-    /* ====== Reset ====== */
     function resetAll(){
       const html = document.documentElement;
       const currentMode = html.classList.contains('mobile') ? 'mobile' :
@@ -1070,11 +949,9 @@
       html.classList.remove('mobile','desktop','auto');
       html.classList.add(currentMode);
       updateResponsiveClass();
-      closeSettingsDrawer(false);  // chiusura automatica anche su Reset
+      closeSettingsDrawer(false);
     }
     $('btnReset').onclick=resetAll;
-
-    /* ====== Init ====== */
     (function init(){
       setupLogoUI();
       updateResponsiveClass();
