@@ -3,13 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>The Wine Caveau - Simulatore d'investimento</title>  
+  <title>The Wine Caveau - Simulatore d'investimento</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.3/dist/jspdf.plugin.autotable.min.js"></script>
+
   <style>
     :root{
       --bg:#0f0f10; --panel:#151518; --muted:#9797a1; --text:#f4f4f6; --brand:#7b0a2e; --gold:#c9a227;
@@ -24,6 +27,7 @@
     }
     body.no-scroll{ overflow:hidden; }
     .wrap{ max-width:1320px; margin:14px auto; padding:0 12px; width:100%; flex:1 0 auto; }
+
     header{
       background:#141418; border:1px solid #2a2a31; border-radius:14px;
       padding:6px 10px;
@@ -42,8 +46,10 @@
     }
     .logo-img{ display:block; max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; object-position:center; }
     .logo-fallback{ position:absolute; inset:0; display:grid; place-items:center; font-weight:900; font-size:24px; color:#c9a227; letter-spacing:1px; }
+
     .title{ grid-area:title; justify-self:center; text-align:center; }
     .title h1{ margin:0; font-size:32px; line-height:1.15; white-space:normal; }
+
     .toolbar{ grid-area:toolbar; justify-self:end; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
     .btn{
       border:1px solid #2a2a31; border-radius:10px; padding:8px 12px;
@@ -51,6 +57,7 @@
     }
     .btn.gold{ background:linear-gradient(135deg,var(--gold),#8d7218); color:#111; border-color:#8d7218; }
     .btn.ghost{ background:transparent; }
+
     .grid{ display:grid; grid-template-columns:var(--leftCol) 1fr; gap:12px; margin:12px 0 0; }
     .card{ background:#151518; border:1px solid #2a2a31; border-radius:14px; }
     .card .head{
@@ -60,14 +67,17 @@
     .card .head h2{ margin:0; font-size:15px; width:100%; text-align:center; }
     .card .head > div{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; justify-content:center; }
     .card .body{ padding:8px 10px; }
+
     .settings .head{ flex-direction:column; gap:6px; }
     .settings .body .row{ display:flex; flex-direction:column; gap:8px; align-items:stretch; }
+
     .field{ display:flex; flex-direction:column; gap:4px; margin-bottom:6px; text-align:center; }
     .field label{ font-size:12px; color:#c9cad1; margin-bottom:2px; font-weight:800; }
     .field input,.field select{
       border-radius:10px; border:1px solid #2a2a31; background:#0f0f12; color:#f8f8fb; padding:8px; font-size:13px; width:100%;
       text-align:center;
     }
+
     .kpis{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
     .kpi{
       background:#0f0f12; border:1px solid #222228; border-radius:10px; padding:8px;
@@ -82,8 +92,10 @@
       align-self:end; font-weight:900; font-size:18px; margin-top:2px; white-space:nowrap;
       overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums;
     }
+
     .chart-box{ position:relative; height:340px; width:100%; margin-top:6px; }
     #chart{ width:100% !important; height:100% !important; display:block; }
+
     table{ width:100%; border-collapse:separate; border-spacing:0 6px; text-align:center; table-layout:auto; }
     thead th{ font-size:12px; color:#b8bac3; text-align:center; padding:0 8px; }
     tbody td{ padding:8px; background:#0f0f12; border-top:1px solid #222228; border-bottom:1px solid #222228; font-size:13px; }
@@ -91,34 +103,43 @@
     tbody tr td:last-child{ border-right:1px solid #222228; border-top-right-radius:8px; border-bottom-right-radius:8px; }
     th,td{ word-break:break-word; overflow-wrap:anywhere; }
     canvas, table{ max-width:100%; }
+
     .bench-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; text-align:center; }
+
     #benchControls{ display:none; }
     #simTableWrap{ display:block; }
     #twcControls{ display:none; }
+
     .seg{ display:inline-flex; background:#0f0f12; border:1px solid #2a2a31; border-radius:999px; overflow:hidden; }
     .seg button{ background:transparent; border:0; padding:8px 10px; color:#ddd; font-weight:800; cursor:pointer; font-size:13px; }
     .seg button.active{ background:#2a2a31; color:#fff; }
+
     .notice{
       margin:6px 0 8px; padding:8px 10px; border:1px solid #5c4d12;
       background:linear-gradient(180deg,#1a180e,#141207); color:#e8d18b; border-radius:10px; display:none; font-size:12px; text-align:center;
     }
     .notice.show{ display:block; }
+
     .pct-pos{ color:#2ecc71; font-weight:900; }
     .pct-neg{ color:#e74c3c; font-weight:900; }
+
     .p-row{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:6px; align-items:end; }
     .p-row .field{ margin:0; }
     .p-row label{ font-size:11px; }
     .p-row input{ height:34px; text-align:center; }
     .p-row .remove-wrap{ grid-column: 1 / -1; }
     .p-row .remove-wrap .btn{ width:100%; height:34px; padding:6px 8px; }
+
     footer{ flex:0 0 auto; width:100%; border-top:1px solid #2a2a31; background:#111114; margin-top:14px; }
     .disclaimer{
       max-width:1320px; margin:0 auto; padding:10px 12px;
       font-size:11px; line-height:1.35; color:#b9bac5; text-align:center;
     }
+
     html{ --leftCol: 320px; }
     html.desktop{ --leftCol: 380px; }
     html.mobile{ --leftCol:100%; }
+
     html.mobile .wrap{ padding:0 8px; }
     html.mobile header{
       position:relative;
@@ -135,12 +156,14 @@
       justify-self:center;
     }
     html.mobile .settings-toggle{ display:inline-flex; grid-area:settings; justify-self:start; }
+
     #btnOpenSettings.btn{
       padding:8px 10px;
       display:none; align-items:center; justify-content:center;
     }
     #btnOpenSettings .ic{ font-weight:900; font-size:20px; line-height:1; }
     #btnOpenSettings .txt{ display:none; }
+
     html.mobile #btnOpenSettings{
       display:inline-flex;
       position:fixed;
@@ -150,11 +173,13 @@
       border-radius:9px;
     }
     html.desktop #btnOpenSettings{ display:none !important; }
+
     html.mobile .title{ grid-area:title; align-self:center; justify-self:center; max-width:76vw; }
     html.mobile .title h1{
       font-size: clamp(12px, 2.9vw, 14px);
       line-height:1.05; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;
     }
+
     html.mobile .toolbar{
       position:absolute; top:6px; right:6px;
       display:flex; gap:4px; align-items:center; justify-content:flex-end;
@@ -165,6 +190,7 @@
       line-height:1; border-radius:6px;
       min-height:18px;
     }
+
     html.mobile .grid{ grid-template-columns:1fr !important; gap:8px; }
     html.mobile .kpis{ grid-template-columns:repeat(3,1fr); gap:4px; }
     html.mobile .kpi{ min-height:54px; padding:6px; }
@@ -176,11 +202,13 @@
     html.mobile tbody td{ font-size:11px; padding:6px 4px; }
     html.mobile #simTableWrap h3{ margin:4px 0 6px; font-size:13px; }
     html.mobile .bench-grid{ grid-template-columns:1fr; gap:6px; }
+
     .scrim{
       position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none;
       z-index:var(--zScrim);
     }
     .scrim.show{ display:block; }
+
     html.mobile .settings{
       position:fixed; top:0; left:0;
       height:100dvh; width:min(84vw, 400px);
@@ -193,24 +221,156 @@
     html.mobile .settings .head{ padding:10px; }
     html.mobile .settings .body{ padding:10px; overflow:auto; -webkit-overflow-scrolling:touch; }
     html.desktop .settings-toggle{ display:none; }
-  </style>
+
+  
+    /* ------------------------ EXPORT MENU ------------------------ */
+    #exportMenu{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:120;
+      padding:12px;
+    }
+    #exportMenu .dialog{
+      background:#151518;
+      border-radius:12px;
+      border:1px solid #2a2a31;
+      max-width:360px;
+      width:100%;
+      padding:14px 14px 12px;
+      box-shadow:0 18px 50px rgba(0,0,0,0.6);
+    }
+    #exportMenu h3{
+      margin:0 0 12px;
+      font-size:16px;
+      text-align:center;
+    }
+    .export-list{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .export-list label{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-size:13px;
+      padding:6px 8px;
+      border-radius:8px;
+      background:#0f0f12;
+      border:1px solid #24242a;
+    }
+    .export-list input[type="checkbox"]{
+      width:16px;
+      height:16px;
+    }
+    .export-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      margin-top:10px;
+    }
+    html.mobile #exportMenu .dialog{
+      max-width:320px;
+    }
+
+    /* ------------------------ OVERLAY CARICAMENTO PDF ------------------------ */
+    .pdf-loading{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.60);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:130;
+      padding:12px;
+    }
+    .pdf-loading-box{
+      background:#151518;
+      border-radius:12px;
+      border:1px solid #2a2a31;
+      max-width:260px;
+      width:100%;
+      padding:16px 18px;
+      text-align:center;
+      box-shadow:0 18px 50px rgba(0,0,0,0.6);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+    }
+    .spinner{
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      border:3px solid rgba(255,255,255,0.10);
+      border-top-color:#c9a227;
+      animation:spin 0.8s linear infinite;
+    }
+    .pdf-loading-text{
+      font-size:13px;
+      color:#f4f4f6;
+    }
+    @keyframes spin{
+      from{ transform:rotate(0deg); }
+      to{   transform:rotate(360deg); }
+    }
+</style>
 </head>
+
 <body>
   <div class="wrap">
     <header>
       <button class="btn settings-toggle" id="btnOpenSettings" aria-expanded="false" aria-controls="settingsPanel" title="Impostazioni" aria-label="Apri impostazioni">
         <span class="ic">☰</span><span class="txt">Impostazioni</span>
       </button>
+
       <div class="logo">
         <img id="brandLogo" class="logo-img" alt="TWC Logo" loading="eager" crossorigin="anonymous">
         <div id="brandLogoFallback" class="logo-fallback" aria-hidden="true" style="display:none;">TWC</div>
       </div>
+
       <div class="title"><h1 id="appTitle">The Wine Caveau - Simulatore d'investimento</h1></div>
+
       <div class="toolbar" role="toolbar" aria-label="Azioni principali">
         <button class="btn gold" id="btnPDF">Esporta PDF</button>
       </div>
     </header>
+
     <div id="scrim" class="scrim" aria-hidden="true"></div>
+
+    <!-- ------------------------ MENU EXPORT PDF ------------------------ -->
+    <div id="exportMenu">
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+        <h3 id="exportTitle">Seleziona i dati da esportare</h3>
+
+        <div class="export-list">
+          <label><span>Simulazione</span><input type="checkbox" id="pdfSim" checked></label>
+          <label><span>Confronto asset (rendimento)</span><input type="checkbox" id="pdfBench" checked></label>
+          <label><span>Volatilità</span><input type="checkbox" id="pdfVol" checked></label>
+          <label><span>Inflazione</span><input type="checkbox" id="pdfInfl" checked></label>
+          <label><span>TWC index</span><input type="checkbox" id="pdfTWC" checked></label>
+        </div>
+
+        <div class="export-actions">
+          <button class="btn ghost" id="btnExportCancel">Annulla</button>
+          <button class="btn gold" id="btnExportConfirm">Esporta</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------ OVERLAY CARICAMENTO ------------------------ -->
+    <div id="exportLoading" class="pdf-loading" aria-hidden="true">
+      <div class="pdf-loading-box">
+        <div class="spinner"></div>
+        <div class="pdf-loading-text">Generazione PDF in corso...</div>
+      </div>
+    </div>
+
     <div class="grid" id="layoutGrid">
       <div class="card settings" id="settingsPanel">
         <div class="head">
@@ -223,8 +383,10 @@
         <div class="body">
           <div class="row">
             <div class="field"><label>Budget iniziale (€)</label><input type="text" id="initial" value="10000"></div>
+            <div class="field"><label>Margine di sicurezza (%)</label><input type="text" id="safetyMargin" value="10"></div>
             <div class="field"><label>Orizzonte (anni)</label><input type="number" id="years" value="10" min="1" max="50"></div>
             <div class="field"><label>Rendimento annuo di base (%)</label><input type="text" id="rate" value="16"></div>
+
             <div class="field" id="histRow" style="display:none">
               <div class="inline-label" style="display:flex;align-items:center;gap:8px;justify-content:center">
                 <input type="checkbox" id="useHistorical">
@@ -235,6 +397,7 @@
               <label>Anni da simulare</label>
               <select id="histYears"></select>
             </div>
+
             <div class="field">
               <label>Commissione di gestione</label>
               <select id="mgmtType">
@@ -244,8 +407,10 @@
             </div>
             <div class="field"><label id="lblMgmtValue">Percentuale annua (%)</label><input type="text" id="mgmtValue" value="0"></div>
             <div class="field"><label>Commissione TWC (%)</label><input type="text" id="twcValue" value="50"></div>
+
             <div class="field"><button class="btn gold" id="btnRun">Simula</button></div>
             <div class="field"><button class="btn" id="btnReset">Reset</button></div>
+
             <div class="field">
               <label style="font-weight:900; margin-bottom:6px">Periodi con rendimento personalizzato</label>
               <div id="periodList"></div>
@@ -254,6 +419,7 @@
           </div>
         </div>
       </div>
+
       <div class="card">
         <div class="head"><h2>Risultati</h2></div>
         <div class="body">
@@ -264,6 +430,7 @@
             <div class="kpi"><div class="t">Quota Cliente</div><div class="v" id="kpiClient">—</div></div>
             <div class="kpi"><div class="t">Quota TWC</div><div class="v" id="kpiTWC">—</div></div>
           </div>
+
           <div class="row" style="display:flex;align-items:center;justify-content:center;margin-top:6px;gap:6px;text-align:center">
             <div class="seg" id="modeSwitch" role="tablist" aria-label="Modalità grafico">
               <button data-mode="sim" class="active" aria-pressed="true" role="tab">Simulazione</button>
@@ -271,7 +438,9 @@
               <button data-mode="twc" aria-pressed="false" role="tab">TWC index</button>
             </div>
           </div>
+
           <div class="chart-box"><canvas id="chart"></canvas></div>
+
           <div id="simTableWrap" style="margin-top:8px">
             <h3 style="text-align:center;margin:4px 0 6px">Tabella riepilogativa</h3>
             <table>
@@ -281,13 +450,16 @@
               <tbody id="tableBody"></tbody>
             </table>
           </div>
+
           <div id="benchControls">
             <div id="benchNotice" class="notice"></div>
+
             <div class="seg" id="metricSwitch" style="margin:6px auto 8px auto; display:flex; justify-content:center">
               <button data-metric="return" class="active" aria-pressed="true">Rendimento</button>
               <button data-metric="vol" aria-pressed="false">Confronto volatilità</button>
               <button data-metric="infl" aria-pressed="false">Inflazione</button>
             </div>
+
             <div class="bench-grid" style="margin-bottom:6px">
               <div class="card" style="padding:8px; text-align:center">
                 <label><input type="checkbox" id="chkGOLD" checked> Oro</label>
@@ -299,6 +471,7 @@
                 <label><input type="checkbox" id="chkSPX" checked> S&amp;P 500</label>
               </div>
             </div>
+
             <div id="benchTableWrap">
               <table>
                 <thead id="benchThead"></thead>
@@ -306,6 +479,7 @@
               </table>
             </div>
           </div>
+
           <div id="twcControls" style="margin-top:6px">
             <div id="twcNotice" class="notice show">
               Le bottiglie riportate sono <b>solo alcuni esempi</b> del TWC index, a puro scopo illustrativo. I rendimenti passati non sono garanzia di risultati futuri.
@@ -327,23 +501,32 @@
               </table>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </div>
+
   <footer>
     <div class="disclaimer">
       Il presente simulatore ha finalità esclusivamente informative ed esemplificative. I risultati mostrati non costituiscono in alcun modo garanzia di rendimenti futuri né raccomandazione di investimento.
       TWC srl declina ogni responsabilità per eventuali decisioni finanziarie prese sulla base delle simulazioni fornite o per l’uso improprio del presente strumento.
     </div>
   </footer>
+
   <script>
     function $(id){ return document.getElementById(id); }
-    const fmtEUR = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'});
-    const fmtPCT1= new Intl.NumberFormat('it-IT',{style:'percent',minimumFractionDigits:1,maximumFractionDigits:1});
-    let chart, periods = [], lastSim = null, activeChartMode = 'sim', benchMetric='return';
+
+    const fmtEUR  = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'});
+    const fmtPCT1 = new Intl.NumberFormat('it-IT',{style:'percent',minimumFractionDigits:1,maximumFractionDigits:1});
+
+    let chart, periods = [];
+    let activeChartMode = 'sim';
+    let benchMetric = 'return';
+
     const LOGO_UI_REMOTE  = 'https://raw.githubusercontent.com/thewinecaveaudeveloper/TWC-ASSETS/main/Logo%20bianco%20caveau%20copia.png';
     const LOGO_PDF_REMOTE = 'https://raw.githubusercontent.com/thewinecaveaudeveloper/TWC-ASSETS/main/Logo%20nero%20wine%20caveau.png';
+
     const LOGO_EMBED  = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="360" height="120">
         <rect width="100%" height="100%" fill="#151518"/>
@@ -351,6 +534,7 @@
               font-family="Inter,system-ui" font-weight="900" font-size="64" fill="#c9a227">TWC</text>
       </svg>
     `);
+
     function setupLogoUI(){
       const img = $('brandLogo');
       const fb  = $('brandLogoFallback');
@@ -358,6 +542,7 @@
       img.onload = ()=>{ fb.style.display='none'; };
       img.onerror= ()=>{ fb.style.display='grid'; img.removeAttribute('src'); img.src = LOGO_EMBED; };
     }
+
     async function fetchAsDataURL(url){
       try{
         const res = await fetch(url, { mode:'cors', cache:'no-store', credentials:'omit' });
@@ -371,12 +556,14 @@
         });
       }catch(e){ return null; }
     }
+
     function sniffFormat(dataURL){
       if (!dataURL) return 'PNG';
       if (dataURL.startsWith('data:image/png')) return 'PNG';
       if (dataURL.startsWith('data:image/jpeg') || dataURL.startsWith('data:image/jpg')) return 'JPEG';
       return 'PNG';
     }
+
     async function rasterSVGToPNG(dataURL){
       return await new Promise((resolve)=>{
         const img = new Image();
@@ -393,6 +580,7 @@
         img.src = dataURL;
       });
     }
+
     let __logoPDFCache = null;
     async function getLogoForPDF(){
       if (__logoPDFCache) return __logoPDFCache;
@@ -407,11 +595,15 @@
       if (raster){ __logoPDFCache = { dataURL: raster, fmt: 'PNG' }; return __logoPDFCache; }
       return null;
     }
+
     const COLORS = {
       TWC:'#2ecc71', NDX:'#007bff', SPX:'#e74c3c', GOLD:'#c9a227',
-      SIM_INVESTITO:'rgba(123,10,46,0.7)', SIM_RENDIMENTO:'rgba(201,162,39,0.7)',
+      SIM_INVESTITO:'rgba(123,10,46,0.7)',
+      SIM_RENDIMENTO:'rgba(201,162,39,0.7)',
+      SIM_MARGINE:'#40a5c7',  
       IT:'#e67e22', WORLD:'#95a5a6'
     };
+
     const TWC_BOTTLES = [
       { name: 'Romanee Conti Grand Cru 2015',                       release: 20000, after5y: 31500 },
       { name: 'Jacques Selosse Substance',                          release:   220, after5y:   530 },
@@ -424,15 +616,44 @@
       { name: 'Domaine Anne Gros Echezeaux Grand Cru 2016',         release:   155, after5y:   480 },
       { name: 'The Macallan Sherry Oak 30 Year Release 18',         release:  4700, after5y:  8100 }
     ];
+
     const FULL_SERIES=[{year:2015,pct:7.9},{year:2016,pct:38.4},{year:2017,pct:27.5},{year:2018,pct:24.2},{year:2019,pct:-0.8},{year:2020,pct:7.5},{year:2021,pct:24.2},{year:2022,pct:1.2},{year:2023,pct:-12.5},{year:2024,pct:-12.1}];
+
     const VOL_FIX = { NDX:0.28, SPX:0.138, GOLD:0.19 };
-    const INFL = { years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],
+
+    const INFL = {
+      years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],
       IT:[0.0007,-0.0009,0.0124,0.0115,0.0061,-0.0014,0.0187,0.0813,0.0569,0.0100],
-      WORLD:[0.0276,0.0279,0.0328,0.0361,0.0351,0.0323,0.0469,0.0874,0.0679,0.0590] };
-    function stdev(arr){ const a=arr.filter(x=>isFinite(x)); if(!a.length) return 0; const m=a.reduce((s,x)=>s+x,0)/a.length; return Math.sqrt(a.reduce((s,x)=>(x-m)*(x-m),0)/a.length); }
-    function computeTWCVolFromSeries(nYears){ const n=Math.max(1,Math.min(10,nYears||10)); const r=FULL_SERIES.slice(-n).map(x=>x.pct/100); return stdev(r); }
-    function wealthFromReturns(P0, returns, Y){ let vals=[P0], b=P0; for(let i=0;i<Y;i++){ const r=(i<returns.length&&returns[i]!=null)?returns[i]:0; b*=(1+r); vals.push(b); } return vals; }
-    function CAGR(v0, vN, years){ return (years<=0||v0<=0)?0:Math.pow(vN/v0,1/years)-1; }
+      WORLD:[0.0276,0.0279,0.0328,0.0361,0.0351,0.0323,0.0469,0.0874,0.0679,0.0590]
+    };
+
+    function stdev(arr){
+      const a=arr.filter(x=>isFinite(x));
+      if(!a.length) return 0;
+      const m=a.reduce((s,x)=>s+x,0)/a.length;
+      return Math.sqrt(a.reduce((s,x)=>(x-m)*(x-m),0)/a.length);
+    }
+
+    function computeTWCVolFromSeries(nYears){
+      const n=Math.max(1,Math.min(10,nYears||10));
+      const r=FULL_SERIES.slice(-n).map(x=>x.pct/100);
+      return stdev(r);
+    }
+
+    function wealthFromReturns(P0, returns, Y){
+      let vals=[P0], b=P0;
+      for(let i=0;i<Y;i++){
+        const r=(i<returns.length&&returns[i]!=null)?returns[i]:0;
+        b*=(1+r);
+        vals.push(b);
+      }
+      return vals;
+    }
+
+    function CAGR(v0, vN, years){
+      return (years<=0||v0<=0)?0:Math.pow(vN/v0,1/years)-1;
+    }
+
     function renderPeriods(){
       const list = $('periodList');
       list.innerHTML = '';
@@ -459,53 +680,101 @@
         });
       });
     }
+
     function addPeriod(p){ periods.push(p||{start:1,end:3,rate:20}); renderPeriods(); }
     function removePeriod(i){ periods.splice(i,1); renderPeriods(); }
+
     function compute(params){
       const {P0,Y,baseR,mgmtType,mgmtValue,twcPct,periods:periodsP,histRates}=params;
-      const months=Y*12; let b=P0; const rows=[]; let yearStart=b, netYear=0;
+      const months=Y*12; let b=P0;
+      const rows=[];
+      let yearStart=b, netYear=0;
+
       for(let m=1;m<=months;m++){
-        const yIdx=Math.floor((m-1)/12)+1; let r=baseR;
+        const yIdx=Math.floor((m-1)/12)+1;
+        let r=baseR;
         if(histRates && (yIdx-1)<histRates.length && histRates[yIdx-1]!=null){ r=histRates[yIdx-1]; }
         periodsP.forEach(pp=>{ if(yIdx>=pp.start && yIdx<=pp.end){ r=pp.rate/100; } });
-        const rm=Math.pow(1+r,1/12)-1; const before=b; b*=(1+rm); const grown=b-before; netYear+=grown;
-        if(m%12===0){ rows.push({yearIndex:yIdx,start:yearStart,fees:0,net:netYear,end:b}); yearStart=b; netYear=0; }
+
+        const rm=Math.pow(1+r,1/12)-1;
+        const before=b;
+        b*=(1+rm);
+        const grown=b-before;
+        netYear+=grown;
+
+        if(m%12===0){
+          rows.push({yearIndex:yIdx,start:yearStart,fees:0,net:netYear,end:b});
+          yearStart=b;
+          netYear=0;
+        }
       }
-      const final=b; const grossProfit=Math.max(0,final-P0);
+
+      const final=b;
+      const grossProfit=Math.max(0,final-P0);
       const annualFee=(mgmtType==='percent')?(P0*((parseFloat(mgmtValue)||0)/100)):(parseFloat(mgmtValue)||0);
-      const feesTot=annualFee*Y; rows.forEach(r=>{ r.fees=annualFee; });
-      const twcShare=Math.max(0,grossProfit*(twcPct/100)+feesTot); const clientShare=Math.max(0,grossProfit-twcShare);
+      const feesTot=annualFee*Y;
+      rows.forEach(r=>{ r.fees=annualFee; });
+
+      const twcShare=Math.max(0,grossProfit*(twcPct/100)+feesTot);
+      const clientShare=Math.max(0,grossProfit-twcShare);
+
       return { rows, final, grossProfit, clientShare, twcShare, feesTot, annualFee };
     }
-    function drawSimulationChart(sim, yearLabels, P0){
-      const principalCum=sim.rows.map(()=>P0);
-      const interestCum=sim.rows.map(r=>r.end-P0);
+
+    function drawSimulationChart(sim, yearLabels, P0Total, marginAmount){
+      const principalCum = sim.rows.map(()=>P0Total);
+      const interestCum  = sim.rows.map(r=>r.end-P0Total);
+      const safetyCum    = sim.rows.map(()=>marginAmount);
+
       if(chart){ chart.destroy(); }
       chart=new Chart($('chart'),{
         type:'bar',
-        data:{labels:yearLabels,datasets:[
-          {label:'Capitale investito',data:principalCum,backgroundColor:COLORS.SIM_INVESTITO,stack:'tot'},
-          {label:'Rendimento',data:interestCum,backgroundColor:COLORS.SIM_RENDIMENTO,stack:'tot'}
-        ]},
-        options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:(v)=>fmtEUR.format(v)}}}}
+        data:{
+          labels:yearLabels,
+          datasets:[
+            {label:'Capitale investito',  data:principalCum,backgroundColor:COLORS.SIM_INVESTITO, stack:'tot'},
+            {label:'Margine di sicurezza',data:safetyCum,   backgroundColor:COLORS.SIM_MARGINE,   stack:'tot'},
+            {label:'Rendimento',          data:interestCum, backgroundColor:COLORS.SIM_RENDIMENTO,stack:'tot'}
+          ]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          animation:true,
+          scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:(v)=>fmtEUR.format(v)}}},
+          plugins:{ tooltip:{ enabled:true } }
+        }
       });
     }
+
+    
     function simulate(){
-      const P0=parseFloat($('initial').value)||0;
+      const P0Budget = parseFloat($('initial').value)||0;
+      let mPct = parseFloat($('safetyMargin').value);
+      if(!isFinite(mPct)) mPct = 0;
+      mPct = Math.max(0, Math.min(100, mPct));
+      $('safetyMargin').value = String(mPct);
+
+      const marginAmount = P0Budget * (mPct/100);
+      const P0Total = Math.max(0, P0Budget + marginAmount); 
+
       const mt=$('mgmtType').value;
       const mv=parseFloat($('mgmtValue').value)||0;
       const twc=parseFloat($('twcValue').value)||0;
       const baseR=(parseFloat($('rate').value)||0)/100;
       const Y=Math.min(50,Math.max(1,parseInt($('years').value)||1));
       const yearLabels=Array.from({length:Y},(_,i)=>'Anno '+(i+1));
-      const sim=compute({P0:P0,Y:Y,baseR:baseR,mgmtType:mt,mgmtValue:mv,twcPct:twc,periods:periods,histRates:null});
-      lastSim=sim;
-      $('kpiPrincipal').textContent=fmtEUR.format(P0);
+
+      const sim=compute({P0:P0Total,Y:Y,baseR:baseR,mgmtType:mt,mgmtValue:mv,twcPct:twc,periods:periods,histRates:null});
+
+      $('kpiPrincipal').textContent=fmtEUR.format(P0Total);
       $('kpiFinal').textContent=fmtEUR.format(sim.final);
       $('kpiGain').textContent=fmtEUR.format(sim.grossProfit);
       $('kpiClient').textContent=fmtEUR.format(sim.clientShare);
       $('kpiTWC').textContent=fmtEUR.format(sim.twcShare);
-      if(activeChartMode==='sim'){ drawSimulationChart(sim, yearLabels, P0); }
+
+      if(activeChartMode==='sim'){ drawSimulationChart(sim, yearLabels, P0Total, marginAmount); }
+
       const tb=$('tableBody'); tb.innerHTML='';
       sim.rows.forEach(function(r,i){
         const lbl = yearLabels[i] || ('Anno '+(i+1));
@@ -517,77 +786,134 @@
                      '<td>'+fmtEUR.format(r.end)+'</td>';
         tb.appendChild(tr);
       });
+
       if(activeChartMode==='bench') drawBenchmarkChart();
       if(activeChartMode==='twc')  drawTWCIndex();
+
       if(document.documentElement.classList.contains('mobile') && drawer.classList.contains('open')){
         closeSettingsDrawer(true);
       }
     }
+
     const BENCH = {
       GOLD:{name:'Oro',years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],rates:[-0.0418,0.0854,0.1321,-0.0158,0.1826,0.2499,-0.0365,-0.0031,0.1309,0.2711]},
       NDX:{name:'Nasdaq 100',years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],rates:[0.0843,0.0589,0.3152,-0.0104,0.3796,0.4758,0.2663,-0.3297,0.5381,0.2488]},
       SPX:{name:'S&P 500',years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],rates:[-0.0073,0.0954,0.1942,-0.0624,0.2888,0.1626,0.2689,-0.1944,0.2423,0.2331]}
     };
+
     function setBenchTableHeader(){
       const thead = $('benchThead');
-      if(benchMetric==='return'){ thead.innerHTML = '<tr><th>Asset</th><th>Valore finale</th><th>CAGR</th><th>Vol annua</th></tr>'; }
-      else if(benchMetric==='vol'){ thead.innerHTML = '<tr><th>Asset</th><th>Vol annua</th></tr>'; }
-      else{ thead.innerHTML = '<tr><th>Anno</th><th>Italia</th><th>Mondo</th></tr>'; }
+      if(benchMetric==='return'){
+        thead.innerHTML = '<tr><th>Asset</th><th>Valore finale</th><th>CAGR</th><th>Vol annua</th></tr>';
+      } else if(benchMetric==='vol'){
+        thead.innerHTML = '<tr><th>Asset</th><th>Vol annua</th></tr>';
+      } else {
+        thead.innerHTML = '<tr><th>Anno</th><th>Italia</th><th>Mondo</th></tr>';
+      }
     }
+
     function drawBenchmarkChart(){
       const Ysim = Math.min(50,Math.max(1,parseInt($('years').value)||1));
       const Y = Math.min(10, Ysim);
       const showWarn = (Ysim>10);
       const notice = $('benchNotice');
-      if(showWarn){ notice.classList.add('show'); notice.textContent = 'Nota: l’orizzonte della simulazione ('+Ysim+' anni) eccede i dati disponibili per il confronto (max 10 anni: 2015–2024). Il grafico usa gli ultimi 10 anni.'; }
-      else{ notice.classList.remove('show'); notice.textContent = ''; }
+
+      if(showWarn){
+        notice.classList.add('show');
+        notice.textContent = 'Nota: l’orizzonte della simulazione ('+Ysim+' anni) eccede i dati disponibili per il confronto (max 10 anni: 2015–2024). Il grafico usa gli ultimi 10 anni.';
+      } else {
+        notice.classList.remove('show');
+        notice.textContent = '';
+      }
+
       const P0 = parseFloat($('initial').value)||0;
       const activeKeys=[];
       if($('chkGOLD').checked) activeKeys.push('GOLD');
       if($('chkNDX').checked)  activeKeys.push('NDX');
       if($('chkSPX').checked)  activeKeys.push('SPX');
+
       let datasets=[], tableRowsHTML='';
+
       if(benchMetric==='return'){
         const labels = Array.from({length:Y+1}, (_,i)=> i===0 ? 'T0' : 'Anno '+i);
         const baseR=(parseFloat($('rate').value)||0)/100;
-        const sim=compute({P0:P0,Y:Y,baseR:baseR,mgmtType:$('mgmtType').value,mgmtValue:parseFloat($('mgmtValue').value)||0,twcPct:parseFloat($('twcValue').value)||0,periods:periods,histRates:null});
+        const sim=compute({
+          P0:P0,
+          Y:Y,
+          baseR:baseR,
+          mgmtType:$('mgmtType').value,
+          mgmtValue:parseFloat($('mgmtValue').value)||0,
+          twcPct:parseFloat($('twcValue').value)||0,
+          periods:periods,
+          histRates:null
+        });
         const twcCurve=[P0].concat(sim.rows.map(r=>r.end));
         const twcVol=computeTWCVolFromSeries(Y);
-        datasets.push({ type:'line', label:'TWC', data:twcCurve, borderWidth:2, tension:0.15, borderColor:COLORS.TWC });
+
+        datasets.push({
+          type:'line',
+          label:'TWC',
+          data:twcCurve,
+          borderWidth:2,
+          tension:0.15,
+          borderColor:COLORS.TWC
+        });
+
         function addRowRet(name, vN, vol){
           tableRowsHTML += '<tr><td>'+name+'</td><td>'+fmtEUR.format(vN)+'</td><td>'+ (CAGR(P0,vN,Y)*100).toFixed(2) +'%</td><td>'+ (vol*100).toFixed(1) +'%</td></tr>';
         }
-        addRowRet('TWC', twcCurve[twcCurve.length-1], twcVol);
+
+        const twcFinal = twcCurve[twcCurve.length-1];
+        addRowRet('TWC', twcFinal, twcVol);
+
         activeKeys.forEach(function(key){
           const K=BENCH[key];
           const rates=K.rates.slice(-Y);
           const curve=wealthFromReturns(P0, rates, Y);
           const color=(key==='GOLD')?COLORS.GOLD:(key==='NDX'?COLORS.NDX:COLORS.SPX);
-          datasets.push({ type:'line', label:K.name, data:curve, borderWidth:2, tension:0.15, borderColor:color });
+          datasets.push({
+            type:'line',
+            label:K.name,
+            data:curve,
+            borderWidth:2,
+            tension:0.15,
+            borderColor:color
+          });
           const vol=(key==='GOLD')?VOL_FIX.GOLD:(key==='NDX'?VOL_FIX.NDX:VOL_FIX.SPX);
           addRowRet(K.name, curve[curve.length-1], vol);
         });
+
         setBenchTableHeader();
         $('benchTable').innerHTML = tableRowsHTML;
+
         if(chart){ chart.destroy(); }
         chart = new Chart($('chart'), {
           type: 'line',
           data:{ labels, datasets },
           options:{
             responsive:true, maintainAspectRatio:false,
-            plugins:{ legend:{ position:'bottom' } },
+            animation:false,
+            plugins:{ legend:{ position:'bottom' }, tooltip:{ enabled:true } },
             scales:{ y:{ ticks:{ callback:(v)=>fmtEUR.format(v) } } }
           }
         });
+
       }else if(benchMetric==='vol'){
         setBenchTableHeader();
+
+        const Yvol = Math.min(10, Ysim);
         const labelsVol = ['TWC'];
-        const dataVol   = [ computeTWCVolFromSeries(Y) ];
+        const dataVol   = [ computeTWCVolFromSeries(Yvol) ];
         const colorsVol = [ COLORS.TWC ];
+
         if(activeKeys.includes('NDX'))  { labelsVol.push('Nasdaq 100'); dataVol.push(VOL_FIX.NDX);  colorsVol.push(COLORS.NDX); }
         if(activeKeys.includes('SPX'))  { labelsVol.push('S&P 500');   dataVol.push(VOL_FIX.SPX);  colorsVol.push(COLORS.SPX); }
         if(activeKeys.includes('GOLD')) { labelsVol.push('Oro');       dataVol.push(VOL_FIX.GOLD); colorsVol.push(COLORS.GOLD); }
-        $('benchTable').innerHTML = labelsVol.map((nm,i)=>'<tr><td>'+nm+'</td><td>'+ fmtPCT1.format(dataVol[i]) +'</td></tr>').join('');
+
+        $('benchTable').innerHTML = labelsVol.map((nm,i)=>
+          '<tr><td>'+nm+'</td><td>'+ fmtPCT1.format(dataVol[i]) +'</td></tr>'
+        ).join('');
+
         if(chart){ chart.destroy(); }
         chart = new Chart($('chart'), {
           type: 'bar',
@@ -606,9 +932,10 @@
           },
           options: {
             responsive:true, maintainAspectRatio:false,
+            animation:false,
             plugins:{
               legend:{ display:false },
-              tooltip:{ callbacks:{ label: (ctx)=> fmtPCT1.format(ctx.parsed.y ?? ctx.parsed) } }
+              tooltip:{ enabled:true, callbacks:{ label: (ctx)=> fmtPCT1.format(ctx.parsed.y ?? ctx.parsed) } }
             },
             scales:{
               x:{ grid:{ display:false }, ticks:{ maxRotation:0, autoSkip:false } },
@@ -616,42 +943,50 @@
             }
           }
         });
+
       }else{
         setBenchTableHeader();
-        const idxStart = INFL.years.length - Y;
+
+        const Yinfl = Math.min(10, Ysim);
+        const idxStart = INFL.years.length - Yinfl;
         const labels = INFL.years.slice(idxStart);
         const it = INFL.IT.slice(idxStart);
         const wd = INFL.WORLD.slice(idxStart);
+
         $('benchTable').innerHTML = labels.map((yy,i)=>
           `<tr><td>${yy}</td><td>${fmtPCT1.format(it[i])}</td><td>${fmtPCT1.format(wd[i])}</td></tr>`
         ).join('');
+
         if(chart){ chart.destroy(); }
         chart = new Chart($('chart'), {
           type: 'line',
           data: {
             labels,
             datasets: [
-              { label: 'Italia (NIC, media annua)', data: it, borderColor: COLORS.IT, backgroundColor: COLORS.IT, tension:0.2, borderWidth:2, pointRadius:3 },
-              { label: 'Mondo (IMF, media globale)', data: wd, borderColor: COLORS.WORLD, backgroundColor: COLORS.WORLD, tension:0.2, borderWidth:2, pointRadius:3 }
+              { label: 'Italia (NIC, media annua)', data: it.map(v=>v*100), borderColor: COLORS.IT, backgroundColor: COLORS.IT, tension:0.2, borderWidth:2, pointRadius:3 },
+              { label: 'Mondo (IMF, media globale)', data: wd.map(v=>v*100), borderColor: COLORS.WORLD, backgroundColor: COLORS.WORLD, tension:0.2, borderWidth:2, pointRadius:3 }
             ]
           },
           options: {
             responsive:true, maintainAspectRatio:false,
+            animation:false,
             plugins:{
               legend:{ position:'bottom' },
-              tooltip:{ callbacks:{ label: (ctx)=> `${ctx.dataset.label}: ${fmtPCT1.format(ctx.parsed.y)}` } }
+              tooltip:{ enabled:true, callbacks:{ label: (ctx)=> `${ctx.dataset.label}: ${fmtPCT1.format((ctx.parsed.y/100) || 0)}` } }
             },
             scales:{
-              y:{ beginAtZero:true, ticks:{ callback:(v)=>fmtPCT1.format(v) } },
+              y:{ beginAtZero:true, ticks:{ callback:(v)=>fmtPCT1.format(v/100) } },
               x:{ grid:{ display:false } }
             }
           }
         });
       }
     }
+
     function drawTWCIndex(){
       const uscita = TWC_BOTTLES.map(b=>+b.release||0);
       const y5     = TWC_BOTTLES.map(b=>+b.after5y||0);
+
       const rowsHTML = TWC_BOTTLES.map((b,i)=>{
         const abs = (y5[i]-uscita[i]);
         const pct = uscita[i]>0 ? (y5[i]/uscita[i]-1) : 0;
@@ -667,10 +1002,14 @@
           <td><span class="${clsCgr}">${fmtPCT1.format(cgr)}</span></td>
         </tr>`;
       }).join('');
+
       $('twcTable').innerHTML = rowsHTML;
+
       if (chart){ chart.destroy(); chart = null; }
     }
+
     function clampRate(x){ return Math.max(-50, Math.min(100, x)); }
+
     $('btnMinusRate').onclick=function(){
       const v = clampRate((parseFloat($('rate').value)||0) - 1);
       $('rate').value = String(v);
@@ -681,9 +1020,11 @@
       $('rate').value = String(v);
       simulate();
     };
+
     $('mgmtType').addEventListener('change',function(){
       $('lblMgmtValue').textContent=($('mgmtType').value==='percent')?'Percentuale annua (%)':'Quota annuale (€)';
     });
+
     (function(){
       const seg=$('modeSwitch');
       function showSection(mode){
@@ -711,6 +1052,7 @@
       });
       showSection('sim');
     })();
+
     (function(){
       const seg=$('metricSwitch');
       seg.addEventListener('click', function(e){
@@ -726,133 +1068,613 @@
         if(activeChartMode==='bench') drawBenchmarkChart();
       });
     })();
+
     ['chkGOLD','chkNDX','chkSPX'].forEach(function(id){
       const el=$(id);
       if(el) el.addEventListener('change', function(){ if(activeChartMode==='bench') drawBenchmarkChart(); });
     });
+
     $('btnAddPeriod').onclick=function(){
       const next=periods.length? (periods[periods.length-1].end+1) : 1;
       addPeriod({start:next,end:next+1,rate:20});
     };
-    function drawLogoFallback(pdf,x,y,w,h){
-      pdf.setDrawColor(42,42,49); pdf.setFillColor(21,21,24);
-      pdf.roundedRect(x,y,w,h,8,8,'FD');
-    }
-    async function addImageFitted(pdf, dataURL, fmt, boxX, boxY, boxW, boxH){
-      return await new Promise((resolve)=>{
-        const im = new Image();
-        im.onload = ()=>{
-          const r = im.width / im.height;
-          let w = boxW, h = w / r;
-          if (h > boxH){ h = boxH; w = h * r; }
-          const x = boxX + (boxW - w)/2;
-          const y = boxY + (boxH - h)/2;
-          try{ pdf.addImage(dataURL, fmt, x, y, w, h); resolve({x,y,w,h}); }
-          catch(e){ resolve(null); }
-        };
-        im.onerror = ()=> resolve(null);
-        im.src = dataURL;
-      });
-    }
+
     const LETTERHEAD = "TWC srl · Via Parrocchia 7, Flero (BS) 25020 · P.IVA 07388060480";
-    $('btnPDF').onclick = async function(){
+
+    function showPdfLoading(){
+      const o = $('exportLoading');
+      if(o){
+        o.style.display = 'flex';
+        document.body.classList.add('no-scroll');
+      }
+    }
+
+    function hidePdfLoading(){
+      const o = $('exportLoading');
+      if(o){
+        o.style.display = 'none';
+        document.body.classList.remove('no-scroll');
+      }
+    }
+
+    async function exportPDF(){
+      const includeSim   = $('pdfSim')?.checked ?? true;
+      const includeBench = $('pdfBench')?.checked ?? true;
+      const includeVol   = $('pdfVol')?.checked ?? true;
+      const includeInfl  = $('pdfInfl')?.checked ?? true;
+      const includeTWC   = $('pdfTWC')?.checked ?? true;
+
+      const originalMode = activeChartMode;
+      const originalBenchMetric = benchMetric;
+
+   
+      function buildSimSection(){
+        const P0Budget = parseFloat($('initial').value)||0;
+        let mPct = parseFloat($('safetyMargin').value);
+        if(!isFinite(mPct)) mPct = 0;
+        mPct = Math.max(0, Math.min(100, mPct));
+
+        const marginAmount = P0Budget * (mPct/100);
+        const P0Total = Math.max(0, P0Budget + marginAmount);
+
+        const mt = $('mgmtType').value;
+        const mv = parseFloat($('mgmtValue').value)||0;
+        const twc = parseFloat($('twcValue').value)||0;
+        const baseR = (parseFloat($('rate').value)||0)/100;
+        const Y = Math.min(50,Math.max(1,parseInt($('years').value)||1));
+
+        const sim = compute({
+          P0:P0Total,Y:Y,baseR:baseR,mgmtType:mt,mgmtValue:mv,twcPct:twc,periods:periods,histRates:null
+        });
+
+        const yearLabels = Array.from({length:Y},(_,i)=>'Anno '+(i+1));
+        const principalCum = sim.rows.map(()=>P0Total);
+        const interestCum  = sim.rows.map(r=>r.end-P0Total);
+        const safetyCum    = sim.rows.map(()=>marginAmount);
+
+        const canvas = document.createElement('canvas');
+        canvas.width  = 1000;
+        canvas.height = 500;
+
+        const localChart = new Chart(canvas,{
+          type:'bar',
+          data:{
+            labels: yearLabels,
+            datasets:[
+              {label:'Capitale investito',  data:principalCum,backgroundColor:COLORS.SIM_INVESTITO, stack:'tot'},
+              {label:'Margine di sicurezza',data:safetyCum,   backgroundColor:COLORS.SIM_MARGINE,   stack:'tot'},
+              {label:'Rendimento',          data:interestCum, backgroundColor:COLORS.SIM_RENDIMENTO,stack:'tot'}
+            ]
+          },
+          options:{
+            responsive:false,
+            maintainAspectRatio:false,
+            animation:false,
+            scales:{x:{stacked:true},y:{stacked:true}}
+          }
+        });
+
+        const dataURL = canvas.toDataURL('image/png',1.0);
+        localChart.destroy();
+
+        const rows = sim.rows.map((r,i)=>{
+          const lbl = yearLabels[i] || ('Anno '+(i+1));
+          return [
+            lbl,
+            fmtEUR.format(r.start),
+            fmtEUR.format(-r.fees),
+            fmtEUR.format(r.net),
+            fmtEUR.format(r.end)
+          ];
+        });
+
+        return {
+          img: { dataURL, fmt:'PNG', width:canvas.width, height:canvas.height },
+          rows
+        };
+      }
+
+      function buildBenchSection(metric){
+        const P0   = parseFloat($('initial').value)||0;
+        const Ysim = Math.min(50, Math.max(1, parseInt($('years').value)||1));
+        const Y    = Math.min(10, Ysim);
+
+        const activeKeys = [];
+        if($('chkGOLD')?.checked) activeKeys.push('GOLD');
+        if($('chkNDX')?.checked)  activeKeys.push('NDX');
+        if($('chkSPX')?.checked)  activeKeys.push('SPX');
+
+        const canvas = document.createElement('canvas');
+        canvas.width  = 1000;
+        canvas.height = 500;
+
+        let head = [];
+        let rows = [];
+        let chartConfig = null;
+
+        if(metric==='return'){
+          const labels = Array.from({length:Y+1},(_,i)=> i===0 ? 'T0' : 'Anno '+i);
+          const baseR = (parseFloat($('rate').value)||0)/100;
+          const mt    = $('mgmtType').value;
+          const mv    = parseFloat($('mgmtValue').value)||0;
+          const twc   = parseFloat($('twcValue').value)||0;
+
+          const sim = compute({
+            P0, Y, baseR,
+            mgmtType:mt,
+            mgmtValue:mv,
+            twcPct:twc,
+            periods,
+            histRates:null
+          });
+
+          const twcCurve = [P0].concat(sim.rows.map(r=>r.end));
+          const twcVol   = computeTWCVolFromSeries(Y);
+          const datasets = [];
+
+          datasets.push({
+            type:'line',
+            label:'TWC',
+            data:twcCurve,
+            borderWidth:2,
+            tension:0.15,
+            borderColor:COLORS.TWC
+          });
+
+          function addRow(name, vN, vol){
+            rows.push([
+              name,
+              fmtEUR.format(vN),
+              (CAGR(P0, vN, Y)*100).toFixed(2)+'%',
+              (vol*100).toFixed(1)+'%'
+            ]);
+          }
+
+          const twcFinal = twcCurve[twcCurve.length-1];
+          addRow('TWC', twcFinal, twcVol);
+
+          activeKeys.forEach(key=>{
+            const K     = BENCH[key];
+            const rates = K.rates.slice(-Y);
+            const curve = wealthFromReturns(P0, rates, Y);
+            const color = (key==='GOLD') ? COLORS.GOLD :
+                          (key==='NDX')  ? COLORS.NDX  :
+                                          COLORS.SPX;
+            datasets.push({
+              type:'line',
+              label:K.name,
+              data:curve,
+              borderWidth:2,
+              tension:0.15,
+              borderColor:color
+            });
+            const vol = (key==='GOLD') ? VOL_FIX.GOLD :
+                        (key==='NDX')  ? VOL_FIX.NDX  :
+                                        VOL_FIX.SPX;
+            addRow(K.name, curve[curve.length-1], vol);
+          });
+
+          chartConfig = {
+            type:'line',
+            data:{ labels, datasets },
+            options:{
+              responsive:false,
+              maintainAspectRatio:false,
+              animation:false
+            }
+          };
+
+          head = ['Asset','Valore finale','CAGR','Vol annua'];
+
+        } else if(metric==='vol'){
+          const Yvol = Math.min(10, Ysim);
+          const labelsVol = ['TWC'];
+          const dataVol   = [ computeTWCVolFromSeries(Yvol) ];
+          const colorsVol = [ COLORS.TWC ];
+
+          if(activeKeys.includes('NDX'))  { labelsVol.push('Nasdaq 100'); dataVol.push(VOL_FIX.NDX);  colorsVol.push(COLORS.NDX); }
+          if(activeKeys.includes('SPX'))  { labelsVol.push('S&P 500');   dataVol.push(VOL_FIX.SPX);  colorsVol.push(COLORS.SPX); }
+          if(activeKeys.includes('GOLD')) { labelsVol.push('Oro');       dataVol.push(VOL_FIX.GOLD); colorsVol.push(COLORS.GOLD); }
+
+          chartConfig = {
+            type:'bar',
+            data:{
+              labels:labelsVol,
+              datasets:[{
+                label:'Volatilità annua',
+                data:dataVol,
+                backgroundColor:colorsVol,
+                borderColor:colorsVol,
+                borderWidth:1.2,
+                borderRadius:10,
+                borderSkipped:false,
+                maxBarThickness:52
+              }]
+            },
+            options:{
+              responsive:false,
+              maintainAspectRatio:false,
+              animation:false
+            }
+          };
+
+          head = ['Asset','Vol annua'];
+          rows = labelsVol.map((nm,i)=>[
+            nm,
+            fmtPCT1.format(dataVol[i])
+          ]);
+
+        } else {
+          const Yinfl    = Math.min(10, Ysim);
+          const idxStart = INFL.years.length - Yinfl;
+          const labels   = INFL.years.slice(idxStart);
+          const it       = INFL.IT.slice(idxStart);
+          const wd       = INFL.WORLD.slice(idxStart);
+
+          chartConfig = {
+            type:'line',
+            data:{
+              labels,
+              datasets:[
+                {
+                  label:'Italia (NIC, media annua)',
+                  data:it.map(v=>v*100),
+                  borderColor:COLORS.IT,
+                  backgroundColor:COLORS.IT,
+                  tension:0.2,
+                  borderWidth:2,
+                  pointRadius:3
+                },
+                {
+                  label:'Mondo (IMF, media globale)',
+                  data:wd.map(v=>v*100),
+                  borderColor:COLORS.WORLD,
+                  backgroundColor:COLORS.WORLD,
+                  tension:0.2,
+                  borderWidth:2,
+                  pointRadius:3
+                }
+              ]
+            },
+            options:{
+              responsive:false,
+              maintainAspectRatio:false,
+              animation:false
+            }
+          };
+
+          head = ['Anno','Italia','Mondo'];
+          rows = labels.map((yy,i)=>[
+            String(yy),
+            fmtPCT1.format(it[i]),
+            fmtPCT1.format(wd[i])
+          ]);
+        }
+
+        const localChart = new Chart(canvas, chartConfig);
+        const dataURL = canvas.toDataURL('image/png',1.0);
+        localChart.destroy();
+
+        return {
+          img: { dataURL, fmt:'PNG', width:canvas.width, height:canvas.height },
+          head,
+          rows
+        };
+      }
+
+      function buildTWCSection(){
+        const uscita = TWC_BOTTLES.map(b=>+b.release||0);
+        const y5     = TWC_BOTTLES.map(b=>+b.after5y||0);
+
+        const rows = TWC_BOTTLES.map((b,i)=>{
+          const abs = y5[i]-uscita[i];
+          const pct = uscita[i]>0 ? (y5[i]/uscita[i]-1) : 0;
+          const cgr = CAGR(uscita[i], y5[i], 5);
+          return [
+            b.name,
+            fmtEUR.format(uscita[i]),
+            fmtEUR.format(y5[i]),
+            fmtEUR.format(abs),
+            fmtPCT1.format(pct),
+            fmtPCT1.format(cgr)
+          ];
+        });
+
+        return { rows };
+      }
+
+      simulate();
+
+      const simSection   = includeSim   ? buildSimSection()              : null;
+      const benchSection = includeBench ? buildBenchSection('return')    : null;
+      const volSection   = includeVol   ? buildBenchSection('vol')       : null;
+      const inflSection  = includeInfl  ? buildBenchSection('infl')      : null;
+      const twcSection   = includeTWC   ? buildTWCSection()              : null;
+
+      activeChartMode = originalMode;
+      benchMetric     = originalBenchMetric;
+      if(originalMode==='sim')   simulate();
+      else if(originalMode==='bench') drawBenchmarkChart();
+      else if(originalMode==='twc')   drawTWCIndex();
+
       const jsPDF = window.jspdf.jsPDF;
-      const pdf=new jsPDF('p','pt','a4');
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'pt',
+        format: 'a4',
+        compressPdf: true
+      });
+
       const marginX=14, marginTop=10, marginBottom=12;
       const pageW=pdf.internal.pageSize.getWidth();
       const pageH=pdf.internal.pageSize.getHeight();
       const contentW=pageW - marginX*2;
       let y = marginTop;
+
       const boxW = 86, boxH = 86;
       const boxX = marginX, boxY = y;
+
       const logoObj = await getLogoForPDF();
       if (logoObj && logoObj.dataURL){
-        const ok = await addImageFitted(pdf, logoObj.dataURL, logoObj.fmt, boxX, boxY, boxW, boxH);
-        if (!ok) drawLogoFallback(pdf, boxX, boxY, boxW, boxH);
+        await (async()=>{
+          const im = new Image();
+          await new Promise((resolve)=>{
+            im.onload = resolve;
+            im.onerror = resolve;
+            im.src = logoObj.dataURL;
+          });
+          const W = im.width || 360;
+          const H = im.height || 120;
+          const r = W/H;
+          let w = boxW, h = w / r;
+          if (h > boxH){ h = boxH; w = h * r; }
+          const x = boxX + (boxW - w)/2;
+          const y2 = boxY + (boxH - h)/2;
+          try{ pdf.addImage(logoObj.dataURL, logoObj.fmt, x, y2, w, h); }
+          catch(e){
+            pdf.setDrawColor(42,42,49); pdf.setFillColor(240,240,245);
+            pdf.roundedRect(boxX, boxY, boxW, boxH, 8, 8, 'FD');
+          }
+        })();
       } else {
-        drawLogoFallback(pdf, boxX, boxY, boxW, boxH);
+        pdf.setDrawColor(42,42,49); pdf.setFillColor(240,240,245);
+        pdf.roundedRect(boxX, boxY, boxW, boxH, 8, 8, 'FD');
       }
+
       const title="The Wine Caveau - Simulatore d'investimento";
       pdf.setFont('helvetica','bold'); pdf.setFontSize(18);
       pdf.text(title, boxX + boxW + 14, boxY + 52);
+
       y = boxY + boxH + 8;
+
       const colGap=16,leftColW=258,rightColW=contentW-leftColW-colGap,twoColX=marginX,rightColX=twoColX+leftColW+colGap;
-      const mgmtTypeText = ($('mgmtType').value==='percent') ? 'Percentuale su quota investita' : 'Quota annuale fissa';
-      const paramsRows = [
-        ['Budget iniziale', ($('initial').value||'') + ' €'],
-        ['Orizzonte', ($('years').value||'') + ' anni'],
-        ['Rendimento base', ($('rate').value||'') + '%'],
-        ['Comm. gestione', mgmtTypeText + ' — ' + ($('mgmtValue').value||'') + (($('mgmtType').value==='percent')?'%':' €')],
-        ['Commissione TWC', ($('twcValue').value||'') + '%'],
-        ['Vista', activeChartMode==='sim' ? 'Simulazione' : (activeChartMode==='bench'
-           ? ('Confronto asset — ' + (benchMetric==='return'?'Rendimento':(benchMetric==='vol'?'Volatilità':'Inflazione')))
-           : 'TWC index (uscita vs 5 anni)')]
-      ];
+
+      const mt = $('mgmtType').value;
+      const mgmtTypeText = (mt==='percent') ? 'Percentuale su quota investita' : 'Quota annuale fissa';
+
+      let vistaLabel = '';
+      if(includeSim)      vistaLabel = 'Simulazione';
+      else if(includeBench) vistaLabel = 'Confronto asset';
+      else if(includeTWC)   vistaLabel = 'TWC index';
+
+      const P0totForPdf = parseFloat($('initial').value)||0;
+      let mPctForPdf = parseFloat($('safetyMargin').value);
+      if(!isFinite(mPctForPdf)) mPctForPdf = 0;
+      mPctForPdf = Math.max(0, Math.min(100, mPctForPdf));
+      const mAmtForPdf = P0totForPdf * (mPctForPdf/100);
+
+      const paramsRows = [];
+
+     
+      paramsRows.push(['Budget iniziale', fmtEUR.format(P0totForPdf)]);
+      paramsRows.push([
+        'Margine di sicurezza',
+        mPctForPdf.toFixed(1).replace('.',',') + ' % (' + fmtEUR.format(mAmtForPdf) + ')'
+      ]);
+      paramsRows.push(['Orizzonte', ($('years').value||'') + ' anni']);
+
+      if (periods && periods.length > 0) {
+        periods.forEach((p, idx) => {
+          const from = p.start ?? '';
+          const to   = p.end ?? '';
+          const rateNum = (typeof p.rate === 'number') ? p.rate : parseFloat(p.rate) || 0;
+          const rateStr = rateNum.toFixed(1).replace('.',',') + ' %';
+
+          const label = 'Periodo ' + (idx + 1);
+          const value = 'Anni ' + from + '–' + to + ' · ' + rateStr;
+
+          paramsRows.push([label, value]);
+        });
+      }
+
+     
+      paramsRows.push(['Rendimento base', ($('rate').value||'') + '%']);
+      paramsRows.push([
+        'Comm. gestione',
+        mgmtTypeText + ' — ' + ($('mgmtValue').value||'') + (mt === 'percent' ? '%' : ' €')
+      ]);
+      paramsRows.push(['Commissione TWC', ($('twcValue').value||'') + '%']);
+
+      
+      if (vistaLabel){
+        paramsRows.push(['Vista', vistaLabel]);
+      }
+
+
       const kpiRows = [
         ['Capitale investito', $('kpiPrincipal').innerText || ''],
-        ['Guadagno netto', $('kpiGain').innerText || ''],
-        ['Valore finale', $('kpiFinal').innerText || ''],
-        ['Quota Cliente', $('kpiClient').innerText || ''],
-        ['Quota TWC', $('kpiTWC').innerText || '']
+        ['Guadagno netto',     $('kpiGain').innerText      || ''],
+        ['Valore finale',      $('kpiFinal').innerText     || ''],
+        ['Quota Cliente',      $('kpiClient').innerText    || ''],
+        ['Quota TWC',          $('kpiTWC').innerText       || '']
       ];
+
+      const COMMON_TABLE_STYLES = {
+        theme:'grid',
+        styles:{ fontSize:9, cellPadding:5, lineColor:[0,0,0], lineWidth:0.25 },
+        headStyles:{ fillColor:[0,0,0], textColor:255, halign:'center' }
+      };
+
       pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
       pdf.text('Parametri selezionati', twoColX, y + 12);
-      pdf.text('Indicatori', rightColX, y + 12);
+      pdf.text('Indicatori',            rightColX, y + 12);
+
       pdf.autoTable({
-        startY: y + 20, margin: { left: twoColX }, tableWidth: leftColW,
-        head: [['Parametro','Valore']], body: paramsRows, theme:'grid',
-        styles:{ fontSize:9, cellPadding:5 },
-        headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }
+        startY: y + 20,
+        margin: { left: twoColX },
+        tableWidth: leftColW,
+        head: [['Parametro','Valore']],
+        body: paramsRows,
+        ...COMMON_TABLE_STYLES
       });
       const paramsBottom = pdf.lastAutoTable.finalY;
+
       pdf.autoTable({
-        startY: y + 20, margin: { left: rightColX }, tableWidth: rightColW,
-        head: [['Indicatore','Valore']], body: kpiRows, theme:'grid',
-        styles:{ fontSize:9, cellPadding:5 },
-        headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }
+        startY: y + 20,
+        margin: { left: rightColX },
+        tableWidth: rightColW,
+        head: [['Indicatore','Valore']],
+        body: kpiRows,
+        ...COMMON_TABLE_STYLES
       });
       const kpiBottom = pdf.lastAutoTable.finalY;
-      y = Math.max(paramsBottom, kpiBottom) + 8;
-      const chartEl = $('chart');
-      if (chartEl && activeChartMode!=='twc'){
-        try{
-          const chartImg = chartEl.toDataURL('image/png',1.0);
-          const h = 210;
-          pdf.addImage(chartImg,'PNG', marginX, y, contentW, h);
-          y += h + 8;
-        }catch(e){}
+
+      y = Math.max(paramsBottom, kpiBottom) + 10;
+
+      const marginBottomVal = marginBottom;
+      const pageBreakCheck = (neededHeight=40)=>{
+        if (y + neededHeight > pageH - marginBottomVal){
+          pdf.addPage();
+          y = marginTop;
+        }
+      };
+
+      function estimateTableHeight(rowCount){
+        if(!rowCount || rowCount<=0) return 0;
+        const headerH = 24;
+        const rowH    = 18;
+        return headerH + rowH * rowCount;
       }
-      if(activeChartMode==='sim'){
-        const rows = Array.from(document.querySelectorAll('#tableBody tr'))
-          .map(tr=>Array.from(tr.children).map(td=>td.textContent));
-        pdf.autoTable({
-          head: [['Anno','Saldo iniziale','Commissioni','Rendimento netto','Saldo finale']],
-          body: rows, startY: y, margin: { left: marginX, right: marginX, bottom: marginBottom }, tableWidth: contentW, theme:'grid',
-          styles:{ fontSize:9, cellPadding:5 },
-          headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }
-        });
-      } else if(activeChartMode==='bench'){
-        const headCells = Array.from(document.querySelectorAll('#benchThead th')).map(th=>th.textContent);
-        const rowsB = Array.from(document.querySelectorAll('#benchTable tr'))
-          .map(tr=>Array.from(tr.children).map(td=>td.textContent));
-        pdf.autoTable({
-          head: [headCells],
-          body: rowsB, startY: y, margin: { left: marginX, right: marginX, bottom: marginBottom }, tableWidth: contentW, theme:'grid',
-          styles:{ fontSize:9, cellPadding:5 },
-          headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }
-        });
-      } else {
-        const rowsT = Array.from(document.querySelectorAll('#twcTable tr'))
-          .map(tr=>Array.from(tr.children).map(td=>td.textContent));
-        pdf.autoTable({
-          head: [['Bottiglia','Prezzo uscita','Prezzo 5 anni','Δ Assoluto','Δ %','CAGR (5y)']],
-          body: rowsT, startY: y, margin: { left: marginX, right: marginX, bottom: marginBottom }, tableWidth: contentW, theme:'grid',
-          styles:{ fontSize:9, cellPadding:5 },
-          headStyles:{ fillColor:[30,30,36], textColor:255, halign:'center' }
-        });
+
+      function addChartSection(title, imgObj, tableHead, tableBody, addDisclaimer=false){
+        const hasImg = !!(
+          imgObj &&
+          typeof imgObj.dataURL === 'string' &&
+          imgObj.dataURL.startsWith('data:image/')
+        );
+        const rowsLen = tableBody ? tableBody.length : 0;
+
+        let baseW = hasImg ? (imgObj.width  || 800) : 0;
+        let baseH = hasImg ? (imgObj.height || 400) : 0;
+        let ratio = (hasImg && baseW > 0 && baseH > 0) ? (baseH / baseW) : 0.5;
+        let imgH  = hasImg ? contentW * ratio * 0.9 : 0;
+
+        const tableH = estimateTableHeight(rowsLen);
+
+        let neededHeight = 18;
+        if (hasImg)  neededHeight += imgH + 8;
+        if (rowsLen) neededHeight += tableH + 12;
+
+        pageBreakCheck(neededHeight);
+
+        pdf.setFont('helvetica','bold');
+        pdf.setFontSize(13);
+        pdf.text(title, marginX, y + 12);
+        y += 18;
+
+        if(addDisclaimer){
+          pdf.setFont('helvetica','normal');
+          pdf.setFontSize(10);
+          pdf.setTextColor(230,126,34);
+
+          const disclaimerText = "Le bottiglie riportate sono solo alcuni esempi del TWC index a scopo illustrativo. I rendimenti passati non garantiscono risultati futuri.";
+          const wrapped = pdf.splitTextToSize(disclaimerText, contentW);
+          pdf.text(wrapped, marginX, y + 10);
+
+          y += (wrapped.length * 12) + 6;
+
+          pdf.setTextColor(0,0,0);
+          pdf.setFont('helvetica','bold');
+          pdf.setFontSize(13);
+        }
+
+        if(hasImg){
+          try{
+            pdf.addImage(imgObj.dataURL, imgObj.fmt || 'PNG', marginX, y, contentW, imgH);
+            y += imgH + 8;
+          }catch(err){
+            console.error('Errore addImage, salto grafico PDF:', err);
+          }
+        }
+
+        if(rowsLen){
+          pdf.autoTable({
+            head: [tableHead],
+            body: tableBody,
+            startY: y,
+            margin: { left: marginX, right: marginX, bottom: marginBottomVal },
+            tableWidth: contentW,
+            styles: {
+              ...COMMON_TABLE_STYLES.styles,
+              halign: 'center'
+            },
+            headStyles: {
+              ...COMMON_TABLE_STYLES.headStyles,
+              halign: 'center'
+            }
+          });
+          y = pdf.lastAutoTable.finalY + 12;
+        }
       }
+
+      if(includeSim && simSection){
+        addChartSection(
+          'Simulazione – andamento e tabella riepilogativa',
+          simSection.img,
+          ['Anno','Saldo iniziale','Commissioni','Rendimento netto','Saldo finale'],
+          simSection.rows
+        );
+      }
+
+      if(includeBench && benchSection){
+        addChartSection(
+          'Confronto asset – rendimento',
+          benchSection.img,
+          benchSection.head,
+          benchSection.rows
+        );
+      }
+
+      if(includeVol && volSection){
+        addChartSection(
+          'Confronto asset – volatilità',
+          volSection.img,
+          volSection.head,
+          volSection.rows
+        );
+      }
+
+      if(includeInfl && inflSection){
+        addChartSection(
+          'Inflazione – Italia vs Mondo',
+          inflSection.img,
+          inflSection.head,
+          inflSection.rows
+        );
+      }
+
+      if(includeTWC && twcSection){
+        addChartSection(
+          'TWC index',
+          null,
+          ['Bottiglia','Prezzo uscita','Prezzo 5 anni','Delta Assoluto','Delta %','CAGR (5y)'],
+          twcSection.rows,
+          true
+        );
+      }
+
       const totalPages = pdf.internal.getNumberOfPages();
-      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(120,120,130);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(80,80,88);
       for (let i = 1; i <= totalPages; i++){
         pdf.setPage(i);
         const w = pdf.getTextWidth(LETTERHEAD);
@@ -860,11 +1682,16 @@
         const yFoot = pageH - 10;
         pdf.text(LETTERHEAD, x, yFoot);
       }
+
       pdf.save('simulazione.pdf');
-    };
-    const DEFAULTS = { initial:'10000', years:'10', rate:'16', mgmtType:'percent', mgmtValue:'0', twcValue:'50' };
+    }
+
+
+    const DEFAULTS = { initial:'10000', safetyMargin:'10', years:'10', rate:'16', mgmtType:'percent', mgmtValue:'0', twcValue:'50' };
+
     function applyDefaultsToUI(){
       $('initial').value=DEFAULTS.initial;
+      $('safetyMargin').value=DEFAULTS.safetyMargin;
       $('years').value=DEFAULTS.years;
       $('rate').value=DEFAULTS.rate;
       $('mgmtType').value=DEFAULTS.mgmtType;
@@ -873,6 +1700,7 @@
       $('mgmtType').dispatchEvent(new Event('change'));
       periods=[]; renderPeriods();
     }
+
     function updateResponsiveClass(){
       const html = document.documentElement;
       const isMobile = window.matchMedia('(max-width: 900px)').matches;
@@ -880,9 +1708,11 @@
       html.classList.add(isMobile ? 'mobile' : 'desktop');
       if(!isMobile){ closeSettingsDrawer(false); }
     }
+
     const drawer = $('settingsPanel');
     const scrim  = $('scrim');
     const btnOpen = $('btnOpenSettings');
+
     function resetViewportZoom(){
       const vp = document.querySelector('meta[name="viewport"]');
       if(!vp) return;
@@ -890,6 +1720,7 @@
       vp.setAttribute('content', base + ', maximum-scale=1');
       setTimeout(()=>{ vp.setAttribute('content', base); }, 350);
     }
+
     function openSettingsDrawer(){
       if(!document.documentElement.classList.contains('mobile')){
         drawer.scrollIntoView({ behavior:'smooth', block:'start' });
@@ -902,6 +1733,7 @@
       document.body.classList.add('no-scroll');
       setTimeout(()=>{ try{ $('initial').focus(); }catch(_){} }, 280);
     }
+
     function closeSettingsDrawer(restoreFocus=true){
       if (!drawer.classList.contains('open')) return;
       drawer.classList.remove('open');
@@ -911,6 +1743,7 @@
       if(restoreFocus) btnOpen.focus();
       resetViewportZoom();
     }
+
     function toggleSettingsDrawer(){
       resetViewportZoom();
       if (!document.documentElement.classList.contains('mobile')) {
@@ -920,45 +1753,83 @@
       if (drawer.classList.contains('open')) closeSettingsDrawer(true);
       else openSettingsDrawer();
     }
+
     btnOpen.addEventListener('click', toggleSettingsDrawer);
     scrim.addEventListener('click', ()=> closeSettingsDrawer(true));
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeSettingsDrawer(true); });
+
     function resetAll(){
       const html = document.documentElement;
       const currentMode = html.classList.contains('mobile') ? 'mobile' :
                           (html.classList.contains('desktop') ? 'desktop' : 'auto');
       applyDefaultsToUI();
       activeChartMode='sim'; benchMetric='return';
+
       const seg=$('modeSwitch');
       Array.from(seg.querySelectorAll('button')).forEach(function(x){
         const on = x.getAttribute('data-mode')==='sim';
         x.classList.toggle('active', on);
         x.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
+
       const ms=$('metricSwitch');
       Array.from(ms.querySelectorAll('button')).forEach(function(x){
         const on = x.getAttribute('data-metric')==='return';
         x.classList.toggle('active', on);
         x.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
+
       $('benchControls').style.display='none';
       $('simTableWrap').style.display='block';
       $('twcControls').style.display='none';
+
       const bn=$('benchNotice'); if(bn){ bn.classList.remove('show'); bn.textContent=''; }
+
       simulate();
+
       html.classList.remove('mobile','desktop','auto');
       html.classList.add(currentMode);
       updateResponsiveClass();
       closeSettingsDrawer(false);
     }
+
     $('btnRun').onclick = function(){
       resetViewportZoom();
       simulate();
     };
+
     $('btnReset').onclick = function(){
       resetViewportZoom();
       resetAll();
     };
+
+    const exportMenu = $('exportMenu');
+    const btnExportCancel = $('btnExportCancel');
+    const btnExportConfirm = $('btnExportConfirm');
+
+    $('btnPDF').onclick = function(){
+      resetViewportZoom();
+      if(exportMenu) exportMenu.style.display='flex';
+    };
+
+    if(btnExportCancel){
+      btnExportCancel.onclick = function(){
+        exportMenu.style.display='none';
+      };
+    }
+
+    if(btnExportConfirm){
+      btnExportConfirm.onclick = async function(){
+        exportMenu.style.display='none';
+        showPdfLoading();
+        try{
+          await exportPDF();
+        } finally {
+          hidePdfLoading();
+        }
+      };
+    }
+
     (function init(){
       setupLogoUI();
       updateResponsiveClass();
