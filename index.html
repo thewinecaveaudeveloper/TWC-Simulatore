@@ -50,11 +50,34 @@
     .title{ grid-area:title; justify-self:center; text-align:center; }
     .title h1{ margin:0; font-size:32px; line-height:1.15; white-space:normal; }
 
-    .toolbar{ grid-area:toolbar; justify-self:end; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
-    .btn{
-      border:1px solid #2a2a31; border-radius:10px; padding:8px 12px;
-      background:#1a1a1f; color:#f7f7fa; cursor:pointer; font-weight:700;
-    }
+    .toolbar{
+        grid-area:toolbar;
+        justify-self:end;
+        display:flex;
+        gap:6px;
+        flex-wrap:wrap;
+        align-items:center;
+      }
+
+     
+      .toolbar-column {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+      }
+
+      .btn{
+        border:1px solid #2a2a31;
+        border-radius:10px;
+        padding:8px 12px;
+        background:#1a1a1f;
+        color:#f7f7fa;
+        cursor:pointer;
+        font-weight:700;
+      }
+
+
+  
     .btn.gold{ background:linear-gradient(135deg,var(--gold),#8d7218); color:#111; border-color:#8d7218; }
     .btn.ghost{ background:transparent; }
 
@@ -278,6 +301,56 @@
       max-width:320px;
     }
 
+        /* ------------------------ MODALE ISTRUZIONI ------------------------ */
+    .info-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:120;
+      padding:12px;
+    }
+    .info-overlay .dialog{
+      background:#151518;
+      border-radius:12px;
+      border:1px solid #2a2a31;
+      max-width:720px;
+      width:100%;
+      padding:14px 16px 12px;
+      box-shadow:0 18px 50px rgba(0,0,0,0.6);
+      max-height:80vh;
+      display:flex;
+      flex-direction:column;
+    }
+    .info-content{
+      font-size:12px;
+      line-height:1,45;
+      color:#f4f4f6;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      padding-right:4px;
+    }
+    .info-content h4,
+    .info-content h5{
+      margin:8px 0 4px;
+      font-size:12,5px;
+    }
+    .info-content ul,
+    .info-content ol{
+      margin:4px 0 8px 18px;
+      padding:0;
+    }
+    .info-content li{
+      margin-bottom:2px;
+    }
+    html.mobile .info-overlay .dialog{
+      max-width:92vw;
+      padding:12px;
+    }
+
+
     /* ------------------------ OVERLAY CARICAMENTO PDF ------------------------ */
     .pdf-loading{
       position:fixed;
@@ -336,9 +409,12 @@
 
       <div class="title"><h1 id="appTitle">The Wine Caveau - Simulatore d'investimento</h1></div>
 
-      <div class="toolbar" role="toolbar" aria-label="Azioni principali">
+      <div class="toolbar toolbar-column" role="toolbar" aria-label="Azioni principali">
         <button class="btn gold" id="btnPDF">Esporta PDF</button>
+        <button class="btn ghost" id="btnHelp" title="Istruzioni">ⓘ Istruzioni</button>
       </div>
+
+
     </header>
 
     <div id="scrim" class="scrim" aria-hidden="true"></div>
@@ -359,6 +435,131 @@
         <div class="export-actions">
           <button class="btn ghost" id="btnExportCancel">Annulla</button>
           <button class="btn gold" id="btnExportConfirm">Esporta</button>
+        </div>
+      </div>
+    </div>
+        <!-- ------------------------ MODALE ISTRUZIONI ------------------------ -->
+    <div id="helpModal" class="info-overlay" style="display:none;">
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+        <h3 id="helpTitle" style="text-align:center;margin-top:0;margin-bottom:10px;">📘 Istruzioni rapide – Simulatore d’Investimento TWC</h3>
+
+        <div class="info-content">
+          <h4>1. Imposta la simulazione ⚙️</h4>
+          <p>Nel pannello <strong>Impostazioni</strong> puoi configurare i parametri principali della simulazione:</p>
+          <ul>
+            <li><strong>Budget iniziale</strong> – capitale da investire.</li>
+            <li><strong>Margine di sicurezza (%)</strong> – percentuale da applicare in base alla tipologia di portafoglio.
+              Tutti i calcoli vengono effettuati su <strong>Budget + Margine di sicurezza</strong>.
+            </li>
+            <li><strong>Orizzonte (anni)</strong> – durata dell’investimento.</li>
+            <li><strong>Rendimento annuo di base (%)</strong> – crescita media attesa. Default: 16% (media TWC Index).</li>
+            <li><strong>Commissione di gestione</strong> – applicata solo se il cliente affida le bottiglie a TWC:
+              <ul>
+                <li>Percentuale annua su quota investita, oppure</li>
+                <li>Quota fissa annuale.</li>
+              </ul>
+            </li>
+            <li><strong>Commissione TWC</strong> – percentuale trattenuta da TWC solo sulla plusvalenza dell’investimento.</li>
+          </ul>
+
+          <h5>Periodi personalizzati 📅 (anni anomali)</h5>
+          <p>Questa funzione permette di simulare anni con rendimenti diversi dal rendimento annuo base, per introdurre <strong>scenari anomali</strong> nella simulazione.</p>
+          <ol>
+            <li>Premi <strong>+ Aggiungi periodo</strong></li>
+            <li>Imposta <strong>anno iniziale</strong>, <strong>anno finale</strong> e <strong>rendimento (%)</strong></li>
+            <li>Aggiungi più periodi e rimuovili liberamente</li>
+          </ol>
+          <p><em>Esempi di utilizzo:</em></p>
+          <ul>
+            <li>Anni eccezionalmente positivi ✨</li>
+            <li>Shock di mercato ⚠️</li>
+            <li>Fasi più lente o stagnanti</li>
+          </ul>
+
+          <p>👉 Premi <strong>Simula</strong> per aggiornare grafici e risultati.<br>
+             👉 Premi <strong>Reset</strong> per tornare alla configurazione iniziale.</p>
+
+          <hr>
+
+          <h4>2. Sezione Risultati 📊</h4>
+
+          <h5>2.1 Modalità “Simulazione”</h5>
+          <p>Il grafico mostra:</p>
+          <ul>
+            <li><strong>Capitale investito</strong> (Budget + Margine di sicurezza)</li>
+            <li><strong>Margine di sicurezza</strong> (solo rappresentazione grafica)</li>
+            <li><strong>Rendimento generato</strong>, calcolato sul totale Budget + Margine di sicurezza</li>
+          </ul>
+          <p>È presente una tabella annuale con:</p>
+          <ul>
+            <li>Saldo iniziale</li>
+            <li>Commissioni</li>
+            <li>Rendimento netto</li>
+            <li>Saldo finale</li>
+          </ul>
+
+          <h5>2.2 KPI principali 🧮</h5>
+          <ul>
+            <li><strong>Capitale investito</strong> – capitale complessivo iniziale.</li>
+            <li><strong>Guadagno netto</strong> – rendimento totale prima delle commissioni.</li>
+            <li><strong>Valore finale</strong> – capitale investito + guadagno netto.</li>
+            <li><strong>Quota Cliente</strong> – rendimento destinato al cliente, al netto di tutte le commissioni.</li>
+            <li><strong>Quota TWC</strong> – parte di rendimento e commissioni spettante a TWC.</li>
+          </ul>
+
+          <h5>2.3 Modalità “Confronto Asset” 🔍</h5>
+          <p>Permette di confrontare la simulazione con:</p>
+          <ul>
+            <li>Oro</li>
+            <li>Nasdaq 100</li>
+            <li>S&amp;P 500</li>
+          </ul>
+          <p>Ogni asset può essere attivato o disattivato tramite le spunte sotto il grafico.</p>
+          <p>Metriche aggiuntive disponibili:</p>
+          <ul>
+            <li>Volatilità annua 📈</li>
+            <li>Inflazione (Italia vs Mondo) 🌍</li>
+          </ul>
+
+          <h5>2.4 Modalità “TWC Index” 🍷</h5>
+          <p>Mostra una selezione di bottiglie del TWC Index con:</p>
+          <ul>
+            <li>Prezzo alla release</li>
+            <li>Prezzo dopo 5 anni</li>
+            <li>Delta assoluto e %</li>
+            <li>CAGR (5 anni)</li>
+          </ul>
+
+          <hr>
+
+          <h4>3. Esportazione PDF 📄</h4>
+          <p>Con <strong>Esporta PDF</strong> puoi includere nel report:</p>
+          <ul>
+            <li>Simulazione</li>
+            <li>Confronto asset</li>
+            <li>Volatilità</li>
+            <li>Inflazione</li>
+            <li>TWC Index</li>
+          </ul>
+
+          <hr>
+
+          <h4>4. Uso su smartphone 📱</h4>
+          <ul>
+            <li>Il pannello impostazioni scorre da sinistra premendo sulll'icona menù in alto a sinistra</li>
+            <li>Il grafico si adatta automaticamente allo schermo.</li>
+            <li>Le tabelle sono consultabili tramite scroll orizzontale.</li>
+          </ul>
+
+          <hr>
+
+          <h4>5. Nota importante ⚠️</h4>
+          <p>Il simulatore ha finalità <strong>informative ed esemplificative</strong>.<br>
+             I rendimenti passati <strong>non garantiscono</strong> risultati futuri.</p>
+        </div>
+
+        <div class="export-actions" style="margin-top:10px; justify-content:flex-end;">
+          <button class="btn" id="btnHelpClose">Chiudi</button>
         </div>
       </div>
     </div>
@@ -628,11 +829,13 @@
     };
 
     function stdev(arr){
-      const a=arr.filter(x=>isFinite(x));
+      const a = arr.filter(x => isFinite(x));
       if(!a.length) return 0;
-      const m=a.reduce((s,x)=>s+x,0)/a.length;
-      return Math.sqrt(a.reduce((s,x)=>(x-m)*(x-m),0)/a.length);
+      const m = a.reduce((s,x) => s + x, 0) / a.length;
+      const variance = a.reduce((s,x) => s + (x - m)*(x - m), 0) / a.length;
+      return Math.sqrt(variance);
     }
+
 
     function computeTWCVolFromSeries(nYears){
       const n=Math.max(1,Math.min(10,nYears||10));
@@ -685,41 +888,79 @@
     function removePeriod(i){ periods.splice(i,1); renderPeriods(); }
 
     function compute(params){
-      const {P0,Y,baseR,mgmtType,mgmtValue,twcPct,periods:periodsP,histRates}=params;
-      const months=Y*12; let b=P0;
-      const rows=[];
-      let yearStart=b, netYear=0;
+        const {
+          P0Budget,      // solo Budget → base per le commissioni
+          P0Total,       // Budget + Margine → base per i rendimenti
+          Y,
+          baseR,
+          mgmtType,
+          mgmtValue,
+          twcPct,
+          periods: periodsP,
+          histRates
+        } = params;
 
-      for(let m=1;m<=months;m++){
-        const yIdx=Math.floor((m-1)/12)+1;
-        let r=baseR;
-        if(histRates && (yIdx-1)<histRates.length && histRates[yIdx-1]!=null){ r=histRates[yIdx-1]; }
-        periodsP.forEach(pp=>{ if(yIdx>=pp.start && yIdx<=pp.end){ r=pp.rate/100; } });
+        // Capitale da cui parte la simulazione (sempre capitale investito completo)
+        const investStart = (typeof P0Total === 'number' && isFinite(P0Total))
+          ? P0Total
+          : (typeof P0Budget === 'number' && isFinite(P0Budget) ? P0Budget : 0);
 
-        const rm=Math.pow(1+r,1/12)-1;
-        const before=b;
-        b*=(1+rm);
-        const grown=b-before;
-        netYear+=grown;
+        // Base su cui calcolare la commissione di gestione
+        const feeBase = (typeof P0Budget === 'number' && isFinite(P0Budget))
+          ? P0Budget
+          : investStart;
 
-        if(m%12===0){
-          rows.push({yearIndex:yIdx,start:yearStart,fees:0,net:netYear,end:b});
-          yearStart=b;
-          netYear=0;
+        const months = Y * 12;
+        let b = investStart;
+        const rows = [];
+        let yearStart = b;
+        let netYear = 0;
+
+        for (let m = 1; m <= months; m++) {
+          const yIdx = Math.floor((m - 1) / 12) + 1;
+
+          let r = baseR;
+          if (histRates && (yIdx - 1) < histRates.length && histRates[yIdx - 1] != null) {
+            r = histRates[yIdx - 1];
+          }
+          periodsP.forEach(pp => {
+            if (yIdx >= pp.start && yIdx <= pp.end) {
+              r = pp.rate / 100;
+            }
+          });
+
+          const rm = Math.pow(1 + r, 1 / 12) - 1;
+          const before = b;
+          b *= (1 + rm);
+          const grown = b - before;
+          netYear += grown;
+
+          if (m % 12 === 0) {
+            rows.push({ yearIndex: yIdx, start: yearStart, fees: 0, net: netYear, end: b });
+            yearStart = b;
+            netYear = 0;
+          }
         }
+
+        const final = b;
+        // Guadagno lordo calcolato sul capitale investito (Budget + Margine)
+        const grossProfit = Math.max(0, final - investStart);
+
+        // ⚠️ QUI la commissione percentuale è SOLO sul Budget (feeBase)
+        const annualFee =
+          (mgmtType === 'percent')
+            ? (feeBase * ((parseFloat(mgmtValue) || 0) / 100))
+            : (parseFloat(mgmtValue) || 0);
+
+        const feesTot = annualFee * Y;
+        rows.forEach(r => { r.fees = annualFee; });
+
+        const twcShare = Math.max(0, grossProfit * (twcPct / 100) + feesTot);
+        const clientShare = Math.max(0, grossProfit - twcShare);
+
+        return { rows, final, grossProfit, clientShare, twcShare, feesTot, annualFee };
       }
 
-      const final=b;
-      const grossProfit=Math.max(0,final-P0);
-      const annualFee=(mgmtType==='percent')?(P0*((parseFloat(mgmtValue)||0)/100)):(parseFloat(mgmtValue)||0);
-      const feesTot=annualFee*Y;
-      rows.forEach(r=>{ r.fees=annualFee; });
-
-      const twcShare=Math.max(0,grossProfit*(twcPct/100)+feesTot);
-      const clientShare=Math.max(0,grossProfit-twcShare);
-
-      return { rows, final, grossProfit, clientShare, twcShare, feesTot, annualFee };
-    }
 
     function drawSimulationChart(sim, yearLabels, P0Total, marginAmount){
       const principalCum = sim.rows.map(()=>P0Total);
@@ -758,32 +999,47 @@
       const marginAmount = P0Budget * (mPct/100);
       const P0Total = Math.max(0, P0Budget + marginAmount); 
 
-      const mt=$('mgmtType').value;
-      const mv=parseFloat($('mgmtValue').value)||0;
-      const twc=parseFloat($('twcValue').value)||0;
-      const baseR=(parseFloat($('rate').value)||0)/100;
-      const Y=Math.min(50,Math.max(1,parseInt($('years').value)||1));
-      const yearLabels=Array.from({length:Y},(_,i)=>'Anno '+(i+1));
+      const mt   = $('mgmtType').value;
+      const mv   = parseFloat($('mgmtValue').value)||0;
+      const twc  = parseFloat($('twcValue').value)||0;
+      const baseR= (parseFloat($('rate').value)||0)/100;
+      const Y    = Math.min(50,Math.max(1,parseInt($('years').value)||1));
+      const yearLabels = Array.from({length:Y},(_,i)=>'Anno '+(i+1));
 
-      const sim=compute({P0:P0Total,Y:Y,baseR:baseR,mgmtType:mt,mgmtValue:mv,twcPct:twc,periods:periods,histRates:null});
+      // ✅ CHIAMATA CORRETTA
+      const sim = compute({
+        P0Budget: P0Budget,   // base per fee di gestione
+        P0Total:  P0Total,    // Budget + Margine → base per i rendimenti
+        Y: Y,
+        baseR: baseR,
+        mgmtType: mt,
+        mgmtValue: mv,
+        twcPct: twc,
+        periods: periods,
+        histRates: null
+      });
 
-      $('kpiPrincipal').textContent=fmtEUR.format(P0Total);
-      $('kpiFinal').textContent=fmtEUR.format(sim.final);
-      $('kpiGain').textContent=fmtEUR.format(sim.grossProfit);
-      $('kpiClient').textContent=fmtEUR.format(sim.clientShare);
-      $('kpiTWC').textContent=fmtEUR.format(sim.twcShare);
+      $('kpiPrincipal').textContent = fmtEUR.format(P0Total);
+      $('kpiFinal').textContent     = fmtEUR.format(sim.final);
+      $('kpiGain').textContent      = fmtEUR.format(sim.grossProfit);
+      $('kpiClient').textContent    = fmtEUR.format(sim.clientShare);
+      $('kpiTWC').textContent       = fmtEUR.format(sim.twcShare);
 
-      if(activeChartMode==='sim'){ drawSimulationChart(sim, yearLabels, P0Total, marginAmount); }
+      if(activeChartMode==='sim'){
+        drawSimulationChart(sim, yearLabels, P0Total, marginAmount);
+      }
 
-      const tb=$('tableBody'); tb.innerHTML='';
+      const tb = $('tableBody');
+      tb.innerHTML='';
       sim.rows.forEach(function(r,i){
         const lbl = yearLabels[i] || ('Anno '+(i+1));
         const tr=document.createElement('tr');
-        tr.innerHTML='<td>'+lbl+'</td>'+
-                     '<td>'+fmtEUR.format(r.start)+'</td>'+
-                     '<td>'+fmtEUR.format(-r.fees)+'</td>'+
-                     '<td>'+fmtEUR.format(r.net)+'</td>'+
-                     '<td>'+fmtEUR.format(r.end)+'</td>';
+        tr.innerHTML =
+          '<td>'+lbl+'</td>'+
+          '<td>'+fmtEUR.format(r.start)+'</td>'+
+          '<td>'+fmtEUR.format(-r.fees)+'</td>'+
+          '<td>'+fmtEUR.format(r.net)+'</td>'+
+          '<td>'+fmtEUR.format(r.end)+'</td>';
         tb.appendChild(tr);
       });
 
@@ -794,6 +1050,7 @@
         closeSettingsDrawer(true);
       }
     }
+
 
     const BENCH = {
       GOLD:{name:'Oro',years:[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],rates:[-0.0418,0.0854,0.1321,-0.0158,0.1826,0.2499,-0.0365,-0.0031,0.1309,0.2711]},
@@ -837,16 +1094,18 @@
       if(benchMetric==='return'){
         const labels = Array.from({length:Y+1}, (_,i)=> i===0 ? 'T0' : 'Anno '+i);
         const baseR=(parseFloat($('rate').value)||0)/100;
-        const sim=compute({
-          P0:P0,
-          Y:Y,
-          baseR:baseR,
-          mgmtType:$('mgmtType').value,
-          mgmtValue:parseFloat($('mgmtValue').value)||0,
-          twcPct:parseFloat($('twcValue').value)||0,
-          periods:periods,
-          histRates:null
+        const sim = compute({
+          P0Budget: P0,   // qui budget = capitale iniziale (niente margine)
+          P0Total:  P0,   // stessa cosa, nessun margine
+          Y: Y,
+          baseR: baseR,
+          mgmtType: $('mgmtType').value,
+          mgmtValue: parseFloat($('mgmtValue').value) || 0,
+          twcPct: parseFloat($('twcValue').value) || 0,
+          periods: periods,
+          histRates: null
         });
+
         const twcCurve=[P0].concat(sim.rows.map(r=>r.end));
         const twcVol=computeTWCVolFromSeries(Y);
 
@@ -1124,8 +1383,18 @@
         const Y = Math.min(50,Math.max(1,parseInt($('years').value)||1));
 
         const sim = compute({
-          P0:P0Total,Y:Y,baseR:baseR,mgmtType:mt,mgmtValue:mv,twcPct:twc,periods:periods,histRates:null
+          P0Budget: P0Budget,
+          P0Total:  P0Total,
+          Y: Y,
+          baseR: baseR,
+          mgmtType: mt,
+          mgmtValue: mv,
+          twcPct: twc,
+          periods: periods,
+          histRates: null
         });
+
+
 
         const yearLabels = Array.from({length:Y},(_,i)=>'Anno '+(i+1));
         const principalCum = sim.rows.map(()=>P0Total);
@@ -1200,13 +1469,17 @@
           const twc   = parseFloat($('twcValue').value)||0;
 
           const sim = compute({
-            P0, Y, baseR,
-            mgmtType:mt,
-            mgmtValue:mv,
-            twcPct:twc,
-            periods,
-            histRates:null
+            P0Budget: P0,
+            P0Total:  P0,
+            Y: Y,
+            baseR: baseR,
+            mgmtType: mt,
+            mgmtValue: mv,
+            twcPct: twc,
+            periods: periods,
+            histRates: null
           });
+
 
           const twcCurve = [P0].concat(sim.rows.map(r=>r.end));
           const twcVol   = computeTWCVolFromSeries(Y);
@@ -1756,7 +2029,16 @@
 
     btnOpen.addEventListener('click', toggleSettingsDrawer);
     scrim.addEventListener('click', ()=> closeSettingsDrawer(true));
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeSettingsDrawer(true); });
+        document.addEventListener('keydown', (e)=>{
+          if(e.key === 'Escape'){
+            if(helpModal && helpModal.style.display === 'flex'){
+              helpModal.style.display = 'none';
+              return;
+            }
+            closeSettingsDrawer(true);
+          }
+        });
+
 
     function resetAll(){
       const html = document.documentElement;
@@ -1811,6 +2093,25 @@
       resetViewportZoom();
       if(exportMenu) exportMenu.style.display='flex';
     };
+
+    
+    const helpModal = $('helpModal');
+    const btnHelp = $('btnHelp');
+    const btnHelpClose = $('btnHelpClose');
+
+    if(btnHelp && helpModal){
+      btnHelp.onclick = function(){
+        resetViewportZoom();
+        helpModal.style.display = 'flex';
+      };
+    }
+
+    if(btnHelpClose && helpModal){
+      btnHelpClose.onclick = function(){
+        helpModal.style.display = 'none';
+      };
+    }
+
 
     if(btnExportCancel){
       btnExportCancel.onclick = function(){
