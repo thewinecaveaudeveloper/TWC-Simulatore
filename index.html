@@ -486,13 +486,13 @@
           <h5>2.1 Modalità “Simulazione”</h5>
           <p>Il grafico mostra:</p>
           <ul>
-            <li><strong>Capitale investito</strong> (Budget + Margine di sicurezza)</li>
+            <li><strong>Valore Collezione</strong> (Budget + Margine di sicurezza)</li>
             <li><strong>Margine di sicurezza</strong> (solo rappresentazione grafica)</li>
             <li><strong>Rendimento generato</strong>, calcolato sul totale Budget + Margine di sicurezza</li>
           </ul>
           <p>È presente una tabella annuale con:</p>
           <ul>
-            <li>Saldo iniziale</li>
+            <li>Saldo iniziale (Budget + Margine di sicurezza)</li>
             <li>Commissioni</li>
             <li>Rendimento netto</li>
             <li>Saldo finale</li>
@@ -500,9 +500,9 @@
 
           <h5>2.2 KPI principali 🧮</h5>
           <ul>
-            <li><strong>Capitale investito</strong> – capitale complessivo iniziale.</li>
+            <li><strong>Valore Collezione</strong> – capitale complessivo iniziale.</li>
             <li><strong>Guadagno netto</strong> – rendimento totale prima delle commissioni.</li>
-            <li><strong>Valore finale</strong> – capitale investito + guadagno netto.</li>
+            <li><strong>Valore finale</strong> – Valore Collezione + guadagno netto.</li>
             <li><strong>Quota Cliente</strong> – rendimento destinato al cliente, al netto di tutte le commissioni.</li>
             <li><strong>Quota TWC</strong> – parte di rendimento e commissioni spettante a TWC.</li>
           </ul>
@@ -625,7 +625,7 @@
         <div class="head"><h2>Risultati</h2></div>
         <div class="body">
           <div class="kpis" id="kpis">
-            <div class="kpi"><div class="t">Capitale investito</div><div class="v" id="kpiPrincipal">—</div></div>
+            <div class="kpi"><div class="t">Valore Collezione</div><div class="v" id="kpiPrincipal">—</div></div>
             <div class="kpi"><div class="t">Guadagno netto</div><div class="v" id="kpiGain">—</div></div>
             <div class="kpi"><div class="t">Valore finale</div><div class="v" id="kpiFinal">—</div></div>
             <div class="kpi"><div class="t">Quota Cliente</div><div class="v" id="kpiClient">—</div></div>
@@ -889,8 +889,8 @@
 
     function compute(params){
         const {
-          P0Budget,      // solo Budget → base per le commissioni
-          P0Total,       // Budget + Margine → base per i rendimenti
+          P0Budget,      
+          P0Total,       
           Y,
           baseR,
           mgmtType,
@@ -900,12 +900,12 @@
           histRates
         } = params;
 
-        // Capitale da cui parte la simulazione (sempre capitale investito completo)
+        
         const investStart = (typeof P0Total === 'number' && isFinite(P0Total))
           ? P0Total
           : (typeof P0Budget === 'number' && isFinite(P0Budget) ? P0Budget : 0);
 
-        // Base su cui calcolare la commissione di gestione
+        
         const feeBase = (typeof P0Budget === 'number' && isFinite(P0Budget))
           ? P0Budget
           : investStart;
@@ -943,10 +943,14 @@
         }
 
         const final = b;
-        // Guadagno lordo calcolato sul capitale investito (Budget + Margine)
-        const grossProfit = Math.max(0, final - investStart);
 
-        // ⚠️ QUI la commissione percentuale è SOLO sul Budget (feeBase)
+        
+        const baseBudget = (typeof P0Budget === 'number' && isFinite(P0Budget))
+          ? P0Budget
+          : investStart;
+        const grossProfit = Math.max(0, final - baseBudget);
+
+        
         const annualFee =
           (mgmtType === 'percent')
             ? (feeBase * ((parseFloat(mgmtValue) || 0) / 100))
@@ -955,38 +959,58 @@
         const feesTot = annualFee * Y;
         rows.forEach(r => { r.fees = annualFee; });
 
-        const twcShare = Math.max(0, grossProfit * (twcPct / 100) + feesTot);
+        
+        const twcShare    = Math.max(0, grossProfit * (twcPct / 100) + feesTot);
         const clientShare = Math.max(0, grossProfit - twcShare);
 
         return { rows, final, grossProfit, clientShare, twcShare, feesTot, annualFee };
       }
 
 
-    function drawSimulationChart(sim, yearLabels, P0Total, marginAmount){
-      const principalCum = sim.rows.map(()=>P0Total);
-      const interestCum  = sim.rows.map(r=>r.end-P0Total);
-      const safetyCum    = sim.rows.map(()=>marginAmount);
 
+    function drawSimulationChart(sim, yearLabels, P0Total, marginAmount){
+
+      
+      const endValues = sim.rows.map(r => r.end);
+
+      
+      const principal = sim.rows.map(r => P0Total);                 
+      const safety    = sim.rows.map(() => marginAmount);          
+      const interest  = sim.rows.map((r,i) => r.end - P0Total);     
       if(chart){ chart.destroy(); }
-      chart=new Chart($('chart'),{
+
+      chart = new Chart($('chart'), {
         type:'bar',
         data:{
-          labels:yearLabels,
+          labels: yearLabels,
           datasets:[
-            {label:'Capitale investito',  data:principalCum,backgroundColor:COLORS.SIM_INVESTITO, stack:'tot'},
-            {label:'Margine di sicurezza',data:safetyCum,   backgroundColor:COLORS.SIM_MARGINE,   stack:'tot'},
-            {label:'Rendimento',          data:interestCum, backgroundColor:COLORS.SIM_RENDIMENTO,stack:'tot'}
+            { label:'Valore Collezione',  data:principal,  backgroundColor:COLORS.SIM_INVESTITO,  stack:'tot' },
+            { label:'Margine di sicurezza', data:safety,   backgroundColor:COLORS.SIM_MARGINE,    stack:'tot' },
+            { label:'Rendimento',          data:interest,  backgroundColor:COLORS.SIM_RENDIMENTO, stack:'tot' }
           ]
         },
         options:{
           responsive:true,
           maintainAspectRatio:false,
           animation:true,
-          scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:(v)=>fmtEUR.format(v)}}},
-          plugins:{ tooltip:{ enabled:true } }
+          scales:{
+            x:{ stacked:true },
+            y:{ stacked:true, ticks:{ callback: v => fmtEUR.format(v) } }
+          },
+          plugins:{
+            tooltip:{
+              callbacks:{
+                afterBody: ctx => {
+                  const i = ctx[0].dataIndex;
+                  return "Valore finale: " + fmtEUR.format(endValues[i]);
+                }
+              }
+            }
+          }
         }
       });
     }
+
 
     
     function simulate(){
@@ -1006,10 +1030,10 @@
       const Y    = Math.min(50,Math.max(1,parseInt($('years').value)||1));
       const yearLabels = Array.from({length:Y},(_,i)=>'Anno '+(i+1));
 
-      // ✅ CHIAMATA CORRETTA
+      
       const sim = compute({
-        P0Budget: P0Budget,   // base per fee di gestione
-        P0Total:  P0Total,    // Budget + Margine → base per i rendimenti
+        P0Budget: P0Budget,   
+        P0Total:  P0Total,    
         Y: Y,
         baseR: baseR,
         mgmtType: mt,
@@ -1020,7 +1044,7 @@
       });
 
       $('kpiPrincipal').textContent = fmtEUR.format(P0Total);
-      $('kpiFinal').textContent     = fmtEUR.format(sim.final);
+      $('kpiFinal').textContent = fmtEUR.format(P0Budget + sim.grossProfit);
       $('kpiGain').textContent      = fmtEUR.format(sim.grossProfit);
       $('kpiClient').textContent    = fmtEUR.format(sim.clientShare);
       $('kpiTWC').textContent       = fmtEUR.format(sim.twcShare);
@@ -1069,178 +1093,234 @@
       }
     }
 
-    function drawBenchmarkChart(){
-      const Ysim = Math.min(50,Math.max(1,parseInt($('years').value)||1));
-      const Y = Math.min(10, Ysim);
-      const showWarn = (Ysim>10);
-      const notice = $('benchNotice');
+  function drawBenchmarkChart(){
+  const Ysim = Math.min(50, Math.max(1, parseInt($('years').value) || 1));
+  const Y    = Math.min(10, Ysim);
+  const showWarn = (Ysim > 10);
+  const notice = $('benchNotice');
 
-      if(showWarn){
-        notice.classList.add('show');
-        notice.textContent = 'Nota: l’orizzonte della simulazione ('+Ysim+' anni) eccede i dati disponibili per il confronto (max 10 anni: 2015–2024). Il grafico usa gli ultimi 10 anni.';
-      } else {
-        notice.classList.remove('show');
-        notice.textContent = '';
-      }
+  if (showWarn) {
+    notice.classList.add('show');
+    notice.textContent =
+      'Nota: l’orizzonte della simulazione (' + Ysim +
+      ' anni) eccede i dati disponibili per il confronto (max 10 anni: 2015–2024). Il grafico usa gli ultimi 10 anni.';
+  } else {
+    notice.classList.remove('show');
+    notice.textContent = '';
+  }
 
-      const P0 = parseFloat($('initial').value)||0;
-      const activeKeys=[];
-      if($('chkGOLD').checked) activeKeys.push('GOLD');
-      if($('chkNDX').checked)  activeKeys.push('NDX');
-      if($('chkSPX').checked)  activeKeys.push('SPX');
+  // ------------------ CAPITALE INIZIALE COERENTE CON KPI ------------------
+  const P0BudgetRaw = parseFloat($('initial').value) || 0;
+  let mPct = parseFloat($('safetyMargin').value);
+  if (!isFinite(mPct)) mPct = 0;
+  mPct = Math.max(0, Math.min(100, mPct));
+  const marginAmount = P0BudgetRaw * (mPct / 100);
+  const P0Total = Math.max(0, P0BudgetRaw + marginAmount);   // Budget + margine = Valore Collezione
 
-      let datasets=[], tableRowsHTML='';
+  const activeKeys = [];
+  if ($('chkGOLD').checked) activeKeys.push('GOLD');
+  if ($('chkNDX').checked)  activeKeys.push('NDX');
+  if ($('chkSPX').checked)  activeKeys.push('SPX');
 
-      if(benchMetric==='return'){
-        const labels = Array.from({length:Y+1}, (_,i)=> i===0 ? 'T0' : 'Anno '+i);
-        const baseR=(parseFloat($('rate').value)||0)/100;
-        const sim = compute({
-          P0Budget: P0,   // qui budget = capitale iniziale (niente margine)
-          P0Total:  P0,   // stessa cosa, nessun margine
-          Y: Y,
-          baseR: baseR,
-          mgmtType: $('mgmtType').value,
-          mgmtValue: parseFloat($('mgmtValue').value) || 0,
-          twcPct: parseFloat($('twcValue').value) || 0,
-          periods: periods,
-          histRates: null
-        });
+  let datasets = [];
+  let tableRowsHTML = '';
 
-        const twcCurve=[P0].concat(sim.rows.map(r=>r.end));
-        const twcVol=computeTWCVolFromSeries(Y);
+  // ------------------ MODALITÀ: RENDIMENTO ------------------
+  if (benchMetric === 'return') {
+    const labels = Array.from({ length: Y + 1 }, (_, i) => i === 0 ? 'T0' : 'Anno ' + i);
+    const baseR  = (parseFloat($('rate').value) || 0) / 100;
+    const mt     = $('mgmtType').value;
+    const mv     = parseFloat($('mgmtValue').value) || 0;
+    const twcPct = parseFloat($('twcValue').value) || 0;
 
-        datasets.push({
-          type:'line',
-          label:'TWC',
-          data:twcCurve,
-          borderWidth:2,
-          tension:0.15,
-          borderColor:COLORS.TWC
-        });
+    // Simulazione TWC coerente con la vista "Simulazione"
+    const sim = compute({
+      P0Budget: P0BudgetRaw,
+      P0Total:  P0Total,
+      Y:        Y,
+      baseR:    baseR,
+      mgmtType: mt,
+      mgmtValue: mv,
+      twcPct:   twcPct,
+      periods:  periods,
+      histRates: null
+    });
 
-        function addRowRet(name, vN, vol){
-          tableRowsHTML += '<tr><td>'+name+'</td><td>'+fmtEUR.format(vN)+'</td><td>'+ (CAGR(P0,vN,Y)*100).toFixed(2) +'%</td><td>'+ (vol*100).toFixed(1) +'%</td></tr>';
-        }
+    // Curva TWC: parte da Valore Collezione e arriva al Valore finale reale
+    const twcCurve = [P0Total].concat(sim.rows.map(r => r.end));
+    const twcVol   = computeTWCVolFromSeries(Y);
 
-        const twcFinal = twcCurve[twcCurve.length-1];
-        addRowRet('TWC', twcFinal, twcVol);
+    datasets.push({
+      type: 'line',
+      label: 'TWC',
+      data: twcCurve,
+      borderWidth: 2,
+      tension: 0.15,
+      borderColor: COLORS.TWC
+    });
 
-        activeKeys.forEach(function(key){
-          const K=BENCH[key];
-          const rates=K.rates.slice(-Y);
-          const curve=wealthFromReturns(P0, rates, Y);
-          const color=(key==='GOLD')?COLORS.GOLD:(key==='NDX'?COLORS.NDX:COLORS.SPX);
-          datasets.push({
-            type:'line',
-            label:K.name,
-            data:curve,
-            borderWidth:2,
-            tension:0.15,
-            borderColor:color
-          });
-          const vol=(key==='GOLD')?VOL_FIX.GOLD:(key==='NDX'?VOL_FIX.NDX:VOL_FIX.SPX);
-          addRowRet(K.name, curve[curve.length-1], vol);
-        });
-
-        setBenchTableHeader();
-        $('benchTable').innerHTML = tableRowsHTML;
-
-        if(chart){ chart.destroy(); }
-        chart = new Chart($('chart'), {
-          type: 'line',
-          data:{ labels, datasets },
-          options:{
-            responsive:true, maintainAspectRatio:false,
-            animation:false,
-            plugins:{ legend:{ position:'bottom' }, tooltip:{ enabled:true } },
-            scales:{ y:{ ticks:{ callback:(v)=>fmtEUR.format(v) } } }
-          }
-        });
-
-      }else if(benchMetric==='vol'){
-        setBenchTableHeader();
-
-        const Yvol = Math.min(10, Ysim);
-        const labelsVol = ['TWC'];
-        const dataVol   = [ computeTWCVolFromSeries(Yvol) ];
-        const colorsVol = [ COLORS.TWC ];
-
-        if(activeKeys.includes('NDX'))  { labelsVol.push('Nasdaq 100'); dataVol.push(VOL_FIX.NDX);  colorsVol.push(COLORS.NDX); }
-        if(activeKeys.includes('SPX'))  { labelsVol.push('S&P 500');   dataVol.push(VOL_FIX.SPX);  colorsVol.push(COLORS.SPX); }
-        if(activeKeys.includes('GOLD')) { labelsVol.push('Oro');       dataVol.push(VOL_FIX.GOLD); colorsVol.push(COLORS.GOLD); }
-
-        $('benchTable').innerHTML = labelsVol.map((nm,i)=>
-          '<tr><td>'+nm+'</td><td>'+ fmtPCT1.format(dataVol[i]) +'</td></tr>'
-        ).join('');
-
-        if(chart){ chart.destroy(); }
-        chart = new Chart($('chart'), {
-          type: 'bar',
-          data: {
-            labels: labelsVol,
-            datasets: [{
-              label:'Volatilità annua',
-              data: dataVol,
-              backgroundColor: colorsVol,
-              borderColor: colorsVol,
-              borderWidth: 1.2,
-              borderRadius: 10,
-              borderSkipped: false,
-              maxBarThickness: 52
-            }]
-          },
-          options: {
-            responsive:true, maintainAspectRatio:false,
-            animation:false,
-            plugins:{
-              legend:{ display:false },
-              tooltip:{ enabled:true, callbacks:{ label: (ctx)=> fmtPCT1.format(ctx.parsed.y ?? ctx.parsed) } }
-            },
-            scales:{
-              x:{ grid:{ display:false }, ticks:{ maxRotation:0, autoSkip:false } },
-              y:{ beginAtZero:true, grid:{ color:'rgba(255,255,255,0.06)' }, ticks:{ callback:(v)=>fmtPCT1.format(v) } }
-            }
-          }
-        });
-
-      }else{
-        setBenchTableHeader();
-
-        const Yinfl = Math.min(10, Ysim);
-        const idxStart = INFL.years.length - Yinfl;
-        const labels = INFL.years.slice(idxStart);
-        const it = INFL.IT.slice(idxStart);
-        const wd = INFL.WORLD.slice(idxStart);
-
-        $('benchTable').innerHTML = labels.map((yy,i)=>
-          `<tr><td>${yy}</td><td>${fmtPCT1.format(it[i])}</td><td>${fmtPCT1.format(wd[i])}</td></tr>`
-        ).join('');
-
-        if(chart){ chart.destroy(); }
-        chart = new Chart($('chart'), {
-          type: 'line',
-          data: {
-            labels,
-            datasets: [
-              { label: 'Italia (NIC, media annua)', data: it.map(v=>v*100), borderColor: COLORS.IT, backgroundColor: COLORS.IT, tension:0.2, borderWidth:2, pointRadius:3 },
-              { label: 'Mondo (IMF, media globale)', data: wd.map(v=>v*100), borderColor: COLORS.WORLD, backgroundColor: COLORS.WORLD, tension:0.2, borderWidth:2, pointRadius:3 }
-            ]
-          },
-          options: {
-            responsive:true, maintainAspectRatio:false,
-            animation:false,
-            plugins:{
-              legend:{ position:'bottom' },
-              tooltip:{ enabled:true, callbacks:{ label: (ctx)=> `${ctx.dataset.label}: ${fmtPCT1.format((ctx.parsed.y/100) || 0)}` } }
-            },
-            scales:{
-              y:{ beginAtZero:true, ticks:{ callback:(v)=>fmtPCT1.format(v/100) } },
-              x:{ grid:{ display:false } }
-            }
-          }
-        });
-      }
+    function addRowRet(name, vN, vol){
+      tableRowsHTML +=
+        '<tr><td>' + name + '</td>' +
+        '<td>' + fmtEUR.format(vN) + '</td>' +
+        '<td>' + (CAGR(P0Total, vN, Y) * 100).toFixed(2) + '%</td>' +
+        '<td>' + (vol * 100).toFixed(1) + '%</td></tr>';
     }
+
+    const twcFinal = twcCurve[twcCurve.length - 1];
+    addRowRet('TWC', twcFinal, twcVol);
+
+    // Benchmark: partono dallo stesso capitale iniziale P0Total
+    activeKeys.forEach(function(key){
+      const K     = BENCH[key];
+      const rates = K.rates.slice(-Y);
+      const curve = wealthFromReturns(P0Total, rates, Y);
+      const color = (key === 'GOLD') ? COLORS.GOLD :
+                    (key === 'NDX')  ? COLORS.NDX  :
+                                        COLORS.SPX;
+
+      datasets.push({
+        type: 'line',
+        label: K.name,
+        data: curve,
+        borderWidth: 2,
+        tension: 0.15,
+        borderColor: color
+      });
+
+      const vol = (key === 'GOLD') ? VOL_FIX.GOLD :
+                  (key === 'NDX')  ? VOL_FIX.NDX  :
+                                      VOL_FIX.SPX;
+      addRowRet(K.name, curve[curve.length - 1], vol);
+    });
+
+    setBenchTableHeader();
+    $('benchTable').innerHTML = tableRowsHTML;
+
+    if (chart) { chart.destroy(); }
+    chart = new Chart($('chart'), {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          y: {
+            ticks: { callback: v => fmtEUR.format(v) }
+          }
+        }
+      }
+    });
+
+  // ------------------ MODALITÀ: VOLATILITÀ ------------------
+  } else if (benchMetric === 'vol') {
+    setBenchTableHeader();
+
+    const Yvol = Math.min(10, Ysim);
+    const labelsVol = ['TWC'];
+    const dataVol   = [ computeTWCVolFromSeries(Yvol) ];
+    const colorsVol = [ COLORS.TWC ];
+
+    if (activeKeys.includes('NDX'))  { labelsVol.push('Nasdaq 100'); dataVol.push(VOL_FIX.NDX);  colorsVol.push(COLORS.NDX); }
+    if (activeKeys.includes('SPX'))  { labelsVol.push('S&P 500');   dataVol.push(VOL_FIX.SPX);  colorsVol.push(COLORS.SPX); }
+    if (activeKeys.includes('GOLD')) { labelsVol.push('Oro');       dataVol.push(VOL_FIX.GOLD); colorsVol.push(COLORS.GOLD); }
+
+    $('benchTable').innerHTML = labelsVol.map((nm,i)=>
+      '<tr><td>'+nm+'</td><td>'+ fmtPCT1.format(dataVol[i]) +'</td></tr>'
+    ).join('');
+
+    if(chart){ chart.destroy(); }
+    chart = new Chart($('chart'), {
+      type: 'bar',
+      data: {
+        labels: labelsVol,
+        datasets: [{
+          label:'Volatilità annua',
+          data: dataVol,
+          backgroundColor: colorsVol,
+          borderColor: colorsVol,
+          borderWidth: 1.2,
+          borderRadius: 10,
+          borderSkipped: false,
+          maxBarThickness: 52
+        }]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        animation:false,
+        plugins:{
+          legend:{ display:false },
+          tooltip:{ enabled:true, callbacks:{ label: (ctx)=> fmtPCT1.format(ctx.parsed.y ?? ctx.parsed) } }
+        },
+        scales:{
+          x:{ grid:{ display:false }, ticks:{ maxRotation:0, autoSkip:false } },
+          y:{ beginAtZero:true, grid:{ color:'rgba(255,255,255,0.06)' }, ticks:{ callback:(v)=>fmtPCT1.format(v) } }
+        }
+      }
+    });
+
+  // ------------------ MODALITÀ: INFLAZIONE ------------------
+  } else {
+    setBenchTableHeader();
+
+    const Yinfl    = Math.min(10, Ysim);
+    const idxStart = INFL.years.length - Yinfl;
+    const labels   = INFL.years.slice(idxStart);
+    const it       = INFL.IT.slice(idxStart);
+    const wd       = INFL.WORLD.slice(idxStart);
+
+    $('benchTable').innerHTML = labels.map((yy,i)=>
+      '<tr><td>'+yy+'</td><td>'+fmtPCT1.format(it[i])+'</td><td>'+fmtPCT1.format(wd[i])+'</td></tr>'
+    ).join('');
+
+    if(chart){ chart.destroy(); }
+    chart = new Chart($('chart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Italia (NIC, media annua)',
+            data: it.map(v=>v*100),
+            borderColor: COLORS.IT,
+            backgroundColor: COLORS.IT,
+            tension: 0.2,
+            borderWidth: 2,
+            pointRadius: 3
+          },
+          {
+            label: 'Mondo (IMF, media globale)',
+            data: wd.map(v=>v*100),
+            borderColor: COLORS.WORLD,
+            backgroundColor: COLORS.WORLD,
+            tension: 0.2,
+            borderWidth: 2,
+            pointRadius: 3
+          }
+        ]
+      },
+      options: {
+        responsive:true,
+        maintainAspectRatio:false,
+        animation:false,
+        plugins:{
+          legend:{ position:'bottom' },
+          tooltip:{ enabled:true, callbacks:{ label: (ctx)=> `${ctx.dataset.label}: ${fmtPCT1.format((ctx.parsed.y/100) || 0)}` } }
+        },
+        scales:{
+          y:{ beginAtZero:true, ticks:{ callback:(v)=>fmtPCT1.format(v/100) } },
+          x:{ grid:{ display:false } }
+        }
+      }
+    });
+  }
+}
+
 
     function drawTWCIndex(){
       const uscita = TWC_BOTTLES.map(b=>+b.release||0);
@@ -1410,7 +1490,7 @@
           data:{
             labels: yearLabels,
             datasets:[
-              {label:'Capitale investito',  data:principalCum,backgroundColor:COLORS.SIM_INVESTITO, stack:'tot'},
+              {label:'Valore Collezione',  data:principalCum,backgroundColor:COLORS.SIM_INVESTITO, stack:'tot'},
               {label:'Margine di sicurezza',data:safetyCum,   backgroundColor:COLORS.SIM_MARGINE,   stack:'tot'},
               {label:'Rendimento',          data:interestCum, backgroundColor:COLORS.SIM_RENDIMENTO,stack:'tot'}
             ]
@@ -1444,14 +1524,20 @@
       }
 
       function buildBenchSection(metric){
-        const P0   = parseFloat($('initial').value)||0;
-        const Ysim = Math.min(50, Math.max(1, parseInt($('years').value)||1));
+        const P0BudgetRaw = parseFloat($('initial').value) || 0;
+        const Ysim = Math.min(50, Math.max(1, parseInt($('years').value) || 1));
         const Y    = Math.min(10, Ysim);
 
+        let mPct = parseFloat($('safetyMargin').value);
+        if (!isFinite(mPct)) mPct = 0;
+        mPct = Math.max(0, Math.min(100, mPct));
+        const marginAmount = P0BudgetRaw * (mPct / 100);
+        const P0Total = Math.max(0, P0BudgetRaw + marginAmount);
+
         const activeKeys = [];
-        if($('chkGOLD')?.checked) activeKeys.push('GOLD');
-        if($('chkNDX')?.checked)  activeKeys.push('NDX');
-        if($('chkSPX')?.checked)  activeKeys.push('SPX');
+        if ($('chkGOLD')?.checked) activeKeys.push('GOLD');
+        if ($('chkNDX')?.checked)  activeKeys.push('NDX');
+        if ($('chkSPX')?.checked)  activeKeys.push('SPX');
 
         const canvas = document.createElement('canvas');
         canvas.width  = 1000;
@@ -1461,27 +1547,26 @@
         let rows = [];
         let chartConfig = null;
 
-        if(metric==='return'){
-          const labels = Array.from({length:Y+1},(_,i)=> i===0 ? 'T0' : 'Anno '+i);
-          const baseR = (parseFloat($('rate').value)||0)/100;
-          const mt    = $('mgmtType').value;
-          const mv    = parseFloat($('mgmtValue').value)||0;
-          const twc   = parseFloat($('twcValue').value)||0;
+        if (metric === 'return') {
+          const labels = Array.from({ length: Y + 1 }, (_, i) => i === 0 ? 'T0' : 'Anno ' + i);
+          const baseR  = (parseFloat($('rate').value) || 0) / 100;
+          const mt     = $('mgmtType').value;
+          const mv     = parseFloat($('mgmtValue').value) || 0;
+          const twcPct = parseFloat($('twcValue').value) || 0;
 
           const sim = compute({
-            P0Budget: P0,
-            P0Total:  P0,
-            Y: Y,
-            baseR: baseR,
+            P0Budget: P0BudgetRaw,
+            P0Total:  P0Total,
+            Y:        Y,
+            baseR:    baseR,
             mgmtType: mt,
             mgmtValue: mv,
-            twcPct: twc,
-            periods: periods,
+            twcPct:   twcPct,
+            periods:  periods,
             histRates: null
           });
 
-
-          const twcCurve = [P0].concat(sim.rows.map(r=>r.end));
+          const twcCurve = [P0Total].concat(sim.rows.map(r => r.end));
           const twcVol   = computeTWCVolFromSeries(Y);
           const datasets = [];
 
@@ -1498,21 +1583,22 @@
             rows.push([
               name,
               fmtEUR.format(vN),
-              (CAGR(P0, vN, Y)*100).toFixed(2)+'%',
+              (CAGR(P0Total, vN, Y)*100).toFixed(2)+'%',
               (vol*100).toFixed(1)+'%'
             ]);
           }
 
-          const twcFinal = twcCurve[twcCurve.length-1];
+          const twcFinal = twcCurve[twcCurve.length - 1];
           addRow('TWC', twcFinal, twcVol);
 
-          activeKeys.forEach(key=>{
+          activeKeys.forEach(key => {
             const K     = BENCH[key];
             const rates = K.rates.slice(-Y);
-            const curve = wealthFromReturns(P0, rates, Y);
-            const color = (key==='GOLD') ? COLORS.GOLD :
-                          (key==='NDX')  ? COLORS.NDX  :
-                                          COLORS.SPX;
+            const curve = wealthFromReturns(P0Total, rates, Y);
+            const color = (key === 'GOLD') ? COLORS.GOLD :
+                          (key === 'NDX')  ? COLORS.NDX  :
+                                              COLORS.SPX;
+
             datasets.push({
               type:'line',
               label:K.name,
@@ -1521,10 +1607,11 @@
               tension:0.15,
               borderColor:color
             });
-            const vol = (key==='GOLD') ? VOL_FIX.GOLD :
-                        (key==='NDX')  ? VOL_FIX.NDX  :
-                                        VOL_FIX.SPX;
-            addRow(K.name, curve[curve.length-1], vol);
+
+            const vol = (key === 'GOLD') ? VOL_FIX.GOLD :
+                        (key === 'NDX')  ? VOL_FIX.NDX  :
+                                            VOL_FIX.SPX;
+            addRow(K.name, curve[curve.length - 1], vol);
           });
 
           chartConfig = {
@@ -1539,15 +1626,15 @@
 
           head = ['Asset','Valore finale','CAGR','Vol annua'];
 
-        } else if(metric==='vol'){
+        } else if (metric === 'vol') {
           const Yvol = Math.min(10, Ysim);
           const labelsVol = ['TWC'];
           const dataVol   = [ computeTWCVolFromSeries(Yvol) ];
           const colorsVol = [ COLORS.TWC ];
 
-          if(activeKeys.includes('NDX'))  { labelsVol.push('Nasdaq 100'); dataVol.push(VOL_FIX.NDX);  colorsVol.push(COLORS.NDX); }
-          if(activeKeys.includes('SPX'))  { labelsVol.push('S&P 500');   dataVol.push(VOL_FIX.SPX);  colorsVol.push(COLORS.SPX); }
-          if(activeKeys.includes('GOLD')) { labelsVol.push('Oro');       dataVol.push(VOL_FIX.GOLD); colorsVol.push(COLORS.GOLD); }
+          if (activeKeys.includes('NDX'))  { labelsVol.push('Nasdaq 100'); dataVol.push(VOL_FIX.NDX);  colorsVol.push(COLORS.NDX); }
+          if (activeKeys.includes('SPX'))  { labelsVol.push('S&P 500');   dataVol.push(VOL_FIX.SPX);  colorsVol.push(COLORS.SPX); }
+          if (activeKeys.includes('GOLD')) { labelsVol.push('Oro');       dataVol.push(VOL_FIX.GOLD); colorsVol.push(COLORS.GOLD); }
 
           chartConfig = {
             type:'bar',
@@ -1625,15 +1712,16 @@
         }
 
         const localChart = new Chart(canvas, chartConfig);
-        const dataURL = canvas.toDataURL('image/png',1.0);
+        const dataURL = canvas.toDataURL('image/png', 1.0);
         localChart.destroy();
 
         return {
-          img: { dataURL, fmt:'PNG', width:canvas.width, height:canvas.height },
+          img:  { dataURL, fmt:'PNG', width:canvas.width, height:canvas.height },
           head,
           rows
         };
       }
+
 
       function buildTWCSection(){
         const uscita = TWC_BOTTLES.map(b=>+b.release||0);
@@ -1775,7 +1863,7 @@
 
 
       const kpiRows = [
-        ['Capitale investito', $('kpiPrincipal').innerText || ''],
+        ['Valore Collezione', $('kpiPrincipal').innerText || ''],
         ['Guadagno netto',     $('kpiGain').innerText      || ''],
         ['Valore finale',      $('kpiFinal').innerText     || ''],
         ['Quota Cliente',      $('kpiClient').innerText    || ''],
